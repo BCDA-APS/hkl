@@ -51,7 +51,7 @@ opts.AddOptions(
 #---------------------------------------------------------
 # Setting up environment
 #---------------------------------------------------------
-env = Environment(tools = ['default', 'packaging'], options = opts)
+env = Environment(tools = ['default', 'packaging', 'vala'], options = opts)
 
 # create the build directory
 build_dir = os.path.join(env['mode'], platform_name)
