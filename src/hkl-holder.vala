@@ -12,12 +12,15 @@ public class Hkl.Holder {
 
 	public Holder.copy(Holder src, List<Axis> axes)
 	{
+		this.axes = axes;
+		this.private_axes = new List<weak Axis>();
+
 		/* populate the private_axes from the axes */
 		uint i = 0U;
 		for(; i<src.private_axes.size(); ++i) {
 			weak Axis axis = src.private_axes.get(i);
 			int idx = src.axes.index_of(axis);
-			axis = axes.get(idx);
+			axis = this.axes.get(idx);
 			this.private_axes.add(axis);
 		}
 
