@@ -5,7 +5,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_sf_trig.h>
 
-#include <hkl/hkl-pseudoaxis.h>
+#include <hkl-pseudoaxis.h>
 
 HKL_BEGIN_DECLS
 

@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include <hkl/hkl-detector.h>
+#include <hkl-detector.h>
 
 #include "hkl-test.h"
 

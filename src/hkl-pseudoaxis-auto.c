@@ -1,7 +1,7 @@
 #include <gsl/gsl_multiroots.h>
 #include <gsl/gsl_sf_trig.h>
 
-#include <hkl/hkl-pseudoaxis.h>
+#include <hkl-pseudoaxis.h>
 
 typedef struct
 {
@@ -52,8 +52,8 @@ static int auto_to_pseudoAxes(void *vstate,
 	// R * UB
 	// for now the 0 holder is the sample holder.
 	holder = hkl_geometry_get_holder(engine->geom, 0);
-	hkl_quaternion_to_smatrix(holder->q, &RUB);
-	hkl_matrix_times_smatrix(&RUB, engine->sample->UB);
+	hkl_quaternion_to_smatrix(&holder->q, &RUB);
+	hkl_matrix_times_smatrix(&RUB, &engine->sample->UB);
 
 	// kf - ki = Q
 	hkl_source_get_ki(engine->geom->source, &ki);
@@ -66,9 +66,9 @@ static int auto_to_pseudoAxes(void *vstate,
 	H = hkl_list_get_by_idx(engine->pseudoAxes, 0);
 	K = hkl_list_get_by_idx(engine->pseudoAxes, 1);
 	L = hkl_list_get_by_idx(engine->pseudoAxes, 2);
-	H->config.value = hkl.data[0];
-	K->config.value = hkl.data[1];
-	L->config.value = hkl.data[2];
+	H->config.value = hkl.x;
+	K->config.value = hkl.y;
+	L->config.value = hkl.z;
 
 	return HKL_SUCCESS;
 }

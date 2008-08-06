@@ -1,10 +1,10 @@
 #ifndef __HKL_SAMPLE_H__
 #define __HKL_SAMPLE_H__
 
-#include <hkl/hkl-lattice.h>
-#include <hkl/hkl-geometry.h>
-#include <hkl/hkl-detector.h>
-#include <hkl/hkl-list.h>
+#include <hkl-lattice.h>
+#include <hkl-geometry.h>
+#include <hkl-detector.h>
+#include <hkl-list.h>
 
 HKL_BEGIN_DECLS
 
@@ -20,8 +20,8 @@ struct _HklSample {
 	const char *name;
 	HklSampleType type;
 	HklLattice *lattice;
-	HklMatrix *U;
-	HklMatrix *UB;
+	HklMatrix U;
+	HklMatrix UB;
 	HklList *reflections;
 };
 

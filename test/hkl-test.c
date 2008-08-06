@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <hkl/hkl-macros.h>
+#include <hkl-macros.h>
 
 #include "hkl-test.h"
 

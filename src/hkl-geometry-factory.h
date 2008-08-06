@@ -2,7 +2,7 @@
 #define __HKL_GEOMETRY_FACTORY_H__
 
 #include <stdarg.h>
-#include <hkl/hkl-geometry.h>
+#include <hkl-geometry.h>
 
 HKL_BEGIN_DECLS
 

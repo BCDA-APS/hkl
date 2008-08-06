@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "hkl/hkl-lattice.h"
+#include <hkl-lattice.h>
 
 /* private */
 
@@ -120,17 +120,17 @@ int hkl_lattice_get_B(HklLattice const *l, HklMatrix *B)
 	b22 = HKL_TAU / l->c->value;
 	tmp = b22 / s_alpha;
 
-	B->data[0][0] = HKL_TAU * s_alpha / (l->a->value * D);
-	B->data[0][1] = b11 / D * (c_alpha*c_beta - c_gamma);
-	B->data[0][2] = tmp / D * (c_gamma*c_alpha - c_beta);
+	B->m11 = HKL_TAU * s_alpha / (l->a->value * D);
+	B->m12 = b11 / D * (c_alpha*c_beta - c_gamma);
+	B->m13 = tmp / D * (c_gamma*c_alpha - c_beta);
 
-	B->data[1][0] = 0;
-	B->data[1][1] = b11;
-	B->data[1][2] = tmp / (s_beta*s_gamma) * (c_beta*c_gamma - c_alpha);
+	B->m21 = 0;
+	B->m22 = b11;
+	B->m23 = tmp / (s_beta*s_gamma) * (c_beta*c_gamma - c_alpha);
 
-	B->data[2][0] = 0;
-	B->data[2][1] = 0;
-	B->data[2][2] = b22;
+	B->m31 = 0;
+	B->m32 = 0;
+	B->m33 = b22;
 
 	return HKL_SUCCESS;
 }
@@ -181,7 +181,7 @@ int hkl_lattice_reciprocal(HklLattice const *l, HklLattice *reciprocal)
 
 void hkl_lattice_randomize(HklLattice *l)
 {
-	static HklVector vector_x = {{1, 0, 0}};
+	static HklVector vector_x = {1, 0, 0};
 	HklVector a, b, c;
 	HklVector axe;
 	unsigned int angles_to_randomize;

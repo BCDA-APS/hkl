@@ -1,7 +1,7 @@
 #include <math.h>
 
-#include <hkl/hkl-sample.h>
-#include <hkl/hkl-geometry-factory.h>
+#include <hkl-sample.h>
+#include <hkl-geometry-factory.h>
 
 #include "hkl-test.h"
 

@@ -1,7 +1,7 @@
 #ifndef __HKL_PARAMETER_H__
 #define __HKL_PARAMETER_H__
 
-#include <hkl/hkl-interval.h>
+#include <hkl-interval.h>
 
 HKL_BEGIN_DECLS
 

@@ -14,18 +14,20 @@ sources = Split("""
                 hkl-test-interval.c
                 hkl-test-source.c
                 hkl-test-axis.c
-                hkl-test-holder.c
                 hkl-test-geometry.c
+                main.c
+                """)
+
+"""
+                hkl-test-holder.c
                 hkl-test-detector.c
                 hkl-test-parameter.c
                 hkl-test-list.c
                 hkl-test-lattice.c
                 hkl-test-sample.c
                 hkl-test-pseudoaxis.c
-                main.c
-                """)
-
-includes = ['#include']
+		"""
+includes = ['../src']
 
 libpath = ['../src']
 
@@ -37,6 +39,8 @@ lenv.AppendUnique(CPPPATH = includes)
 lenv.AppendUnique(LIBS = libs)
 lenv.AppendUnique(LIBPATH = libpath)
 
+lenv.MergeFlags(['!pkg-config glib-2.0 --cflags --libs'])
+lenv.MergeFlags(['!pkg-config gobject-2.0 --cflags --libs'])
 test = lenv.Program(target = 'test', source = sources)
 lenv.Test("test.passed", test)
 Default(lenv.Alias("check", "test.passed"))

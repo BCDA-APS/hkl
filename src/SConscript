@@ -3,29 +3,36 @@ Import('env')
 
 lenv = env.Clone()
 
+sources_vala = Split("""
+         hkl-constants.vala
+         hkl-vector.vala
+         hkl-interval.vala
+         hkl-source.vala
+         hkl-axis.vala
+         hkl-list.vala
+         hkl-holder.vala
+         hkl-geometry.vala
+         """)
+
 sources = Split("""
-                hkl-vector.c
-                hkl-matrix.c
-                hkl-quaternion.c
-                hkl-interval.c
-                hkl-source.c
-                hkl-axis.c
-                hkl-list.c
-                hkl-holder.c
-                hkl-geometry.c
+                usage.c
+                """)
+"""
+
                 hkl-detector.c
                 hkl-parameter.c
                 hkl-lattice.c
                 hkl-sample.c
                 hkl-pseudoaxis.c
                 hkl-pseudoaxis-auto.c
-                usage.c
-                """)
+                """
 
-includes = ['#include']
+includes = ['.']
 
 lenv.AppendUnique(CPPPATH = includes)
+lenv.MergeFlags(['!pkg-config glib-2.0 --cflags --libs'])
 
-#libhkl = lenv.SharedLibrary(target = 'hkl', source = sources)
-libhkl = lenv.Library(target = 'hkl', source = sources)
+vala = lenv.Vala(sources_vala)
+
+libhkl = lenv.Library(target = 'hkl', source = [vala, sources])
 Default(libhkl)

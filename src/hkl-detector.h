@@ -1,7 +1,7 @@
 #ifndef __HKL_DETECTOR_H__
 #define __HKL_DETECTOR_H__
 
-#include <hkl/hkl-geometry.h>
+#include <hkl-geometry.h>
 
 HKL_BEGIN_DECLS
 

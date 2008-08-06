@@ -1,6 +1,7 @@
 #include <math.h>
 
-#include <hkl/hkl-source.h>
+#include <hkl-source.h>
+#include <hkl-constants.h>
 
 #include "hkl-test.h"
 
@@ -9,95 +10,66 @@
 #endif
 #define HKL_TEST_SUITE_NAME source
 
-HKL_TEST_SUITE_FUNC(new)
-{
-	HklSource *s;
-
-	s = hkl_source_new(1.54, 1, 0, 0);
-	
-	HKL_ASSERT_DOUBLES_EQUAL(1.54, s->wave_length, HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1., s->direction->data[0], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., s->direction->data[1], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., s->direction->data[2], HKL_EPSILON);
-
-	hkl_source_free(s);
-
-	return HKL_TEST_PASS;
-}
-
-HKL_TEST_SUITE_FUNC(new_copy)
-{
-	HklSource *s, *c;
-
-	s = hkl_source_new(1.54, 1, 0, 0);
-	c = hkl_source_new_copy(s);
-	
-	HKL_ASSERT_DOUBLES_EQUAL(c->wave_length, s->wave_length, HKL_EPSILON);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_vector_cmp(c->direction, s->direction));
-
-	hkl_source_free(s);
-	hkl_source_free(c);
-
-	return HKL_TEST_PASS;
-}
-
 HKL_TEST_SUITE_FUNC(set)
 {
-	HklSource *s;
+	HklSource s;
 
-	s = hkl_source_new(1.54, 1, 0, 0);
-	hkl_source_set(s, 1, 1, 0, 0);
+	hkl_source_set(&s, 1, 1, 0, 0);
 	
-	HKL_ASSERT_DOUBLES_EQUAL(1., s->wave_length, HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1., s->direction->data[0], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., s->direction->data[1], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., s->direction->data[2], HKL_EPSILON);
-
-	hkl_source_free(s);
+	HKL_ASSERT_DOUBLES_EQUAL(1., s.wave_length, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., s.direction.x, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., s.direction.y, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., s.direction.z, hkl_EPSILON);
 
 	return HKL_TEST_PASS;
 }
 
 HKL_TEST_SUITE_FUNC(cmp)
 {
-	HklSource *ref, *s1, *s2;
+	HklSource ref, s1, s2;
 
-	ref = hkl_source_new(1.54, 1, 0, 0);
-	s1 = hkl_source_new(1.54, 1, 0, 0);
-	s2 = hkl_source_new(1, 1, 0, 0);
+	hkl_source_set(&ref, 1.54, 1, 0, 0);
+	hkl_source_set(&s1, 1.54, 1, 0, 0);
+	hkl_source_set(&s2, 1, 1, 0, 0);
 
-	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_source_cmp(ref, s1));
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_source_cmp(ref, s2));
+	HKL_ASSERT_EQUAL(0, hkl_source_cmp(&ref, &s1));
+	HKL_ASSERT_EQUAL(0, !hkl_source_cmp(&ref, &s2));
 
-	hkl_source_free(ref);
-	hkl_source_free(s1);
-	hkl_source_free(s2);
+	return HKL_TEST_PASS;
+}
+
+HKL_TEST_SUITE_FUNC(copy)
+{
+	HklSource s1, s2;
+
+	hkl_source_set(&s1, 1.54, 1, 0, 0);
+	s2 = s1;
+	
+	HKL_ASSERT_DOUBLES_EQUAL(s1.wave_length, s2.wave_length, hkl_EPSILON);
+	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&s1.direction, &s2.direction));
 
 	return HKL_TEST_PASS;
 }
 
 HKL_TEST_SUITE_FUNC(get_ki)
 {
-	HklSource *s;
-	HklVector ki_ref = {{HKL_TAU / 1.54, 0, 0}};
+	HklSource s;
+	HklVector ki_ref = {hkl_TAU / 1.54, 0, 0};
 	HklVector ki;
 
-	s = hkl_source_new(1.54, 1, 0, 0);
+	hkl_source_set(&s, 1.54, 1, 0, 0);
 
-	hkl_source_get_ki(s, &ki);
+	hkl_source_get_ki(&s, &ki);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&ki_ref, &ki));
-
-	hkl_source_free(s);
 
 	return HKL_TEST_PASS;
 }
 
 HKL_TEST_SUITE_BEGIN
 
-HKL_TEST( new );
-HKL_TEST( new_copy );
 HKL_TEST( set );
 HKL_TEST( cmp );
+HKL_TEST( copy );
 HKL_TEST( get_ki );
 
 HKL_TEST_SUITE_END

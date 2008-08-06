@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "hkl-test.h"
+#include <glib-object.h>
 
 int main(int argc, char **argv)
 {
@@ -9,6 +10,7 @@ int main(int argc, char **argv)
 	struct hkl_tests tests;
 
 	hkl_tests_init(&tests, 0);
+	g_type_init();
 
 	HKL_TEST_SUITE( vector );
 	HKL_TEST_SUITE( smatrix );
@@ -16,14 +18,16 @@ int main(int argc, char **argv)
 	HKL_TEST_SUITE( interval );
 	HKL_TEST_SUITE( source );
 	HKL_TEST_SUITE( axis );
+	HKL_TEST_SUITE( geometry );
+	/*
 	HKL_TEST_SUITE( holder );
 	HKL_TEST_SUITE( detector );
-	HKL_TEST_SUITE( geometry );
 	HKL_TEST_SUITE( parameter );
 	HKL_TEST_SUITE( lattice );
 	HKL_TEST_SUITE( list );
 	HKL_TEST_SUITE( sample );
 	HKL_TEST_SUITE( pseudoaxis );
+	*/
 	
 	res = hkl_tests_run(&tests);
 	hkl_tests_release(&tests);

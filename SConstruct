@@ -68,7 +68,7 @@ cppdefines = []
 linkflags = []
 
 if platform_name == 'linux2':
-  cflags += ['-Wall']
+  cflags += ['-Wall', '-std=c99']
   cxxflags += ['-Wall']
 elif platform_name == 'win32':
   cflags += ['/GX', '/MD', '/GR']
@@ -111,6 +111,7 @@ def builder_unit_test(target, source, env):
 
 bld = Builder(action = builder_unit_test)
 env.Append(BUILDERS = {'Test' :  bld})
+
 opts.Save(option_file, env)
 
 #----------------------------------------------------------

@@ -5,8 +5,8 @@
 //#include <gsl/gsl_vector.h>
 #include <gsl/gsl_multiroots.h>
 
-#include <hkl/hkl-detector.h>
-#include <hkl/hkl-sample.h>
+#include <hkl-detector.h>
+#include <hkl-sample.h>
 
 HKL_BEGIN_DECLS
 

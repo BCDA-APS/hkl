@@ -2,7 +2,7 @@
 #define __HKL_PSEUDOAXIS_TWOC_VERTICAL_H__
 
 #include <stdarg.h>
-#include <hkl/hkl-pseudoaxis.h>
+#include <hkl-pseudoaxis.h>
 
 HKL_BEGIN_DECLS
 

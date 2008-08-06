@@ -1,4 +1,4 @@
-#include <hkl/hkl-pseudoaxis.h>
+#include <hkl-pseudoaxis.h>
 
 /* private */
 static HklPseudoAxis *hkl_pseudoAxis_new(char const *name,
@@ -161,8 +161,8 @@ int RUBh_minus_Q(const gsl_vector *x, void *params, gsl_vector *f)
 	// R * UB * h = Q
 	// for now the 0 holder is the sample holder.
 	holder = hkl_geometry_get_holder(engine->geom, 0);
-	hkl_matrix_times_vector(engine->sample->UB, &Hkl);
-	hkl_vector_rotated_quaternion(&Hkl, holder->q);
+	hkl_matrix_times_vector(&engine->sample->UB, &Hkl);
+	hkl_vector_rotated_quaternion(&Hkl, &holder->q);
 
 	// kf - ki = Q
 	hkl_source_get_ki(engine->geom->source, &ki);
@@ -171,9 +171,9 @@ int RUBh_minus_Q(const gsl_vector *x, void *params, gsl_vector *f)
 
 	hkl_vector_minus_vector(&dQ, &Hkl);
 
-	gsl_vector_set (f, 0, dQ.data[0]);
-	gsl_vector_set (f, 1, dQ.data[1]);
-	gsl_vector_set (f, 2, dQ.data[2]);
+	gsl_vector_set (f, 0, dQ.x);
+	gsl_vector_set (f, 1, dQ.y);
+	gsl_vector_set (f, 2, dQ.z);
 
 	return GSL_SUCCESS;
 }

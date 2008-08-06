@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <hkl/hkl-parameter.h>
+#include <hkl-parameter.h>
 
 HklParameter *hkl_parameter_new(char const *name,
 		double min, double value, double max, int not_to_fit)

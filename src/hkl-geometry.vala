@@ -1,0 +1,84 @@
+public class Hkl.Geometry
+{
+	public Source source;
+	List<Axis> axes;
+	List<Holder> holders;
+
+	public Geometry()
+	{
+		this.source.set(1.54, 1., 0., 0.);
+		this.axes = new List<Axis>();
+		this.holders = new List<Holder>();
+	}
+
+	public Geometry copy()
+	{
+		Geometry copy = new Geometry();
+		copy.source = this.source;
+		uint i;
+		// make a deep copy of the axes
+		for(i=0U; i<this.axes.size(); ++i) {
+			weak Axis axis = this.axes.get(i);
+			copy.axes.add(axis.copy());
+		}
+
+		// make a deep copy of the holders
+		for(i=0U; i<this.holders.size(); ++i) {
+			weak Holder holder = this.holders.get(i);
+			copy.holders.add(holder.copy(copy.axes));
+		}
+
+		return copy;
+	}
+
+	public weak Holder add_holder()
+	{
+		Holder holder = new Holder(this.axes);
+		this.holders.add(holder);
+
+		return holder;
+	}
+
+	public weak Holder get_holder(uint idx)
+	{
+		return this.holders.get(idx);
+	}
+
+	public weak Axis get_axis(uint idx)
+	{
+		return this.axes.get(idx);
+	}
+
+	public uint get_holders_size()
+	{
+		return this.holders.size();
+	}
+
+	public uint get_axes_size()
+	{
+		return this.axes.size();
+	}
+
+	public void update()
+	{
+		uint i;
+		for(i=0U; i<this.holders.size(); ++i) {
+			weak Holder holder = this.holders.get(i);
+			holder.update();
+		}
+
+		for(i=0U; i<this.axes.size(); ++i) {
+			weak Axis axis = this.axes.get(i);
+			axis.clear_dirty();
+		}
+	}
+
+	public void fprintf(FileStream stream)
+	{
+		uint i;
+		for(i=0U; i<this.axes.size(); ++i) {
+			weak Axis axis = this.axes.get(i);
+			stream.printf(" %s : %f", axis.name, axis.config.value);
+		}
+	}
+}
