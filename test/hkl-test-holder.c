@@ -3,6 +3,7 @@
 
 #include <hkl-holder.h>
 #include <hkl-axis.h>
+#include <hkl-list.h>
 #include <hkl-constants.h>
 
 #include "hkl-test.h"
@@ -15,30 +16,30 @@
 HKL_TEST_SUITE_FUNC(new_copy)
 {
 	HklAxis *axis;
-	GeeArrayList *axes1, *axes2;
+	HklList *axes1, *axes2;
 	HklHolder *holder, *copy;
 	HklVector axis_v = {1, 0, 0};
 	unsigned int i;
 
-	axes1 = gee_array_list_new();
-	axes2 = gee_array_list_new();
-	holder = hkl_holder_new(&axes1);
+	axes1 = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
+	axes2 = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
+	holder = hkl_holder_new(axes1);
 
 	// add two different axis
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
 	hkl_holder_add_rotation_axis(holder, "b", 1, 0, 0);
 
 	// can not copy as axes1 and axes2 are not compatible
-	copy = hkl_holder_copy(holder, &axes2);
+	copy = hkl_holder_new_copy(holder, axes2);
 	HKL_ASSERT_POINTER_EQUAL(NULL, copy);
 	
 	// so set a compatible axes2 and copy the holder
 	axis = hkl_axis_new("a", &axis_v);
-	axes2 = gee_collection_add(axes2, axis);
+	hkl_list_add(axes2, axis);
 	axis = hkl_axis_new("b", &axis_v);
-	axes2 = gee_collection_add(axes2, axis);
+	hkl_list_add(axes2, axis);
 
-	copy = hkl_holder_copy(holder, &axes2);
+	copy = hkl_holder_new_copy(holder, axes2);
 
 	// check that private_axes are the same
 	for(i=0; i<hkl_holder_length(holder); ++i) {
@@ -53,10 +54,11 @@ HKL_TEST_SUITE_FUNC(new_copy)
 
 HKL_TEST_SUITE_FUNC(add_rotation_axis)
 {
-	GList *axes = NULL;
+	HklList *axes = NULL;
 	HklHolder *holder = NULL;
 
-	holder = hkl_holder_new(&axes);
+	axes = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
+	holder = hkl_holder_new(axes);
 
 	// add two different axis
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
@@ -75,10 +77,11 @@ HKL_TEST_SUITE_FUNC(update)
 {
 	HklAxis *axis = NULL;
 	HklAxisConfig config;
-	GList *axes = NULL;
+	HklList *axes = NULL;
 	HklHolder *holder = NULL;
 	unsigned int i;
 
+	axes = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
 	holder = hkl_holder_new(&axes);
 
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
