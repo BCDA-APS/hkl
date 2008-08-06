@@ -18,11 +18,11 @@ public class Hkl.Axis {
 		this.config.dirty = true;
 	}
 
-	public Axis copy()
+	public Axis.copy(Axis src)
 	{
-		Axis copy = new Axis(this.name, this.axis_v);
-		copy.config = this.config;
-		return copy;
+		this.name = src.name;
+		this.axis_v = src.axis_v;
+		this.config = src.config;
 	}
 
 	public void get_config(ref AxisConfig config)

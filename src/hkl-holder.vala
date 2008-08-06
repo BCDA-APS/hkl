@@ -10,23 +10,19 @@ public class Hkl.Holder {
 		q.set(1., 0., 0., 0.);
 	}
 
-	public Holder? copy(List<Axis> axes) requires (axes.size() == this.axes.size())
+	public Holder.copy(Holder src, List<Axis> axes)
 	{
-		Holder copy = new Holder(axes);
-
 		/* populate the private_axes from the axes */
 		uint i = 0U;
-		for(; i<this.private_axes.size(); ++i) {
-			weak Axis axis = this.private_axes.get(i);
-			int idx = this.axes.index_of(axis);
+		for(; i<src.private_axes.size(); ++i) {
+			weak Axis axis = src.private_axes.get(i);
+			int idx = src.axes.index_of(axis);
 			axis = axes.get(idx);
-			copy.private_axes.add(axis);
+			this.private_axes.add(axis);
 		}
 
 		/* now copy the quaternion */
-		copy.q = this.q;
-
-		return copy;
+		this.q = src.q;
 	}
 
 	public weak Axis add_rotation_axis(string name,
