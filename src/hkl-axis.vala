@@ -5,10 +5,11 @@ public struct Hkl.AxisConfig {
 }
 
 public class Hkl.Axis {
-	public string name;
+	public weak string name;
 	public Vector axis_v;
 	public AxisConfig config;
 
+	/* becareful the name must be a static string */
 	public Axis(string name, Vector axis_v) {
 		this.name = name;
 		this.axis_v = axis_v;
