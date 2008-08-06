@@ -28,7 +28,6 @@ HKL_TEST_SUITE_FUNC(add_holder)
 	HKL_ASSERT_EQUAL(2, hkl_geometry_get_holders_size(g));
 
 	HKL_ASSERT_EQUAL(3, hkl_geometry_get_axes_size(g));
-	//HKL_ASSERT_POINTER_EQUAL(NULL, hkl_geometry_get_holder(g, 2));
 	HKL_ASSERT_POINTER_EQUAL(holder, hkl_geometry_get_holder(g, 1));
 
 	return HKL_TEST_PASS;
