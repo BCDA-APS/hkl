@@ -17,11 +17,11 @@ sources = Split("""
                 hkl-test-holder.c
                 hkl-test-geometry.c
                 hkl-test-detector.c
+                hkl-test-parameter.c
                 main.c
                 """)
 
 """
-                hkl-test-parameter.c
                 hkl-test-list.c
                 hkl-test-lattice.c
                 hkl-test-sample.c

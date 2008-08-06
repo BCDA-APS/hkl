@@ -13,6 +13,7 @@ sources_vala = Split("""
          hkl-holder.vala
          hkl-geometry.vala
          hkl-detector.vala
+         hkl-parameter.vala
          """)
 
 sources = Split("""
@@ -20,7 +21,6 @@ sources = Split("""
                 """)
 """
 
-                hkl-parameter.c
                 hkl-lattice.c
                 hkl-sample.c
                 hkl-pseudoaxis.c
