@@ -7,6 +7,11 @@ public struct Hkl.Parameter {
 	/* becarefull only static name */
 	public Parameter(string name, double min, double value, double max, bool to_fit)
 	{
+		this.set(name, min, value, max, to_fit);
+	}
+
+	public void set(string name, double min, double value, double max, bool to_fit)
+	{
 		this.name = name;
 		this.range.min = min;
 		this.range.max = max;

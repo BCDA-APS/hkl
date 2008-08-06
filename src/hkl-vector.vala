@@ -145,7 +145,7 @@ public struct Hkl.Vector {
 		while (!this.cmp(v) || !this.cmp(v1));
 	}
 
-	public void rotated_around_vector(out Vector axe, double angle)
+	public void rotated_around_vector(Vector axe, double angle)
 	{
 		double c = Math.cos(angle);
 		double s = Math.sin(angle);

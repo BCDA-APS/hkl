@@ -18,12 +18,12 @@ sources = Split("""
                 hkl-test-geometry.c
                 hkl-test-detector.c
                 hkl-test-parameter.c
+                hkl-test-lattice.c
                 main.c
                 """)
 
 """
                 hkl-test-list.c
-                hkl-test-lattice.c
                 hkl-test-sample.c
                 hkl-test-pseudoaxis.c
 		"""
