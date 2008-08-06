@@ -1,30 +1,42 @@
 public class Hkl.List<T>
 {
-	GLib.List<T> list;
+	uint length;
+	T[] list;
 
-	public void add(T# item)
+	public List()
 	{
-		this.list.append(item);
+		this.length = 0;
+		/* for now a hack reserve enought space*/
+		this.list = new T[100];
+	}
+
+	public void add(T# item) requires (this.length < this.list.length)
+	{
+		this.list[this.length++] = item;
 	}
 
 	public uint size()
 	{
-		return this.list.length();
+		return this.length;
 	}
 
-	public weak T get(uint idx) requires (idx <this.list.length())
+	public weak T get(uint idx) requires (idx <this.length)
 	{
-		return this.list.nth_data(idx); 
+		return this.list[idx]; 
 	}
 
 	public int index_of(T item)
 	{
-		return this.list.index(item);
+		int i;
+		for(i=0; i<this.length; ++i)
+			if (this.list[i] == item)
+				return i;
+		return -1;
 	}
 
 	public bool contains(T item)
 	{
-		if (this.list.index(item) < 0)
+		if (this.index_of(item) < 0)
 			return false;
 		else
 			return true;
