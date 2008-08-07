@@ -3,6 +3,8 @@
 
 #include <stdarg.h>
 #include <hkl-geometry.h>
+#include <hkl-holder.h>
+#include <hkl-macros.h>
 
 HKL_BEGIN_DECLS
 

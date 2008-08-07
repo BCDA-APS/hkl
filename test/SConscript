@@ -19,12 +19,12 @@ sources = Split("""
                 hkl-test-detector.c
                 hkl-test-parameter.c
                 hkl-test-lattice.c
+                hkl-test-sample.c
                 main.c
                 """)
 
 """
                 hkl-test-list.c
-                hkl-test-sample.c
                 hkl-test-pseudoaxis.c
 		"""
 includes = ['../src']

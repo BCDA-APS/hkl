@@ -23,7 +23,7 @@ public struct Hkl.Source
 	}
 
 	/** compute the ki Vector */
-	public void get_ki(ref Vector ki)
+	public void compute_ki(Vector ki)
 	{
 		double k = TAU / this.wave_length;
 		ki = this.direction;

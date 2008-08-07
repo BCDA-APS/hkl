@@ -51,7 +51,7 @@ HKL_TEST_SUITE_FUNC(copy)
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(get_ki)
+HKL_TEST_SUITE_FUNC(compute_ki)
 {
 	HklSource s;
 	HklVector ki_ref = {hkl_TAU / 1.54, 0, 0};
@@ -59,7 +59,7 @@ HKL_TEST_SUITE_FUNC(get_ki)
 
 	hkl_source_set(&s, 1.54, 1, 0, 0);
 
-	hkl_source_get_ki(&s, &ki);
+	hkl_source_compute_ki(&s, &ki);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&ki_ref, &ki));
 
 	return HKL_TEST_PASS;
@@ -70,6 +70,6 @@ HKL_TEST_SUITE_BEGIN
 HKL_TEST( set );
 HKL_TEST( cmp );
 HKL_TEST( copy );
-HKL_TEST( get_ki );
+HKL_TEST( compute_ki );
 
 HKL_TEST_SUITE_END

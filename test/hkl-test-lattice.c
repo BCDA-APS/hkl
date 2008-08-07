@@ -78,7 +78,7 @@ HKL_TEST_SUITE_FUNC( compute_reciprocal )
 	hkl_lattice_set(&lattice, 1.54, 1.54, 1.54,
 			90*hkl_DEGTORAD, 90*hkl_DEGTORAD, 90*hkl_DEGTORAD);
 
-	hkl_lattice_compute_reciprocal(&lattice, &reciprocal);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_reciprocal(&lattice, &reciprocal));
 
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU / 1.54, reciprocal.a.value, hkl_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU / 1.54, reciprocal.b.value, hkl_EPSILON);
@@ -89,7 +89,7 @@ HKL_TEST_SUITE_FUNC( compute_reciprocal )
 
 	//orthorombic
 	hkl_lattice_set(&lattice, 1., 3., 4., 90 * hkl_DEGTORAD, 90 * hkl_DEGTORAD, 90 * hkl_DEGTORAD);
-	hkl_lattice_compute_reciprocal(&lattice, &reciprocal);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_reciprocal(&lattice, &reciprocal));
 
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU / 1., reciprocal.a.value, hkl_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU / 3., reciprocal.b.value, hkl_EPSILON);
@@ -100,7 +100,7 @@ HKL_TEST_SUITE_FUNC( compute_reciprocal )
 
 	// hexagonal1
 	hkl_lattice_set(&lattice, 1., 2., 1., 90 * hkl_DEGTORAD, 120 * hkl_DEGTORAD, 90 * hkl_DEGTORAD);
-	hkl_lattice_compute_reciprocal(&lattice, &reciprocal);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_reciprocal(&lattice, &reciprocal));
 
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU * 2. / sqrt(3.), reciprocal.a.value, hkl_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU / 2., reciprocal.b.value, hkl_EPSILON);
@@ -111,7 +111,7 @@ HKL_TEST_SUITE_FUNC( compute_reciprocal )
 
 	// hexagonal2
 	hkl_lattice_set(&lattice, 2., 1., 1., 120 * hkl_DEGTORAD, 90 * hkl_DEGTORAD, 90 * hkl_DEGTORAD);
-	hkl_lattice_compute_reciprocal(&lattice, &reciprocal);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_reciprocal(&lattice, &reciprocal));
 
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU / 2., reciprocal.a.value, hkl_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU * 2. / sqrt(3.), reciprocal.b.value, hkl_EPSILON);
@@ -122,7 +122,7 @@ HKL_TEST_SUITE_FUNC( compute_reciprocal )
 
 	// triclinic1
 	hkl_lattice_set(&lattice, 9.32, 8.24, 13.78, 91.23 * hkl_DEGTORAD, 93.64 * hkl_DEGTORAD, 122.21 * hkl_DEGTORAD);
-	hkl_lattice_compute_reciprocal(&lattice, &reciprocal);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_reciprocal(&lattice, &reciprocal));
 
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU * 0.1273130168, reciprocal.a.value, hkl_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU * 0.1437422974, reciprocal.b.value, hkl_EPSILON);
@@ -133,7 +133,7 @@ HKL_TEST_SUITE_FUNC( compute_reciprocal )
 
 	// triclinic2
 	hkl_lattice_set(&lattice, 18.423, 18.417, 18.457, 89.99 * hkl_DEGTORAD, 89.963 * hkl_DEGTORAD, 119.99 * hkl_DEGTORAD);
-	hkl_lattice_compute_reciprocal(&lattice, &reciprocal);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_reciprocal(&lattice, &reciprocal));
 
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU * 0.0626708259, reciprocal.a.value, hkl_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(hkl_TAU * 0.0626912310, reciprocal.b.value, hkl_EPSILON);
@@ -157,7 +157,7 @@ HKL_TEST_SUITE_FUNC( compute_B )
 	// cubic
 	hkl_lattice_init_default(&lattice);
 
-	hkl_lattice_compute_B(&lattice, &B);
+	HKL_ASSERT_EQUAL(TRUE, hkl_lattice_compute_B(&lattice, &B));
 	HKL_ASSERT_EQUAL(FALSE, hkl_matrix_cmp(&B_ref, &B));
 
 	return HKL_TEST_PASS;

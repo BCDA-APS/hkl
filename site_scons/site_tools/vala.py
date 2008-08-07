@@ -5,9 +5,10 @@ vala_action = SCons.Action.Action('$VALACOM', '$VALACOMSTR')
 def vala_emitter(target, source, env):
 	target = []
 	for src in source:
-		tgt = src.target_from_source('', '.c')
-		env.SideEffect(src.target_from_source('', '.h'), src)
-		target.append(tgt)
+		if src.abspath.find('.vapi') == -1:
+			tgt = src.target_from_source('', '.c')
+			env.SideEffect(src.target_from_source('', '.h'), src)
+			target.append(tgt)
 	return target, source
 
 def generate(env):

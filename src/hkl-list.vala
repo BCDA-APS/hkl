@@ -10,9 +10,19 @@ public class Hkl.List<T>
 		this.list = new T[100];
 	}
 
-	public void add(T# item) requires (this.length < this.list.length)
+	public weak T add(T# item) requires (this.length < this.list.length)
 	{
 		this.list[this.length++] = item;
+		return item;
+	}
+
+	public bool del(uint idx) requires (idx < this.length)
+	{
+		uint i=idx;
+		for(; i< this.length - 1; ++i)
+			this.list[i] = this.list[i+1];
+		this.length--;
+		return true;
 	}
 
 	public uint size()

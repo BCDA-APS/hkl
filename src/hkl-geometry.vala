@@ -15,25 +15,24 @@ public class Hkl.Geometry
 	{
 		this.source = src.source;
 		uint i;
+		this.axes = new List<Axis>();
+		this.holders = new List<Holder>();
 		// make a deep copy of the axes
 		for(i=0U; i<src.axes.size(); ++i) {
 			weak Axis axis = src.axes.get(i);
-			this.axes.add(new Axis.copy(axis));
+			axis = this.axes.add(new Axis.copy(axis));
 		}
 
 		// make a deep copy of the holders
 		for(i=0U; i<this.holders.size(); ++i) {
 			weak Holder holder = src.holders.get(i);
-			this.holders.add(new Holder.copy(holder, this.axes));
+			holder = this.holders.add(new Holder.copy(holder, this.axes));
 		}
 	}
 
 	public weak Holder add_holder()
 	{
-		Holder holder = new Holder(this.axes);
-		this.holders.add(holder);
-
-		return holder;
+		return this.holders.add(new Holder(this.axes));
 	}
 
 	public weak Holder get_holder(uint idx)

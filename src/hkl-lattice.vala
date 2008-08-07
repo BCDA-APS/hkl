@@ -6,6 +6,14 @@ public struct Hkl.Lattice
 	public Parameter alpha;
 	public Parameter beta;
 	public Parameter gamma;
+	/*
+	public static Lattice default = {{"a", 0., 1.54, 11.54, false},
+		{"b", 0., 1.54, 11.54, false},
+		{"c", 0., 1.54, 11.54, false},
+		{"alpha", -Math.PI, 90*DEGTORAD, Math.PI, false},
+		{"beta", -Math.PI, 90*DEGTORAD, Math.PI, false},
+		{"gamma", -Math.PI, 90*DEGTORAD, Math.PI, false}}; 
+	*/
 	/* private */
 
 	bool check_lattice_param(double a, double b, double c,
@@ -25,9 +33,9 @@ public struct Hkl.Lattice
 	public Lattice(double a, double b, double c, double alpha, double beta, double gamma)
 	{
 		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)) {
-			this.a.set("a", 0, a, a+10, false);
-			this.b.set("b", 0, b, b+10, false);
-			this.c.set("c", 0, c, c+10, false);
+			this.a.set("a", 0., a, a+10., false);
+			this.b.set("b", 0., b, b+10., false);
+			this.c.set("c", 0., c, c+10., false);
 			this.alpha.set("alpha", -Math.PI, alpha, Math.PI, false);
 			this.beta.set("beta", -Math.PI, beta, Math.PI, false);
 			this.gamma.set("gamma", -Math.PI, gamma, Math.PI, false);
@@ -36,8 +44,12 @@ public struct Hkl.Lattice
 
 	public Lattice.default()
 	{
-		this.set(1.54, 1.54, 1.54,
-				90.*DEGTORAD, 90.*DEGTORAD, 90.*DEGTORAD);
+		this.a.set("a", 0., 1.54, 11.54, false);
+		this.b.set("b", 0., 1.54, 11.54, false);
+		this.c.set("c", 0., 1.54, 11.54, false);
+		this.alpha.set("alpha", -Math.PI, 90*DEGTORAD, Math.PI, false);
+		this.beta.set("beta", -Math.PI, 90*DEGTORAD, Math.PI, false);
+		this.gamma.set("gamma", -Math.PI, 90*DEGTORAD, Math.PI, false);
 	}
 
 	public void set(double a, double b, double c,
@@ -54,9 +66,10 @@ public struct Hkl.Lattice
 	}
 
 	/* 
-	 * Get the B matrix from the l parameters 
+	 * Get the B matrix from the l parameters return true if everything
+	 * goes fine. false if a problem occure.
 	 */
-	public void compute_B(Matrix B)
+	public bool compute_B(Matrix B)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);
@@ -67,7 +80,7 @@ public struct Hkl.Lattice
 		if (D > 0.)
 			D = Math.sqrt(D);
 		else
-			return;
+			return false;
 
 		double s_alpha = Math.sin(this.alpha.value);
 		double s_beta = Math.sin(this.beta.value);
@@ -88,9 +101,11 @@ public struct Hkl.Lattice
 		B.m31 = 0.;
 		B.m32 = 0.;
 		B.m33 = b22;
+
+		return true;
 	}
 
-	public void compute_reciprocal(Lattice reciprocal)
+	public bool compute_reciprocal(Lattice reciprocal)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);
@@ -100,7 +115,7 @@ public struct Hkl.Lattice
 		if (D > 0.)
 			D = Math.sqrt(D);
 		else
-			return;
+			return false;
 
 		double s_alpha = Math.sin(this.alpha.value);
 		double s_beta = Math.sin(this.beta.value);
@@ -123,6 +138,8 @@ public struct Hkl.Lattice
 		reciprocal.alpha.value = Math.atan2(s_beta1, c_beta1);
 		reciprocal.beta.value = Math.atan2(s_beta2, c_beta2);
 		reciprocal.gamma.value = Math.atan2(s_beta3, c_beta3);
+
+		return true;
 	}
 
 	public void randomize()
