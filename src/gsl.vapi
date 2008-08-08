@@ -4151,7 +4151,7 @@ namespace Gsl
 	static delegate int MultirootFdfFree (void* state);
 	
 	[SimpleType]
-	[CCode (cname="gsl_multiroot_function", cheaer_filename="gsl/gsl_multiroots.h")]
+	[CCode (cname="gsl_multiroot_function", cheader_filename="gsl/gsl_multiroots.h")]
 	public struct MultirootFunction
 	{
 		public MultirootF f;
