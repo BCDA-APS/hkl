@@ -1,0 +1,282 @@
+public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
+{
+	public PseudoAxisEngineAuto(string name, string[] names, Geometry g,
+			string[] axes)
+	{
+		base.init(name, names, g, axes);
+	}
+
+	public override bool to_geometry()
+	{
+		int status;
+		uint i;
+		uint  idx;
+		double d;
+
+		// get the starting point from the geometry
+		// must be put in the auto_set method
+		uint n = this.related_axes_idx.length;
+		Gsl.Vector x = new Gsl.Vector(n);
+		for(i=0; i<n; ++i) {
+			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
+			x.set(i, axis.config.value);
+		}
+
+		// Initialize method 
+		Gsl.MultirootFsolver s = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, n);
+		s.set(&this.function.f, x);
+
+		// iterate to find the solution
+		uint iter = 0U;
+		do {
+			++iter;
+			status = s.iterate();
+			if (status != 0 || iter % 1000 == 0) {
+				// Restart from another point.
+				for(i=0; i<n; ++i) {
+					d = Random.double_range(0., Math.PI);
+					x.set(i, d);
+				}
+				s.set(&this.function.f, x);
+				status = s.iterate();
+			}
+			status = Gsl.MultirootTest.residual (s.f, EPSILON);
+		} while (status == Gsl.Status.CONTINUE && iter < 10000);
+		if (status == Gsl.Status.CONTINUE){
+			stdout.printf("toto %u\n", iter);
+			return (bool)Gsl.Status.ENOMEM;
+		}
+
+		// set the geometry from the gsl_vector
+		// in a futur version the geometry must contain a gsl_vector
+		// to avoid this.
+		for(i=0; i<n; ++i) {
+			AxisConfig config = {{0., 0.}, 0., false};
+			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
+			axis.get_config(config);
+			config.value = Gsl.Trig.angle_restrict_pos(s.x.get(i));
+			axis.set_config(config);
+		}
+		this.geometry.update();
+
+		return true;
+	}
+
+	public override bool to_pseudoAxes()
+	{
+		Matrix RUB;
+		Vector hkl, ki, Q;
+
+		// update the geometry internals
+		this.geometry.update();
+
+		// R * UB
+		// for now the 0 holder is the sample holder.
+		weak Holder holder = this.geometry.get_holder(0);
+		holder.q.to_matrix(RUB);
+		RUB.times_matrix(this.sample.UB);
+
+		// kf - ki = Q
+		this.geometry.source.compute_ki(ki);
+		this.detector.compute_kf(this.geometry, Q);
+		Q.minus_vector(ki);
+		RUB.solve(hkl, Q);
+
+		// update the pseudoAxes current and consign parts
+		weak PseudoAxis H = this.pseudoAxes.get(0);
+		weak PseudoAxis K = this.pseudoAxes.get(1);
+		weak PseudoAxis L = this.pseudoAxes.get(2);
+		H.config.value = hkl.x;
+		K.config.value = hkl.y;
+		L.config.value = hkl.z;
+
+		return true;
+	}
+
+	public override bool equiv_geometries()
+	{
+		uint i;
+		Geometry geom = new Geometry.copy(this.geometry);
+
+		uint n = this.related_axes_idx.length;
+		var p = new uint[n];
+
+		for (i=0; i<n; ++i)
+			perm_r(n, 4, p, 0, i, this, geom);
+
+		return true;
+	}
+}
+
+public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
+{
+	Hkl.Vector Hkl, ki, dQ;
+	uint i;
+
+	Hkl.PseudoAxisEngineAuto *engine = params;
+	weak Hkl.PseudoAxis H = engine->pseudoAxes.get(0);
+	weak Hkl.PseudoAxis K = engine->pseudoAxes.get(1);
+	weak Hkl.PseudoAxis L = engine->pseudoAxes.get(2);
+
+	// update the workspace from x;
+	for(i=0; i<engine->related_axes_idx.length ; ++i) {
+		Hkl.AxisConfig config = {{0., 0.}, 0., false};
+
+		uint idx = engine->related_axes_idx[i];
+		weak Hkl.Axis axis = engine->geometry.get_axis(idx);
+		axis.get_config(config);
+		config.value = x.get(i);
+		axis.set_config(config);
+	}
+	engine->geometry.update();
+	Hkl.set(H.config.value, K.config.value, L.config.value);
+
+	// R * UB * h = Q
+	// for now the 0 holder is the sample holder.
+	weak Hkl.Holder holder = engine->geometry.get_holder(0);
+	engine->sample.UB.times_vector(Hkl);
+	Hkl.rotated_quaternion(holder.q);
+
+	// kf - ki = Q
+	engine->geometry.source.compute_ki(ki);
+	engine->detector.compute_kf(engine->geometry, dQ);
+	dQ.minus_vector(ki);
+
+
+	dQ.minus_vector(Hkl);
+
+	f.set(0, dQ.x);
+	f.set(1, dQ.y);
+	f.set(2, dQ.z);
+
+	return Gsl.Status.SUCCESS;
+}
+
+/** 
+ * @brief given a vector of angles change the sector of thoses angles
+ * 
+ * @param x The vector of angles to change.
+ * @param sector the sector vector operation.
+ *
+ * 0 -> no change
+ * 1 -> pi - angle
+ * 2 -> pi + angle
+ * 3 -> -angle
+ */
+static void change_sector(Gsl.Vector x, uint[] sector)
+{
+	uint i;
+
+	for(i=0U; i<x.size; ++i) {
+		double value;
+
+		value = x.get(i);
+		switch (sector[i]) {
+			case 0:
+				break;
+			case 1:
+				value = Math.PI - value;
+				break;
+			case 2:
+				value = Math.PI + value;
+				break;
+			case 3:
+				value = -value;
+				break;
+		}
+		x.set(i, value);
+	}
+}
+
+/** 
+ * @brief Test if an angle combination is compatible with a
+ * pseudoAxisEngine
+ * 
+ * @param x The vector of angles to test.
+ * @param engine The pseudoAxeEngine used for the test.
+ */
+static void test_sector(Gsl.Vector x, Hkl.PseudoAxisEngineFunc function,
+		Hkl.PseudoAxisEngine engine)
+{
+	uint i;
+
+	var f = new Gsl.Vector(x.size);
+
+	function.f.f(x, engine, f);
+	bool ko = false;
+	for(i=0;i<f.size; ++i) {
+		if (Math.fabs(f.get(i)) > Hkl.EPSILON) {
+			ko = true;
+			break;
+		}
+	}
+	if (!ko) {
+		var J = new Gsl.Matrix(x.size, f.size);
+		Gsl.multiroot_fdjacobian(&function.f, x, f,
+				Hkl.SQRT_DBL_EPSILON, J);
+		/*	
+			fprintf(stdout, "\n");
+			hkl_geometry_fprintf(stdout, engine->geom);
+			fprintf(stdout, "\n ");
+			for(i=0;i<x->size;++i)
+			fprintf(stdout, " %d", gsl_vector_int_get(p, i));
+			fprintf(stdout, "   ");
+			for(i=0;i<x->size;++i)
+			fprintf(stdout, " %f", gsl_vector_get(f, i));
+			fprintf(stdout, "\n");
+			for(i=0;i<state->n;++i) {
+			fprintf(stdout, "\n   ");
+			for(j=0;j<state->n;++j)
+			fprintf(stdout, " %f", gsl_matrix_get(J, i, j));
+			}
+			fprintf(stdout, "\n");
+		 */
+	}
+}
+
+/* 
+ * @brief given a ref geometry populate a vector for a specific engine.
+ * 
+ * @param x The vector to populate with the right axes values.
+ * @param engine The engine use to take the right axes from geom.
+ * @param geom The geom use to extract the angles into x.
+ */
+static void get_axes_as_gsl_vector(Gsl.Vector x,
+		Hkl.PseudoAxisEngine engine, Hkl.Geometry geom)
+{
+	uint i;
+
+	for(i=0; i<x.size; ++i) {
+		weak Hkl.Axis axis = geom.get_axis(engine.related_axes_idx[i]);
+		x.set(i, axis.config.value);
+	}
+}
+
+/* 
+ * @brief compute the permutation and test its validity.
+ * 
+ * @param n number of axes
+ * @param k number of operation per axes. (4 for now)
+ * @param p The vector containing the current permutation.
+ * @param z The index of the axes we are permution.
+ * @param x the current operation to set.
+ * @param engine The engine for the validity test.
+ * @param geom The starting point of all geometry permutations.
+ */
+static void perm_r(uint n, int k,
+		uint[] p, int z, uint x,
+		Hkl.PseudoAxisEngine engine, Hkl.Geometry geom)
+{
+	uint i;
+
+	p[z++] = x;
+	if (z == k) {
+		var x = new Gsl.Vector(n);
+
+		get_axes_as_gsl_vector(x, engine, geom);
+		change_sector(x, p);
+		test_sector(x, engine.function, engine);
+	} else
+		for (i=0; i<n; ++i)
+			perm_r(n, k, p, z, i, engine, geom);
+}

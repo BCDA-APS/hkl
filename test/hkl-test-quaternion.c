@@ -110,7 +110,7 @@ HKL_TEST_SUITE_FUNC(conjugate)
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(to_smatrix)
+HKL_TEST_SUITE_FUNC(to_matrix)
 {
 	HklQuaternion q_ref = {1./sqrt(2), 0, 0, 1./sqrt(2)};
 	HklMatrix m_ref = {0,-1, 0,
@@ -118,7 +118,7 @@ HKL_TEST_SUITE_FUNC(to_smatrix)
 		0, 0, 1};
 	HklMatrix m;
 
-	hkl_quaternion_to_smatrix(&q_ref, &m);
+	hkl_quaternion_to_matrix(&q_ref, &m);
 	HKL_ASSERT_EQUAL(0, hkl_matrix_cmp(&m_ref, &m));
 
 	return HKL_TEST_PASS;
@@ -167,7 +167,7 @@ HKL_TEST( from_angle_and_axe );
 HKL_TEST( times_quaternion );
 HKL_TEST( norm2 );
 HKL_TEST( conjugate );
-HKL_TEST( to_smatrix );
+HKL_TEST( to_matrix );
 HKL_TEST( to_angle_and_axe );
 
 HKL_TEST_SUITE_END

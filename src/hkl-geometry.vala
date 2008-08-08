@@ -24,7 +24,7 @@ public class Hkl.Geometry
 		}
 
 		// make a deep copy of the holders
-		for(i=0U; i<this.holders.size(); ++i) {
+		for(i=0U; i<src.holders.size(); ++i) {
 			weak Holder holder = src.holders.get(i);
 			holder = this.holders.add(new Holder.copy(holder, this.axes));
 		}
@@ -43,6 +43,17 @@ public class Hkl.Geometry
 	public weak Axis get_axis(uint idx)
 	{
 		return this.axes.get(idx);
+	}
+
+	public weak Axis? get_axis_by_name(string name)
+	{
+		uint i;
+		for(; i<this.axes.size(); ++i) {
+			weak Axis axis = this.axes.get(i);
+			if (axis.name == name)
+				return axis;
+		}
+		return null;
 	}
 
 	public uint get_holders_size()

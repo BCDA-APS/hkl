@@ -33,7 +33,7 @@ HKL_TEST_SUITE_FUNC(init)
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(get_kf)
+HKL_TEST_SUITE_FUNC(compute_kf)
 {
 	HklDetector det;
 	HklGeometry *geom = NULL;
@@ -56,7 +56,7 @@ HKL_TEST_SUITE_FUNC(get_kf)
 	hkl_axis_set_config(axis1, &config);
 	hkl_axis_set_config(axis2, &config);
 
-	hkl_detector_get_kf(&det, geom, &kf);
+	hkl_detector_compute_kf(&det, geom, &kf);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&kf_ref, &kf));
 
 	return HKL_TEST_PASS;
@@ -65,6 +65,6 @@ HKL_TEST_SUITE_FUNC(get_kf)
 HKL_TEST_SUITE_BEGIN
 
 HKL_TEST( init );
-HKL_TEST( get_kf );
+HKL_TEST( compute_kf );
 
 HKL_TEST_SUITE_END

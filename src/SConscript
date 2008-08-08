@@ -16,17 +16,14 @@ sources_vala = Split("""
          hkl-parameter.vala
          hkl-lattice.vala
          hkl-sample.vala
+         hkl-pseudoaxis.vala
+         hkl-pseudoaxis-auto.vala
          gsl.vapi
          """)
 
 sources = Split("""
                 usage.c
                 """)
-"""
-
-                hkl-pseudoaxis.c
-                hkl-pseudoaxis-auto.c
-                """
 
 includes = ['.']
 

@@ -4,7 +4,7 @@ public class Hkl.Sample {
 	public weak string name;
 	public Lattice lattice;
 	public Matrix U;
-	Matrix UB;
+	public Matrix UB;
 	public List<Reflection> reflections;
 
 	public class Reflection {

@@ -5,11 +5,11 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_sf_trig.h>
 
-#include <hkl-pseudoaxis.h>
+#include <hkl-pseudoaxis-auto.h>
 
 HKL_BEGIN_DECLS
 
-static int E4CV_bissector(const gsl_vector *x, void *params, gsl_vector *f)
+static int E4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
 {
 	double omega, tth;
 
@@ -23,7 +23,7 @@ static int E4CV_bissector(const gsl_vector *x, void *params, gsl_vector *f)
 	return  GSL_SUCCESS;
 }
 
-static int K4CV_bissector(const gsl_vector *x, void *params, gsl_vector *f)
+static int K4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
 {
 	double komega, tth, kappa, kphi, omega;
 	size_t i;
