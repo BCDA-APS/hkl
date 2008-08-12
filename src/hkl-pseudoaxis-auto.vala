@@ -1,5 +1,8 @@
 public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 {
+	Gsl.MultirootFsolver solver;
+	Gsl.Vector x;
+
 	public PseudoAxisEngineAuto(string name, string[] names, Geometry g)
 	{
 		base.init(name, names, g);
@@ -8,7 +11,10 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 	public override bool set(PseudoAxisEngineFunc f, Detector det,
 			Sample sample)
 	{
-		return base.set(f, det, sample);
+		bool res = base.set(f, det, sample);
+		this.solver = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, f.f.n);
+		this.x = new Gsl.Vector(f.f.n);
+		return res;
 	}
 
 	public override bool to_geometry()
@@ -17,35 +23,35 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		uint i;
 		uint  idx;
 		double d;
+		weak Gsl.MultirootFsolver solver = this.solver;
+		weak Gsl.Vector x = this.x;
 
 		// get the starting point from the geometry
 		// must be put in the auto_set method
 		uint n = this.related_axes_idx.length;
-		Gsl.Vector x = new Gsl.Vector(n);
 		for(i=0; i<n; ++i) {
 			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
 			x.set(i, axis.config.value);
 		}
 
 		// Initialize method 
-		Gsl.MultirootFsolver s = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, n);
-		s.set(&this.function.f, x);
+		solver.set(&this.function.f, x);
 
 		// iterate to find the solution
 		uint iter = 0U;
 		do {
 			++iter;
-			status = s.iterate();
+			status = solver.iterate();
 			if (status != 0 || iter % 1000 == 0) {
 				// Restart from another point.
 				for(i=0; i<n; ++i) {
 					d = Random.double_range(0., Math.PI);
 					x.set(i, d);
 				}
-				s.set(&this.function.f, x);
-				status = s.iterate();
+				solver.set(&this.function.f, x);
+				status = solver.iterate();
 			}
-			status = Gsl.MultirootTest.residual (s.f, EPSILON);
+			status = Gsl.MultirootTest.residual (solver.f, EPSILON);
 		} while (status == Gsl.Status.CONTINUE && iter < 10000);
 		if (status == Gsl.Status.CONTINUE){
 			stdout.printf("toto %u\n", iter);
@@ -59,7 +65,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			AxisConfig config = {{0., 0.}, 0., false};
 			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
 			axis.get_config(config);
-			config.value = Gsl.Trig.angle_restrict_pos(s.x.get(i));
+			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(i));
 			axis.set_config(config);
 		}
 		this.geometry.update();
