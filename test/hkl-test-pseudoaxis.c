@@ -124,7 +124,7 @@ HKL_TEST_SUITE_FUNC(set)
 	K = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 1);
 	L = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 2);
 
-	for(i=0;i<100000;++i) {
+	for(i=0;i<1000;++i) {
 		double h, k, l;
 		double hh, kk, ll;
 		int res;
