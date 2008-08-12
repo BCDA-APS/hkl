@@ -1,9 +1,14 @@
 public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 {
-	public PseudoAxisEngineAuto(string name, string[] names, Geometry g,
-			string[] axes)
+	public PseudoAxisEngineAuto(string name, string[] names, Geometry g)
 	{
-		base.init(name, names, g, axes);
+		base.init(name, names, g);
+	}
+
+	public override bool set(PseudoAxisEngineFunc f, Detector det,
+			Sample sample)
+	{
+		return base.set(f, det, sample);
 	}
 
 	public override bool to_geometry()

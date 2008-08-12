@@ -54,12 +54,10 @@ HKL_TEST_SUITE_FUNC(new)
 {
 	HklPseudoAxisEngine *engine;
 	HklGeometry *geom;
-
 	char *pseudoaxes[] = {"h", "k", "l"};
-	char *axes[] = {"omega", "chi", "phi", "tth"};
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
 
-	engine = hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom, axes, 4);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
+	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
 
 	return HKL_TEST_PASS;
 }
@@ -70,15 +68,14 @@ HKL_TEST_SUITE_FUNC(update)
 	HklGeometry *geom;
 	HklDetector det;
 	HklSample *sample;
-
 	char *pseudoaxes[] = {"h", "k", "l"};
 	char *axes[] = {"omega", "chi", "phi", "tth"};
+
 	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
-
-	engine = hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom, axes, 4);
-	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}};
+	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
+	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}, axes};
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	// geometry -> pseudo
@@ -119,16 +116,15 @@ HKL_TEST_SUITE_FUNC(set)
 	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
-
-	engine = hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom, axes, 4);
-	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}};
+	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
+	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}, axes};
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	H = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 0);
 	K = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 1);
 	L = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 2);
 
-	for(i=0;i<1000;++i) {
+	for(i=0;i<100000;++i) {
 		double h, k, l;
 		double hh, kk, ll;
 		int res;
@@ -168,15 +164,15 @@ HKL_TEST_SUITE_FUNC(equiv_geometries)
 	double hh, kk, ll;
 	unsigned int i;
 	int res;
-	char *pseudoaxes[] = {"h", "k", "l"};
-	char *axes[] = {"omega", "chi", "phi", "tth"};
+	char* pseudoaxes[] = {"h", "k", "l"};
+	char* axes[] = {"omega", "chi", "phi", "tth"};
 
 	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
 
-	engine = hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom, axes, 4);
-	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}};
+	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
+	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}, axes};
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	H = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 0);
