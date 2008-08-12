@@ -1,3 +1,14 @@
+/*
+public static Hkl.Lattice default = {
+		{"a", {0., 11.54}, 1.54, 11.54, false},
+		{"b", {0., 11.54}, 1.54, 11.54, false},
+		{"c", {0., 11.54}, 1.54, 11.54, false},
+		{"alpha", {-Math.PI, Math.PI}, 90*DEGTORAD, false},
+		{"beta", {-Math.PI, Math.PI}, 90*DEGTORAD, false},
+		{"gamma", {-Math.PI, Math.PI}, 90*DEGTORAD, false}
+}; 
+*/
+
 public struct Hkl.Lattice
 {
 	public Parameter a;
@@ -6,14 +17,7 @@ public struct Hkl.Lattice
 	public Parameter alpha;
 	public Parameter beta;
 	public Parameter gamma;
-	/*
-	public static Lattice default = {{"a", 0., 1.54, 11.54, false},
-		{"b", 0., 1.54, 11.54, false},
-		{"c", 0., 1.54, 11.54, false},
-		{"alpha", -Math.PI, 90*DEGTORAD, Math.PI, false},
-		{"beta", -Math.PI, 90*DEGTORAD, Math.PI, false},
-		{"gamma", -Math.PI, 90*DEGTORAD, Math.PI, false}}; 
-	*/
+
 	/* private */
 
 	bool check_lattice_param(double a, double b, double c,
