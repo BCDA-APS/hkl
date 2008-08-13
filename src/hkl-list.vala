@@ -19,10 +19,16 @@ public class Hkl.List<T>
 	public bool del(uint idx) requires (idx < this.length)
 	{
 		uint i=idx;
+		this.list[idx];
 		for(; i< this.length - 1; ++i)
 			this.list[i] = this.list[i+1];
 		this.length--;
 		return true;
+	}
+
+	public void clear()
+	{
+		this.length = 0;
 	}
 
 	public uint size()

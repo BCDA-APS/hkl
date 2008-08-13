@@ -137,7 +137,7 @@ HKL_TEST_SUITE_FUNC(set)
 		res = hkl_pseudo_axis_engine_to_geometry(engine);
 
 		// geometry -> pseudo
-		if (!res) {
+		if (res) {
 			hkl_pseudo_axis_engine_to_pseudoAxes(engine);
 
 			hh = H->config.value;
@@ -186,7 +186,7 @@ HKL_TEST_SUITE_FUNC(equiv_geometries)
 
 		// pseudo -> geometry
 		res = hkl_pseudo_axis_engine_to_geometry(engine);
-		if (!res) {
+		if (res) {
 			hkl_pseudo_axis_engine_to_pseudoAxes(engine);
 
 			hh = H->config.value;

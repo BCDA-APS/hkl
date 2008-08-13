@@ -19,58 +19,11 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 	public override bool to_geometry()
 	{
-		int status;
-		uint i;
-		uint  idx;
-		double d;
-		weak Gsl.MultirootFsolver solver = this.solver;
-		weak Gsl.Vector x = this.x;
-
-		// get the starting point from the geometry
-		// must be put in the auto_set method
-		uint n = this.related_axes_idx.length;
-		for(i=0; i<n; ++i) {
-			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
-			x.set(i, axis.config.value);
-		}
-
-		// Initialize method 
-		solver.set(&this.function.f, x);
-
-		// iterate to find the solution
-		uint iter = 0U;
-		do {
-			++iter;
-			status = solver.iterate();
-			if (status != 0 || iter % 1000 == 0) {
-				// Restart from another point.
-				for(i=0; i<n; ++i) {
-					d = Random.double_range(0., Math.PI);
-					x.set(i, d);
-				}
-				solver.set(&this.function.f, x);
-				status = solver.iterate();
-			}
-			status = Gsl.MultirootTest.residual (solver.f, EPSILON);
-		} while (status == Gsl.Status.CONTINUE && iter < 10000);
-		if (status == Gsl.Status.CONTINUE){
-			stdout.printf("toto %u\n", iter);
-			return (bool)Gsl.Status.ENOMEM;
-		}
-
-		// set the geometry from the gsl_vector
-		// in a futur version the geometry must contain a gsl_vector
-		// to avoid this.
-		for(i=0; i<n; ++i) {
-			AxisConfig config = {{0., 0.}, 0., false};
-			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
-			axis.get_config(config);
-			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(i));
-			axis.set_config(config);
-		}
-		this.geometry.update();
-
-		return true;
+		//first clear the geometries.
+		this.geometries.clear();
+		bool res = this.solve(this.function.f);
+		this.geometries.add(new Geometry.copy(this.geometry));
+		return res;
 	}
 
 	public override bool to_pseudoAxes()
@@ -117,6 +70,63 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 		return true;
 	}
+
+	bool solve(Gsl.MultirootFunction f)
+	{
+		int status;
+		uint i;
+		uint  idx;
+		double d;
+		weak Gsl.MultirootFsolver solver = this.solver;
+		weak Gsl.Vector x = this.x;
+
+		// get the starting point from the geometry
+		// must be put in the auto_set method
+		uint n = this.related_axes_idx.length;
+		for(i=0; i<n; ++i) {
+			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
+			x.set(i, axis.config.value);
+		}
+
+		// Initialize method 
+		solver.set(&f, x);
+
+		// iterate to find the solution
+		uint iter = 0U;
+		do {
+			++iter;
+			status = solver.iterate();
+			if (status != 0 || iter % 1000 == 0) {
+				// Restart from another point.
+				for(i=0; i<n; ++i) {
+					d = Random.double_range(0., Math.PI);
+					x.set(i, d);
+				}
+				solver.set(&f, x);
+				status = solver.iterate();
+			}
+			status = Gsl.MultirootTest.residual (solver.f, EPSILON);
+		} while (status == Gsl.Status.CONTINUE && iter < 10000);
+		if (status == Gsl.Status.CONTINUE){
+			stdout.printf("toto %u\n", iter);
+			return (bool)Gsl.Status.ENOMEM;
+		}
+
+		// set the geometry from the gsl_vector
+		// in a futur version the geometry must contain a gsl_vector
+		// to avoid this.
+		for(i=0; i<n; ++i) {
+			AxisConfig config = {{0., 0.}, 0., false};
+			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
+			axis.get_config(config);
+			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(i));
+			axis.set_config(config);
+		}
+		this.geometry.update();
+
+		return true;
+	}
+
 }
 
 public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
