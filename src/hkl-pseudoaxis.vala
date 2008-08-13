@@ -32,9 +32,8 @@ public abstract class Hkl.PseudoAxisEngine
 	public List<PseudoAxis> pseudoAxes;
 	public List<Geometry> geometries;
 
-	public abstract bool to_geometry();
-	public abstract bool to_pseudoAxes();
-	public abstract bool equiv_geometries();
+	public abstract bool compute_geometries();
+	public abstract bool compute_pseudoAxes(Geometry g);
 
 	public bool init(string name, string[] names, Geometry g)
 	{

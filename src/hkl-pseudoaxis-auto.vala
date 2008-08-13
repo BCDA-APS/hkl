@@ -17,32 +17,33 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		return res;
 	}
 
-	public override bool to_geometry()
+	public override bool compute_geometries()
 	{
 		//first clear the geometries.
 		this.geometries.clear();
 		bool res = this.solve(this.function.f);
 		this.geometries.add(new Geometry.copy(this.geometry));
+		this.compute_equivalent_geometries();
 		return res;
 	}
 
-	public override bool to_pseudoAxes()
+	public override bool compute_pseudoAxes(Geometry geom)
 	{
 		Matrix RUB;
 		Vector hkl, ki, Q;
 
 		// update the geometry internals
-		this.geometry.update();
+		geom.update();
 
 		// R * UB
 		// for now the 0 holder is the sample holder.
-		weak Holder holder = this.geometry.get_holder(0);
+		weak Holder holder = geom.get_holder(0);
 		holder.q.to_matrix(RUB);
 		RUB.times_matrix(this.sample.UB);
 
 		// kf - ki = Q
-		this.geometry.source.compute_ki(ki);
-		this.detector.compute_kf(this.geometry, Q);
+		geom.source.compute_ki(ki);
+		this.detector.compute_kf(geom, Q);
 		Q.minus_vector(ki);
 		RUB.solve(hkl, Q);
 
@@ -53,20 +54,6 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		H.config.value = hkl.x;
 		K.config.value = hkl.y;
 		L.config.value = hkl.z;
-
-		return true;
-	}
-
-	public override bool equiv_geometries()
-	{
-		uint i;
-		Geometry geom = new Geometry.copy(this.geometry);
-
-		uint n = this.related_axes_idx.length;
-		var p = new uint[n];
-
-		for (i=0; i<n; ++i)
-			perm_r(n, 4, p, 0, i, this, geom);
 
 		return true;
 	}
@@ -83,7 +70,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		// get the starting point from the geometry
 		// must be put in the auto_set method
 		uint n = this.related_axes_idx.length;
-		for(i=0; i<n; ++i) {
+		for(i=0U; i<n; ++i) {
 			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
 			x.set(i, axis.config.value);
 		}
@@ -98,7 +85,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			status = solver.iterate();
 			if (status != 0 || iter % 1000 == 0) {
 				// Restart from another point.
-				for(i=0; i<n; ++i) {
+				for(i=0U; i<n; ++i) {
 					d = Random.double_range(0., Math.PI);
 					x.set(i, d);
 				}
@@ -124,6 +111,22 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		}
 		this.geometry.update();
 
+		return true;
+	}
+
+	bool compute_equivalent_geometries()
+	{
+		uint i, j;
+
+		uint n = this.related_axes_idx.length;
+		uint p = this.geometries.size();
+		for(i=0U; i<p; ++i) { 
+			weak Geometry geom = this.geometries.get(i);
+
+			var perm = new uint[n];
+			for (j=0U; i<n; ++i)
+				perm_r(n, 4, perm, 0, j, this, geom);
+		}
 		return true;
 	}
 
@@ -232,9 +235,12 @@ static void test_sector(Gsl.Vector x, Hkl.PseudoAxisEngineFunc function,
 		}
 	}
 	if (!ko) {
+		engine.geometries.add(new Hkl.Geometry.copy(engine.geometry));
+		/*
 		var J = new Gsl.Matrix(x.size, f.size);
 		Gsl.multiroot_fdjacobian(&function.f, x, f,
 				Hkl.SQRT_DBL_EPSILON, J);
+		*/
 		/*	
 			fprintf(stdout, "\n");
 			hkl_geometry_fprintf(stdout, engine->geom);
