@@ -1,4 +1,5 @@
 namespace Hkl {
+	public static uint N = 100U;
 	public static double EPSILON = 1.e-6; 
 	public static double DEGTORAD = 3.14159265358979323846264338328 / 180.; 
 	public static double RADTODEG = 180. / 3.14159265358979323846264338328; 

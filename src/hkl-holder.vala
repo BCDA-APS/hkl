@@ -17,7 +17,7 @@ public class Hkl.Holder {
 
 		/* populate the private_axes from the axes */
 		uint i = 0U;
-		for(; i<src.private_axes.size(); ++i) {
+		for(; i<src.private_axes.length; ++i) {
 			weak Axis axis = src.private_axes.get(i);
 			int idx = src.axes.index_of(axis);
 			axis = this.axes.get(idx);
@@ -42,7 +42,7 @@ public class Hkl.Holder {
 
 	public uint length()
 	{
-		return this.private_axes.size();
+		return this.private_axes.length;
 	}
 
 	public weak Axis get_axis(int idx)
@@ -55,7 +55,7 @@ public class Hkl.Holder {
 		if (this.is_dirty()) {
 			uint i;
 			this.q.set(1., 0., 0., 0.);
-			for(; i<this.private_axes.size(); ++i) {
+			for(; i<this.private_axes.length; ++i) {
 				Quaternion q;
 				weak Axis axis = this.private_axes.get(i);
 				axis.get_quaternion(q);
@@ -73,7 +73,7 @@ public class Hkl.Holder {
 	{
 		uint i;
 		// check if an axis with the same name is in the axis list.
-		for(; i<this.axes.size(); ++i) {
+		for(; i<this.axes.length; ++i) {
 			weak Axis axis = this.axes.get(i);
 			if (axis.name == name)
 				return axis;
@@ -84,7 +84,7 @@ public class Hkl.Holder {
 	bool is_dirty()
 	{
 		uint i;
-		for(; i<this.private_axes.size(); ++i) {
+		for(; i<this.private_axes.length; ++i) {
 			weak Axis axis = this.private_axes.get(i);
 			if (axis.config.dirty)
 				return true;

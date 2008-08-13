@@ -85,7 +85,7 @@ public class Hkl.Sample {
 			return double.NAN;
 
 		double fitness = 0.;
-		for(i=0U; i<sample->reflections.size(); ++i) {
+		for(i=0U; i<sample->reflections.length; ++i) {
 			weak Reflection reflection = sample->reflections.get(i);
 			Vector UBh = reflection.hkl;
 			sample->UB.times_vector(UBh);
@@ -124,7 +124,7 @@ public class Hkl.Sample {
 		this.UB = src.UB;
 		/* make a deep copy of the reflections */
 		this.reflections = new List<Reflection>();
-		for(i=0; i<src.reflections.size(); ++i) {
+		for(i=0; i<src.reflections.length; ++i) {
 			weak Reflection reflection = src.reflections.get(i);
 			reflection = this.reflections.add(new Reflection.copy(reflection));
 		}
@@ -153,8 +153,8 @@ public class Hkl.Sample {
 
 	public bool compute_UB_busing_levy(uint idx1, uint idx2)
 	{
-		if (idx1 < this.reflections.size() 
-				&& idx2 < this.reflections.size()) {
+		if (idx1 < this.reflections.length 
+				&& idx2 < this.reflections.length) {
 
 			weak Reflection r1 = this.reflections.get(idx1);
 			weak Reflection r2 = this.reflections.get(idx2);

@@ -119,7 +119,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		uint i, j;
 
 		uint n = this.related_axes_idx.length;
-		uint p = this.geometries.size();
+		uint p = this.geometries.length;
 		for(i=0U; i<p; ++i) { 
 			weak Geometry geom = this.geometries.get(i);
 

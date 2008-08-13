@@ -75,7 +75,7 @@ HKL_TEST_SUITE_FUNC(del_reflection)
 
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
 	hkl_sample_del_reflection(sample, 0);
-	HKL_ASSERT_EQUAL(0, hkl_list_size(sample->reflections));
+	HKL_ASSERT_EQUAL(0, sample->reflections->length);
 
 	return HKL_TEST_PASS;
 }

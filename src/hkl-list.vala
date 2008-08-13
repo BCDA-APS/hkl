@@ -1,13 +1,13 @@
 public class Hkl.List<T>
 {
-	uint length;
+	public uint length;
 	T[] list;
 
 	public List()
 	{
 		this.length = 0;
 		/* for now a hack reserve enought space*/
-		this.list = new T[100];
+		this.list = new T[N];
 	}
 
 	public weak T add(T# item) requires (this.length < this.list.length)
@@ -29,11 +29,6 @@ public class Hkl.List<T>
 	public void clear()
 	{
 		this.length = 0;
-	}
-
-	public uint size()
-	{
-		return this.length;
 	}
 
 	public weak T get(uint idx) requires (idx <this.length)

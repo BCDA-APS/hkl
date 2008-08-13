@@ -139,7 +139,7 @@ HKL_TEST_SUITE_FUNC(compute_geometries)
 		// geometry -> pseudo
 		if (res) {
 			// check all solutions
-			for(j=0; j<hkl_list_size(engine->geometries); ++j) {
+			for(j=0; j<engine->geometries->length; ++j) {
 				HklGeometry const *g = hkl_list_get(engine->geometries, j);
 				hkl_pseudo_axis_engine_compute_pseudoAxes(engine, g);
 
