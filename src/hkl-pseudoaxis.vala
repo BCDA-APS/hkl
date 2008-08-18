@@ -11,10 +11,9 @@ public class Hkl.PseudoAxis
 	}
 }
 
-
 public struct Hkl.PseudoAxisEngineFunc
 {
-	public Gsl.MultirootFunction f;
+	public Gsl.MultirootFunction[] f;
 	public string[] axes;
 }
 
@@ -56,8 +55,8 @@ public abstract class Hkl.PseudoAxisEngine
 		this.detector = det;
 		this.sample = sample;
 		this.function = f;
-		this.related_axes_idx = new uint[f.f.n];
-		for(i=0U; i<f.f.n; ++i) {
+		this.related_axes_idx = new uint[f.axes.length];
+		for(i=0U; i<f.axes.length; ++i) {
 			weak Axis axis = this.geometry.get_axis_by_name(f.axes[i]);
 			int idx = this.geometry.axes.index_of(axis);
 			if (idx >=0)

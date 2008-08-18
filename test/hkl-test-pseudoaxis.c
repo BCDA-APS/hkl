@@ -75,7 +75,8 @@ HKL_TEST_SUITE_FUNC(compute_pseudoAxes)
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
 	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
-	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}, axes};
+	gsl_multiroot_function fm[] = {{E4CV_bissector, 4, engine}};
+	HklPseudoAxisEngineFunc f = {fm, 1, axes, 4};
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	// geometry -> pseudo
@@ -117,7 +118,8 @@ HKL_TEST_SUITE_FUNC(compute_geometries)
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
 	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
-	HklPseudoAxisEngineFunc f = {{E4CV_bissector, 4, engine}, axes};
+	gsl_multiroot_function fm[] = {{E4CV_bissector, 4, engine}};
+	HklPseudoAxisEngineFunc f = {fm, 1, axes, 4};
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	H = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 0);
@@ -140,7 +142,7 @@ HKL_TEST_SUITE_FUNC(compute_geometries)
 		if (res) {
 			// check all solutions
 			for(j=0; j<engine->geometries->length; ++j) {
-				HklGeometry const *g = hkl_list_get(engine->geometries, j);
+				HklGeometry *g = hkl_list_get(engine->geometries, j);
 				hkl_pseudo_axis_engine_compute_pseudoAxes(engine, g);
 
 				hh = H->config.value;

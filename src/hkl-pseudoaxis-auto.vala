@@ -12,8 +12,8 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			Sample sample)
 	{
 		bool res = base.set(f, det, sample);
-		this.solver = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, f.f.n);
-		this.x = new Gsl.Vector(f.f.n);
+		this.solver = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, f.axes.length);
+		this.x = new Gsl.Vector(f.axes.length);
 		return res;
 	}
 
@@ -21,9 +21,12 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 	{
 		//first clear the geometries.
 		this.geometries.clear();
-		bool res = this.solve(this.function.f);
-		this.geometries.add(new Geometry.copy(this.geometry));
-		this.compute_equivalent_geometries();
+		bool res = false;
+		foreach(weak Gsl.MultirootFunction f in this.function.f) {
+			res |= this.solve(f);
+			this.geometries.add(new Geometry.copy(this.geometry));
+			this.compute_equivalent_geometries(f);
+		}
 		return res;
 	}
 
@@ -114,7 +117,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		return true;
 	}
 
-	bool compute_equivalent_geometries()
+	bool compute_equivalent_geometries(Gsl.MultirootFunction f)
 	{
 		uint i, j;
 
@@ -125,7 +128,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 			var perm = new uint[n];
 			for (j=0U; i<n; ++i)
-				perm_r(n, 4, perm, 0, j, this, geom);
+				perm_r(n, 4, perm, 0, j, f, geom);
 		}
 		return true;
 	}
@@ -219,14 +222,13 @@ static void change_sector(Gsl.Vector x, uint[] sector)
  * @param x The vector of angles to test.
  * @param engine The pseudoAxeEngine used for the test.
  */
-static void test_sector(Gsl.Vector x, Hkl.PseudoAxisEngineFunc function,
-		Hkl.PseudoAxisEngine engine)
+static void test_sector(Gsl.Vector x, Gsl.MultirootFunction func)
 {
 	uint i;
 
 	var f = new Gsl.Vector(x.size);
 
-	function.f.f(x, engine, f);
+	func.f(x, func.params, f);
 	bool ko = false;
 	for(i=0;i<f.size; ++i) {
 		if (Math.fabs(f.get(i)) > Hkl.EPSILON) {
@@ -235,12 +237,13 @@ static void test_sector(Gsl.Vector x, Hkl.PseudoAxisEngineFunc function,
 		}
 	}
 	if (!ko) {
-		engine.geometries.add(new Hkl.Geometry.copy(engine.geometry));
+		Hkl.PseudoAxisEngine *engine = func.params;
+		engine->geometries.add(new Hkl.Geometry.copy(engine->geometry));
 		/*
-		var J = new Gsl.Matrix(x.size, f.size);
-		Gsl.multiroot_fdjacobian(&function.f, x, f,
-				Hkl.SQRT_DBL_EPSILON, J);
-		*/
+		   var J = new Gsl.Matrix(x.size, f.size);
+		   Gsl.multiroot_fdjacobian(&function.f, x, f,
+		   Hkl.SQRT_DBL_EPSILON, J);
+		 */
 		/*	
 			fprintf(stdout, "\n");
 			hkl_geometry_fprintf(stdout, engine->geom);
@@ -269,12 +272,12 @@ static void test_sector(Gsl.Vector x, Hkl.PseudoAxisEngineFunc function,
  * @param geom The geom use to extract the angles into x.
  */
 static void get_axes_as_gsl_vector(Gsl.Vector x,
-		Hkl.PseudoAxisEngine engine, Hkl.Geometry geom)
+		Hkl.PseudoAxisEngine *engine, Hkl.Geometry geom)
 {
 	uint i;
 
 	for(i=0; i<x.size; ++i) {
-		weak Hkl.Axis axis = geom.get_axis(engine.related_axes_idx[i]);
+		weak Hkl.Axis axis = geom.get_axis(engine->related_axes_idx[i]);
 		x.set(i, axis.config.value);
 	}
 }
@@ -292,7 +295,7 @@ static void get_axes_as_gsl_vector(Gsl.Vector x,
  */
 static void perm_r(uint n, int k,
 		uint[] p, int z, uint x,
-		Hkl.PseudoAxisEngine engine, Hkl.Geometry geom)
+		Gsl.MultirootFunction f, Hkl.Geometry geom)
 {
 	uint i;
 
@@ -300,10 +303,10 @@ static void perm_r(uint n, int k,
 	if (z == k) {
 		var x = new Gsl.Vector(n);
 
-		get_axes_as_gsl_vector(x, engine, geom);
+		get_axes_as_gsl_vector(x, f.params, geom);
 		change_sector(x, p);
-		test_sector(x, engine.function, engine);
+		test_sector(x, f);
 	} else
 		for (i=0; i<n; ++i)
-			perm_r(n, k, p, z, i, engine, geom);
+			perm_r(n, k, p, z, i, f, geom);
 }

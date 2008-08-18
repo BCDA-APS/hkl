@@ -9,7 +9,7 @@
 
 HKL_BEGIN_DECLS
 
-static int E4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
+static int E4CV_bissector(gsl_vector const *x, void *params, gsl_vector *f)
 {
 	double omega, tth;
 
@@ -23,7 +23,7 @@ static int E4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
 	return  GSL_SUCCESS;
 }
 
-static int K4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
+static int K4CV_bissector(gsl_vector const *x, void *params, gsl_vector *f)
 {
 	double komega, tth, kappa, kphi, omega;
 	size_t i;
@@ -34,7 +34,6 @@ static int K4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
 	for(i=0; i<x->size;++i)
 		if (gsl_isnan(gsl_vector_get(x, i)))
 			return GSL_ENOMEM;
-	//gsl_vector_fprintf(stdout, f, "%f");
 
 	RUBh_minus_Q(x, params, f);
 
@@ -46,7 +45,6 @@ static int K4CV_bissector(gsl_vector *x, void *params, gsl_vector *f)
 	omega = komega + atan(tan(kappa/2.)*cos(50 * HKL_DEGTORAD)) - M_PI_2;
 	omega = komega + atan(tan(kappa/2.)*cos(50 * HKL_DEGTORAD)) + M_PI_2;
 	gsl_sf_angle_restrict_symm_e(&omega);
-	//gsl_vector_set (f, 3, tth - 2 * fmod(omega,M_PI));
 	gsl_vector_set (f, 3, tth - 2 *omega);
 
 	return  GSL_SUCCESS;
