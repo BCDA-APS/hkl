@@ -1,7 +1,7 @@
 public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 {
-	Gsl.MultirootFsolver solver;
-	Gsl.Vector x;
+	public Gsl.MultirootFsolver solver;
+	public Gsl.Vector x;
 
 	public PseudoAxisEngineAuto(string name, string[] names, Geometry g)
 	{
@@ -104,6 +104,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(idx++));
 			axis.set_config(config);
 		}
+		x.memcpy(solver.x);
 		this.geometry.update();
 
 		return true;
@@ -114,10 +115,8 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		uint n = this.axes.length;
 		var perm = new uint[n];
 		var geom = new Gsl.Vector(n);
-		uint i=0U;
-		foreach(weak Axis axis in this.axes)
-			geom.set(i++, axis.config.value);
-		for (i=0U; i<n; ++i)
+		geom.memcpy(this.x);
+		for (uint i=0U; i<n; ++i)
 			perm_r(n, 4, perm, 0, i, f, geom);
 		return true;
 	}
@@ -269,10 +268,10 @@ static void perm_r(uint n, int k,
 
 	p[z++] = x;
 	if (z == k) {
-		var x = new Gsl.Vector(n);
-		x.memcpy(geom);
-		change_sector(x, p);
-		test_sector(x, f);
+		Hkl.PseudoAxisEngineAuto *engine = f.params;
+		engine->x.memcpy(geom);
+		change_sector(engine->x, p);
+		test_sector(engine->x, f);
 	} else
 		for (i=0; i<n; ++i)
 			perm_r(n, k, p, z, i, f, geom);
