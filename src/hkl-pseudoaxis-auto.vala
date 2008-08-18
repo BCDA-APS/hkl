@@ -51,12 +51,9 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		RUB.solve(hkl, Q);
 
 		// update the pseudoAxes current and consign parts
-		weak PseudoAxis H = this.pseudoAxes.get(0);
-		weak PseudoAxis K = this.pseudoAxes.get(1);
-		weak PseudoAxis L = this.pseudoAxes.get(2);
-		H.config.value = hkl.x;
-		K.config.value = hkl.y;
-		L.config.value = hkl.z;
+		this.pseudoAxes[0].config.value = hkl.x;
+		this.pseudoAxes[1].config.value = hkl.y;
+		this.pseudoAxes[2].config.value = hkl.z;
 
 		return true;
 	}
@@ -141,9 +138,9 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	uint i;
 
 	Hkl.PseudoAxisEngineAuto *engine = params;
-	weak Hkl.PseudoAxis H = engine->pseudoAxes.get(0);
-	weak Hkl.PseudoAxis K = engine->pseudoAxes.get(1);
-	weak Hkl.PseudoAxis L = engine->pseudoAxes.get(2);
+	weak Hkl.PseudoAxis H = engine->pseudoAxes[0];
+	weak Hkl.PseudoAxis K = engine->pseudoAxes[1];
+	weak Hkl.PseudoAxis L = engine->pseudoAxes[2];
 
 	// update the workspace from x;
 	for(i=0; i<engine->related_axes_idx.length ; ++i) {

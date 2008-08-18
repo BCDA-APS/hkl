@@ -40,9 +40,9 @@
 #define CHECK_PSEUDOAXES(engine, a, b, c) do{\
 	HklPseudoAxis *H, *K, *L;\
 	\
-	H = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 0);\
-	K = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 1);\
-	L = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 2);\
+	H = engine->pseudoAxes[0];\
+	K = engine->pseudoAxes[1];\
+	L = engine->pseudoAxes[2];\
 	\
 	HKL_ASSERT_DOUBLES_EQUAL(a, H->config.value, HKL_EPSILON);\
 	HKL_ASSERT_DOUBLES_EQUAL(b, K->config.value, HKL_EPSILON);\
@@ -122,9 +122,9 @@ HKL_TEST_SUITE_FUNC(compute_geometries)
 	HklPseudoAxisEngineFunc f = {fm, 1, axes, 4};
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
-	H = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 0);
-	K = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 1);
-	L = (HklPseudoAxis *)hkl_list_get(engine->pseudoAxes, 2);
+	H = engine->pseudoAxes[0];
+	K = engine->pseudoAxes[1];
+	L = engine->pseudoAxes[2];
 
 	for(i=0;i<1000;++i) {
 		double h, k, l;
