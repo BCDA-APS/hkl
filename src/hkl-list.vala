@@ -13,8 +13,7 @@ public class Hkl.List<T>
 	{
 		if (this.length == this.list.length)
 			this.list.resize((int)(this.list.length + N));
-		this.list[this.length++] = item;
-		return item;
+		return this.list[this.length++] = item;
 	}
 
 	public bool del(uint idx) requires (idx < this.length)
