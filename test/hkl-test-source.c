@@ -16,10 +16,10 @@ HKL_TEST_SUITE_FUNC(set)
 
 	hkl_source_set(&s, 1, 1, 0, 0);
 	
-	HKL_ASSERT_DOUBLES_EQUAL(1., s.wave_length, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1., s.direction.x, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., s.direction.y, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., s.direction.z, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., s.wave_length, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., s.direction.x, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., s.direction.y, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., s.direction.z, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -45,7 +45,7 @@ HKL_TEST_SUITE_FUNC(copy)
 	hkl_source_set(&s1, 1.54, 1, 0, 0);
 	s2 = s1;
 	
-	HKL_ASSERT_DOUBLES_EQUAL(s1.wave_length, s2.wave_length, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(s1.wave_length, s2.wave_length, HKL_EPSILON);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&s1.direction, &s2.direction));
 
 	return HKL_TEST_PASS;
@@ -54,7 +54,7 @@ HKL_TEST_SUITE_FUNC(copy)
 HKL_TEST_SUITE_FUNC(compute_ki)
 {
 	HklSource s;
-	HklVector ki_ref = {hkl_TAU / 1.54, 0, 0};
+	HklVector ki_ref = {HKL_TAU / 1.54, 0, 0};
 	HklVector ki;
 
 	hkl_source_set(&s, 1.54, 1, 0, 0);

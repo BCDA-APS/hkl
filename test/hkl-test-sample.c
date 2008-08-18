@@ -105,10 +105,10 @@ do {\
 	hkl_axis_get_config(Phi, &phi);\
 	hkl_axis_get_config(Tth, &tth);\
 \
-	omega.value = a * hkl_DEGTORAD;\
-	chi.value = b * hkl_DEGTORAD;\
-	phi.value = c * hkl_DEGTORAD;\
-	tth.value = d * hkl_DEGTORAD;\
+	omega.value = a * HKL_DEGTORAD;\
+	chi.value = b * HKL_DEGTORAD;\
+	phi.value = c * HKL_DEGTORAD;\
+	tth.value = d * HKL_DEGTORAD;\
 \
 	hkl_axis_set_config(Omega, &omega);\
 	hkl_axis_set_config(Chi, &chi);\
@@ -165,10 +165,10 @@ do {\
 	hkl_axis_get_config(Phi, &phi);\
 	hkl_axis_get_config(Tth, &tth);\
 \
-	omega.value = a * hkl_DEGTORAD;\
-	chi.value = b * hkl_DEGTORAD;\
-	phi.value = c * hkl_DEGTORAD;\
-	tth.value = d * hkl_DEGTORAD;\
+	omega.value = a * HKL_DEGTORAD;\
+	chi.value = b * HKL_DEGTORAD;\
+	phi.value = c * HKL_DEGTORAD;\
+	tth.value = d * HKL_DEGTORAD;\
 \
 	hkl_axis_set_config(Omega, &omega);\
 	hkl_axis_set_config(Chi, &chi);\
@@ -183,11 +183,11 @@ do {\
 	sample->lattice.b.to_fit = 1;
 	sample->lattice.c.value = 4;
 	sample->lattice.c.to_fit = 1;
-	sample->lattice.alpha.value = 92 * hkl_DEGTORAD;
+	sample->lattice.alpha.value = 92 * HKL_DEGTORAD;
 	sample->lattice.alpha.to_fit = 1;
-	sample->lattice.beta.value = 81 * hkl_DEGTORAD;
+	sample->lattice.beta.value = 81 * HKL_DEGTORAD;
 	sample->lattice.beta.to_fit = 1;
-	sample->lattice.gamma.value = 90 * hkl_DEGTORAD;
+	sample->lattice.gamma.value = 90 * HKL_DEGTORAD;
 	sample->lattice.gamma.to_fit = 1;
 
 	SET_ANGLES(30, 0, 90, 60);
@@ -214,12 +214,12 @@ do {\
 	beta = sample->lattice.beta.value;
 	gamma = sample->lattice.gamma.value;
 	HKL_ASSERT_EQUAL(FALSE, hkl_matrix_cmp(&m_ref, &sample->U));
-	HKL_ASSERT_DOUBLES_EQUAL(1.54, a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1.54, b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1.54, c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(90 * hkl_DEGTORAD, alpha, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(90 * hkl_DEGTORAD, beta, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(90 * hkl_DEGTORAD, gamma, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1.54, a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1.54, b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1.54, c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, alpha, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, beta, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, gamma, HKL_EPSILON);
 
 #undef SET_ANGLES
 	return HKL_TEST_PASS;

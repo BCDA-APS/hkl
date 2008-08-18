@@ -6,6 +6,7 @@
 #include <gsl/gsl_sf_trig.h>
 
 #include <hkl-pseudoaxis-auto.h>
+#include <hkl-constants.h>
 
 HKL_BEGIN_DECLS
 

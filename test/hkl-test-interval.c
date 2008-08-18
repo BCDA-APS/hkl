@@ -104,8 +104,8 @@ HKL_TEST_SUITE_FUNC(cos)
 	double max;
 
 #define COS(a, b, min_ref, max_ref)  do {\
-	i.min = min = a * hkl_DEGTORAD;\
-	i.max = max = b * hkl_DEGTORAD;\
+	i.min = min = a * HKL_DEGTORAD;\
+	i.max = max = b * HKL_DEGTORAD;\
 	i_ref.min = min_ref;\
 	i_ref.max = max_ref;\
 	hkl_interval_cos(&i);\
@@ -184,8 +184,8 @@ HKL_TEST_SUITE_FUNC(sin)
 	double min, max;
 
 #define SIN(a,b, min_ref, max_ref)  do {\
-	i.min = min = a *  hkl_DEGTORAD;\
-	i.max = max = b *  hkl_DEGTORAD;\
+	i.min = min = a *  HKL_DEGTORAD;\
+	i.max = max = b *  HKL_DEGTORAD;\
 	i_ref.min = min_ref;\
 	i_ref.max = max_ref;\
 	hkl_interval_sin(&i);\
@@ -261,8 +261,8 @@ HKL_TEST_SUITE_FUNC(tan)
 	double min, max;
 
 #define TAN(a,b, min_ref, max_ref)  do {\
-	i.min = min = a *  hkl_DEGTORAD;\
-	i.max = max = b *  hkl_DEGTORAD;\
+	i.min = min = a *  HKL_DEGTORAD;\
+	i.max = max = b *  HKL_DEGTORAD;\
 	i_ref.min = min_ref;\
 	i_ref.max = max_ref;\
 	hkl_interval_tan(&i);\

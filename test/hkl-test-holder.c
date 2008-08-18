@@ -87,20 +87,20 @@ HKL_TEST_SUITE_FUNC(update)
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
 
 	hkl_holder_update(holder);
-	HKL_ASSERT_DOUBLES_EQUAL(1., holder->q.a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.d, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., holder->q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.d, HKL_EPSILON);
 
 	axis = hkl_holder_get_axis(holder, 0);
 	hkl_axis_get_config(axis, &config);
 	config.value = G_PI_2;
 	hkl_axis_set_config(axis, &config);
 	hkl_holder_update(holder);
-	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), holder->q.a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), holder->q.b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.d, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), holder->q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), holder->q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.d, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -129,57 +129,57 @@ HKL_TEST_SUITE_FUNC(get_distance)
 	B->config.consign =-10 * HKL_DEGTORAD;
 
 	// get_distance
-	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.current = 90 * HKL_DEGTORAD;
 	B->config.current =-90 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(180 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(180 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.current = 120 * HKL_DEGTORAD;
 	B->config.current =-150 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.current =-240 * HKL_DEGTORAD;
 	B->config.current = 200 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(80 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(80 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.current = 200 * HKL_DEGTORAD;
 	B->config.current = 240 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(40 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(40 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.current = -90 * HKL_DEGTORAD;
 	B->config.current =-100 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(20 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.consign = 90 * HKL_DEGTORAD;
 	B->config.consign =-90 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(180 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(180 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.consign = 120 * HKL_DEGTORAD;
 	B->config.consign =-150 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.consign =-240 * HKL_DEGTORAD;
 	B->config.consign = 200 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(80 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(80 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.consign = 200 * HKL_DEGTORAD;
 	B->config.consign = 240 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(40 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(40 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	A->config.consign = -90 * HKL_DEGTORAD;
 	B->config.consign =-100 * HKL_DEGTORAD;
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance(&axes1, &axes2), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10 * HKL_DEGTORAD, hkl_axes_get_distance_consign(&axes1, &axes2), HKL_EPSILON);
 
 	for(i=0; i<axes1->axes->len; ++i)
 		hkl_axis_free(axes1->axes->list[i]);

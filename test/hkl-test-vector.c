@@ -16,9 +16,9 @@ HKL_TEST_SUITE_FUNC(set)
 
 	hkl_vector_set(&v, 1, 2, 3);
 
-	HKL_ASSERT_DOUBLES_EQUAL(1., v.x, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(2., v.y, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(3., v.z, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., v.x, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(2., v.y, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(3., v.z, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -51,8 +51,8 @@ HKL_TEST_SUITE_FUNC(norm2)
 	HklVector v1 = {0.0, 1.0, 2.0};
 	HklVector v2 = {-1.0, 1.0, 2.0};
 
-	HKL_ASSERT_DOUBLES_EQUAL(sqrt(5.0), hkl_vector_norm2(&v1), hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(sqrt(6.0), hkl_vector_norm2(&v2), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(sqrt(5.0), hkl_vector_norm2(&v1), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(sqrt(6.0), hkl_vector_norm2(&v2), HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -73,7 +73,7 @@ HKL_TEST_SUITE_FUNC(scalar_product)
 	HklVector v = {0.0, 1.0, 2.0};
 
 	double scalar = hkl_vector_scalar_product(&v, &v);
-	HKL_ASSERT_DOUBLES_EQUAL( 5.0, scalar, hkl_EPSILON );
+	HKL_ASSERT_DOUBLES_EQUAL( 5.0, scalar, HKL_EPSILON );
 
 	return HKL_TEST_PASS;
 }
@@ -99,13 +99,13 @@ HKL_TEST_SUITE_FUNC(angle)
 	HklVector v3 = {1., .5, -1.};
 
 	angle = hkl_vector_angle(&v, &v);
-	HKL_ASSERT_DOUBLES_EQUAL(0., angle, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., angle, HKL_EPSILON);
 
 	angle = hkl_vector_angle(&v, &v1);
-	HKL_ASSERT_DOUBLES_EQUAL(acos(1./sqrt(2.)), angle, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(acos(1./sqrt(2.)), angle, HKL_EPSILON);
 
 	angle = hkl_vector_angle(&v2, &v3);
-	HKL_ASSERT_DOUBLES_EQUAL(acos(1./2.25), angle, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(acos(1./2.25), angle, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -116,7 +116,7 @@ HKL_TEST_SUITE_FUNC(rotated_around_vector)
 	HklVector z = {0, 0, 1};
 	HklVector y_ref = {0, 1, 0};
 
-	hkl_vector_rotated_around_vector(&x, &z, 90 * hkl_DEGTORAD);
+	hkl_vector_rotated_around_vector(&x, &z, 90 * HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&y_ref, &x));
 
 	return HKL_TEST_PASS;

@@ -20,17 +20,17 @@ HKL_TEST_SUITE_FUNC( new_copy )
 	axis = hkl_axis_new("omega", &v);
 
 	HKL_ASSERT_EQUAL(0, strcmp("omega", axis->name));
-	HKL_ASSERT_DOUBLES_EQUAL(-G_PI, axis->config.range.min, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(G_PI, axis->config.range.max, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., axis->config.value, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(-G_PI, axis->config.range.min, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(G_PI, axis->config.range.max, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., axis->config.value, HKL_EPSILON);
 	HKL_ASSERT_EQUAL(1, axis->config.dirty);
 
 	copy = hkl_axis_new_copy(axis);
 
 	HKL_ASSERT_EQUAL(0, strcmp("omega", copy->name));
-	HKL_ASSERT_DOUBLES_EQUAL(-G_PI, copy->config.range.min, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(G_PI, copy->config.range.max, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., copy->config.value, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(-G_PI, copy->config.range.min, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(G_PI, copy->config.range.max, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., copy->config.value, HKL_EPSILON);
 	HKL_ASSERT_EQUAL(1, copy->config.dirty);
 
 	return HKL_TEST_PASS;
@@ -60,9 +60,9 @@ HKL_TEST_SUITE_FUNC( get_set_config )
 
 	hkl_axis_get_config(axis, &config);
 
-	HKL_ASSERT_DOUBLES_EQUAL(-G_PI, config.range.min, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(G_PI, config.range.max, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., config.value, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(-G_PI, config.range.min, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(G_PI, config.range.max, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., config.value, HKL_EPSILON);
 	HKL_ASSERT_EQUAL(1, config.dirty);
 
 	config.range.min = -1.;
@@ -71,9 +71,9 @@ HKL_TEST_SUITE_FUNC( get_set_config )
 	hkl_axis_clear_dirty(axis);
 	hkl_axis_set_config(axis, &config);
 
-	HKL_ASSERT_DOUBLES_EQUAL(-1., axis->config.range.min, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1., axis->config.range.max, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0.5, axis->config.value, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(-1., axis->config.range.min, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., axis->config.range.max, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0.5, axis->config.value, HKL_EPSILON);
 	HKL_ASSERT_EQUAL(1, axis->config.dirty);
 
 	return HKL_TEST_PASS;
@@ -89,19 +89,19 @@ HKL_TEST_SUITE_FUNC( get_quaternions )
 	axis = hkl_axis_new("omega", &v);
 
 	hkl_axis_get_quaternion(axis, &q);
-	HKL_ASSERT_DOUBLES_EQUAL(1., q.a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, HKL_EPSILON);
 
 	hkl_axis_get_config(axis, &config);
 	config.value = -G_PI_2;
 	hkl_axis_set_config(axis, &config);
 	hkl_axis_get_quaternion(axis, &q);
-	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2.), q.a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(-1./sqrt(2.), q.b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2.), q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(-1./sqrt(2.), q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }

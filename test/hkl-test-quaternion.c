@@ -14,10 +14,10 @@ HKL_TEST_SUITE_FUNC(set)
 {
 	HklQuaternion q;
 	hkl_quaternion_set(&q, 1, 0, 0, 0);
-	HKL_ASSERT_DOUBLES_EQUAL(1., q.a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -27,10 +27,10 @@ HKL_TEST_SUITE_FUNC(copy)
 	HklQuaternion q = {1, 0, 0, 0};
 	HklQuaternion copy = q;
 
-	HKL_ASSERT_DOUBLES_EQUAL(1., copy.a, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., copy.b, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., copy.c, hkl_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., copy.d, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., copy.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., copy.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., copy.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., copy.d, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -73,7 +73,7 @@ HKL_TEST_SUITE_FUNC(from_angle_and_axe)
 	hkl_quaternion_from_angle_and_axe(&q, 0., &v_ref2);
 	HKL_ASSERT_EQUAL(0, hkl_quaternion_cmp(&q_ref1, &q));
 
-	hkl_quaternion_from_angle_and_axe(&q, 90. * hkl_DEGTORAD, &v_ref2);
+	hkl_quaternion_from_angle_and_axe(&q, 90. * HKL_DEGTORAD, &v_ref2);
 	HKL_ASSERT_EQUAL(0, hkl_quaternion_cmp(&q_ref2, &q));
 
 	return HKL_TEST_PASS;
@@ -94,7 +94,7 @@ HKL_TEST_SUITE_FUNC(norm2)
 {
 	HklQuaternion q = {1., 2., 3., 4.};
 
-	HKL_ASSERT_DOUBLES_EQUAL(sqrt(30.), hkl_quaternion_norm2(&q), hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(sqrt(30.), hkl_quaternion_norm2(&q), HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -140,18 +140,18 @@ HKL_TEST_SUITE_FUNC(to_angle_and_axe)
 	// test the q = (1, 0, 0, 0) solution axe == (0, 0, 0) and angle = 0.
 	hkl_quaternion_to_angle_and_axe(&q_I, &angle, &v);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&v_null, &v));
-	HKL_ASSERT_DOUBLES_EQUAL(0., angle, hkl_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., angle, HKL_EPSILON);
 
 	// test other cases
 	for(i=-180; i<180; i++) {
-		angle_ref = i *  hkl_DEGTORAD;
+		angle_ref = i *  HKL_DEGTORAD;
 		hkl_quaternion_from_angle_and_axe(&q, angle_ref, &v_ref);
 		hkl_quaternion_to_angle_and_axe(&q, &angle, &v);
 
 		if (!hkl_vector_cmp(&v_ref, &v))
-			HKL_ASSERT_DOUBLES_EQUAL(angle_ref, angle, hkl_EPSILON);
+			HKL_ASSERT_DOUBLES_EQUAL(angle_ref, angle, HKL_EPSILON);
 		else if (hkl_vector_is_opposite(&v, &v_ref))
-			HKL_ASSERT_DOUBLES_EQUAL(angle_ref, -angle, hkl_EPSILON);
+			HKL_ASSERT_DOUBLES_EQUAL(angle_ref, -angle, HKL_EPSILON);
 	}
 
 	return HKL_TEST_PASS;

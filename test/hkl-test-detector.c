@@ -41,7 +41,7 @@ HKL_TEST_SUITE_FUNC(compute_kf)
 	HklAxis *axis2 = NULL;
 	HklHolder *holder = NULL;
 	HklVector kf;
-	HklVector kf_ref = {0, hkl_TAU / hkl_DEFAULT_WAVE_LENGTH, 0};
+	HklVector kf_ref = {0, HKL_TAU / HKL_DEFAULT_WAVE_LENGTH, 0};
 	HklAxisConfig config;
 
 	geom = hkl_geometry_new();
