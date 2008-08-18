@@ -27,8 +27,8 @@ public class Hkl.Sample {
 			this.hkl.z = l;
 
 			// compute the _hkl using only the axes of the geometry
-			weak Holder holder_d = g.get_holder(det.idx);
-			weak Holder holder_s = g.get_holder(0U);
+			weak Holder holder_d = g.holders[det.idx];
+			weak Holder holder_s = g.holders[0];
 
 			// compute Q from angles
 			g.source.compute_ki(ki);

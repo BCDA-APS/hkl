@@ -40,7 +40,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 		// R * UB
 		// for now the 0 holder is the sample holder.
-		weak Holder holder = geom.get_holder(0);
+		weak Holder holder = geom.holders[0];
 		holder.q.to_matrix(RUB);
 		RUB.times_matrix(this.sample.UB);
 
@@ -160,7 +160,7 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 
 	// R * UB * h = Q
 	// for now the 0 holder is the sample holder.
-	weak Hkl.Holder holder = engine->geometry.get_holder(0);
+	weak Hkl.Holder holder = engine->geometry.holders[0];
 	engine->sample.UB.times_vector(Hkl);
 	Hkl.rotated_quaternion(holder.q);
 

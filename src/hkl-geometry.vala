@@ -2,13 +2,12 @@ public class Hkl.Geometry
 {
 	public Source source;
 	public List<Axis> axes;
-	public List<Holder> holders;
+	public Holder[] holders;
 
 	public Geometry()
 	{
 		this.source.set(1.54, 1., 0., 0.);
 		this.axes = new List<Axis>();
-		this.holders = new List<Holder>();
 	}
 
 	public Geometry.copy(Geometry src)
@@ -16,7 +15,7 @@ public class Hkl.Geometry
 		this.source = src.source;
 		uint i;
 		this.axes = new List<Axis>();
-		this.holders = new List<Holder>();
+		this.holders = new Holder[src.holders.length];
 		// make a deep copy of the axes
 		for(i=0U; i<src.axes.length; ++i) {
 			weak Axis axis = src.axes.get(i);
@@ -24,20 +23,16 @@ public class Hkl.Geometry
 		}
 
 		// make a deep copy of the holders
-		for(i=0U; i<src.holders.length; ++i) {
-			weak Holder holder = src.holders.get(i);
-			holder = this.holders.add(new Holder.copy(holder, this.axes));
-		}
+		uint idx = 0U;
+		foreach(weak Holder holder in src.holders)
+			this.holders[idx++] = new Holder.copy(holder, this.axes);
 	}
 
 	public weak Holder add_holder()
 	{
-		return this.holders.add(new Holder(this.axes));
-	}
-
-	public weak Holder get_holder(uint idx)
-	{
-		return this.holders.get(idx);
+		int length = this.holders.length;
+		this.holders.resize(length + 1);
+		return this.holders[length] = new Holder(this.axes);
 	}
 
 	public weak Axis get_axis(uint idx)
@@ -58,13 +53,11 @@ public class Hkl.Geometry
 
 	public void update()
 	{
-		uint i;
-		for(i=0U; i<this.holders.length; ++i) {
-			weak Holder holder = this.holders.get(i);
+		foreach(weak Holder holder in this.holders)
 			holder.update();
-		}
 
-		for(i=0U; i<this.axes.length; ++i) {
+		uint i=0U;
+		for(; i<this.axes.length; ++i) {
 			weak Axis axis = this.axes.get(i);
 			axis.clear_dirty();
 		}

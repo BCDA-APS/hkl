@@ -11,7 +11,7 @@ public struct Hkl.Detector
 	{
 		g.update();
 
-		weak Holder holder = g.get_holder(this.idx);
+		weak Holder holder = g.holders[this.idx];
 		kf.set(TAU / g.source.wave_length, 0., 0.);
 		kf.rotated_quaternion(holder.q);
 	}
