@@ -62,16 +62,16 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		int status;
 		double d;
 		weak Gsl.MultirootFsolver solver = this.solver;
-		weak Gsl.Vector x = this.x;
+		double *x = this.x.ptr(0);
 
 		// get the starting point from the geometry
 		// must be put in the auto_set method
 		uint idx=0U;
 		foreach(weak Axis axis in this.axes)
-			x.set(idx++, axis.config.value);
+			x[idx++] = axis.config.value;
 
 		// Initialize method 
-		solver.set(&f, x);
+		solver.set(&f, this.x);
 
 		// iterate to find the solution
 		uint iter = 0U;
@@ -80,11 +80,9 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			status = solver.iterate();
 			if (status != 0 || iter % 1000 == 0) {
 				// Restart from another point.
-				for(idx=0U; idx<this.axes.length; ++idx) {
-					d = Random.double_range(0., Math.PI);
-					x.set(idx, d);
-				}
-				solver.set(&f, x);
+				for(idx=0U; idx<this.axes.length; ++idx)
+					x[idx] = Random.double_range(0., Math.PI);
+				solver.set(&f, this.x);
 				status = solver.iterate();
 			}
 			status = Gsl.MultirootTest.residual (solver.f, EPSILON);
@@ -98,13 +96,14 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		// in a futur version the geometry must contain a gsl_vector
 		// to avoid this.
 		idx = 0U;
+		x = solver.x.ptr(0);
 		foreach(weak Axis axis in this.axes) {
 			AxisConfig config = {{0., 0.}, 0., false};
 			axis.get_config(config);
-			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(idx++));
+			config.value = Gsl.Trig.angle_restrict_pos(x[idx++]);
 			axis.set_config(config);
 		}
-		x.memcpy(solver.x);
+		this.x.memcpy(solver.x);
 		this.geometry.update();
 
 		return true;
@@ -132,12 +131,13 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	weak Hkl.PseudoAxis K = engine->pseudoAxes[1];
 	weak Hkl.PseudoAxis L = engine->pseudoAxes[2];
 
-	// update the workspace from x;
+	// update the axes from x;
 	uint idx=0U;
+	double *values = x.ptr(0);
 	foreach(weak Hkl.Axis axis in engine->axes) {
 		Hkl.AxisConfig config = {{0., 0.}, 0., false};
 		axis.get_config(config);
-		config.value = x.get(idx++);
+		config.value = values[idx++];
 		axis.set_config(config);
 	}
 	engine->geometry.update();
@@ -175,14 +175,13 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
  * 2 -> pi + angle
  * 3 -> -angle
  */
-static void change_sector(Gsl.Vector x, uint[] sector)
+static void change_sector(double *x, uint[] sector)
 {
 	uint i;
-
-	for(i=0U; i<x.size; ++i) {
+	for(i=0U; i<sector.length; ++i) {
 		double value;
 
-		value = x.get(i);
+		value = x[i];
 		switch (sector[i]) {
 			case 0:
 				break;
@@ -196,7 +195,7 @@ static void change_sector(Gsl.Vector x, uint[] sector)
 				value = -value;
 				break;
 		}
-		x.set(i, value);
+		x[i] = value;
 	}
 }
 
@@ -211,12 +210,13 @@ static void test_sector(Gsl.Vector x, Gsl.MultirootFunction func)
 {
 	uint i;
 
-	var f = new Gsl.Vector(x.size);
+	var F = new Gsl.Vector(x.size);
+	double *f = F.ptr(0);
 
-	func.f(x, func.params, f);
+	func.f(x, func.params, F);
 	bool ko = false;
-	for(i=0;i<f.size; ++i) {
-		if (Math.fabs(f.get(i)) > Hkl.EPSILON) {
+	for(i=0;i<x.size; ++i) {
+		if (Math.fabs(f[i]) > Hkl.EPSILON) {
 			ko = true;
 			break;
 		}
@@ -270,7 +270,7 @@ static void perm_r(uint n, int k,
 	if (z == k) {
 		Hkl.PseudoAxisEngineAuto *engine = f.params;
 		engine->x.memcpy(geom);
-		change_sector(engine->x, p);
+		change_sector(engine->x.ptr(0), p);
 		test_sector(engine->x, f);
 	} else
 		for (i=0; i<n; ++i)
