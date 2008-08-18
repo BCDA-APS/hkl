@@ -24,7 +24,6 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		bool res = false;
 		foreach(weak Gsl.MultirootFunction f in this.function.f) {
 			res |= this.solve(f);
-			this.geometries.add(new Geometry.copy(this.geometry));
 			this.compute_equivalent_geometries(f);
 		}
 		return res;
@@ -61,19 +60,15 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 	bool solve(Gsl.MultirootFunction f)
 	{
 		int status;
-		uint i;
-		uint  idx;
 		double d;
 		weak Gsl.MultirootFsolver solver = this.solver;
 		weak Gsl.Vector x = this.x;
 
 		// get the starting point from the geometry
 		// must be put in the auto_set method
-		uint n = this.related_axes_idx.length;
-		for(i=0U; i<n; ++i) {
-			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
-			x.set(i, axis.config.value);
-		}
+		uint idx=0U;
+		foreach(weak Axis axis in this.axes)
+			x.set(idx++, axis.config.value);
 
 		// Initialize method 
 		solver.set(&f, x);
@@ -85,9 +80,9 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			status = solver.iterate();
 			if (status != 0 || iter % 1000 == 0) {
 				// Restart from another point.
-				for(i=0U; i<n; ++i) {
+				for(idx=0U; idx<this.axes.length; ++idx) {
 					d = Random.double_range(0., Math.PI);
-					x.set(i, d);
+					x.set(idx, d);
 				}
 				solver.set(&f, x);
 				status = solver.iterate();
@@ -102,11 +97,11 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		// set the geometry from the gsl_vector
 		// in a futur version the geometry must contain a gsl_vector
 		// to avoid this.
-		for(i=0; i<n; ++i) {
+		idx = 0U;
+		foreach(weak Axis axis in this.axes) {
 			AxisConfig config = {{0., 0.}, 0., false};
-			weak Axis axis = this.geometry.get_axis(this.related_axes_idx[i]);
 			axis.get_config(config);
-			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(i));
+			config.value = Gsl.Trig.angle_restrict_pos(solver.x.get(idx++));
 			axis.set_config(config);
 		}
 		this.geometry.update();
@@ -116,17 +111,14 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 	bool compute_equivalent_geometries(Gsl.MultirootFunction f)
 	{
-		uint i, j;
-
-		uint n = this.related_axes_idx.length;
-		uint p = this.geometries.length;
-		for(i=0U; i<p; ++i) { 
-			weak Geometry geom = this.geometries.get(i);
-
-			var perm = new uint[n];
-			for (j=0U; i<n; ++i)
-				perm_r(n, 4, perm, 0, j, f, geom);
-		}
+		uint n = this.axes.length;
+		var perm = new uint[n];
+		var geom = new Gsl.Vector(n);
+		uint i=0U;
+		foreach(weak Axis axis in this.axes)
+			geom.set(i++, axis.config.value);
+		for (i=0U; i<n; ++i)
+			perm_r(n, 4, perm, 0, i, f, geom);
 		return true;
 	}
 
@@ -135,7 +127,6 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 {
 	Hkl.Vector Hkl, ki, dQ;
-	uint i;
 
 	Hkl.PseudoAxisEngineAuto *engine = params;
 	weak Hkl.PseudoAxis H = engine->pseudoAxes[0];
@@ -143,13 +134,11 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	weak Hkl.PseudoAxis L = engine->pseudoAxes[2];
 
 	// update the workspace from x;
-	for(i=0; i<engine->related_axes_idx.length ; ++i) {
+	uint idx=0U;
+	foreach(weak Hkl.Axis axis in engine->axes) {
 		Hkl.AxisConfig config = {{0., 0.}, 0., false};
-
-		uint idx = engine->related_axes_idx[i];
-		weak Hkl.Axis axis = engine->geometry.get_axis(idx);
 		axis.get_config(config);
-		config.value = x.get(i);
+		config.value = x.get(idx++);
 		axis.set_config(config);
 	}
 	engine->geometry.update();
@@ -262,24 +251,6 @@ static void test_sector(Gsl.Vector x, Gsl.MultirootFunction func)
 }
 
 /* 
- * @brief given a ref geometry populate a vector for a specific engine.
- * 
- * @param x The vector to populate with the right axes values.
- * @param engine The engine use to take the right axes from geom.
- * @param geom The geom use to extract the angles into x.
- */
-static void get_axes_as_gsl_vector(Gsl.Vector x,
-		Hkl.PseudoAxisEngine *engine, Hkl.Geometry geom)
-{
-	uint i;
-
-	for(i=0; i<x.size; ++i) {
-		weak Hkl.Axis axis = geom.get_axis(engine->related_axes_idx[i]);
-		x.set(i, axis.config.value);
-	}
-}
-
-/* 
  * @brief compute the permutation and test its validity.
  * 
  * @param n number of axes
@@ -292,15 +263,14 @@ static void get_axes_as_gsl_vector(Gsl.Vector x,
  */
 static void perm_r(uint n, int k,
 		uint[] p, int z, uint x,
-		Gsl.MultirootFunction f, Hkl.Geometry geom)
+		Gsl.MultirootFunction f, Gsl.Vector geom)
 {
 	uint i;
 
 	p[z++] = x;
 	if (z == k) {
 		var x = new Gsl.Vector(n);
-
-		get_axes_as_gsl_vector(x, f.params, geom);
+		x.memcpy(geom);
 		change_sector(x, p);
 		test_sector(x, f);
 	} else

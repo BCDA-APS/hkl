@@ -27,7 +27,7 @@ public abstract class Hkl.PseudoAxisEngine
 	public Geometry geometry;
 	public Detector detector;
 	public weak Sample sample;
-	public uint[] related_axes_idx;
+	public Axis[] axes;
 	public PseudoAxis[] pseudoAxes;
 	public List<Geometry> geometries;
 
@@ -56,15 +56,10 @@ public abstract class Hkl.PseudoAxisEngine
 		this.detector = det;
 		this.sample = sample;
 		this.function = f;
-		this.related_axes_idx = new uint[f.axes.length];
-		for(i=0U; i<f.axes.length; ++i) {
-			weak Axis axis = this.geometry.get_axis_by_name(f.axes[i]);
-			int idx = this.geometry.axes.index_of(axis);
-			if (idx >=0)
-				this.related_axes_idx[i] = idx;
-			else
-				return false;
-		}
+		this.axes = new Axis[f.axes.length];
+		uint idx=0U;
+		foreach(weak string s in f.axes)
+			this.axes[idx++] = this.geometry.get_axis_by_name(s);
 		return true;
 	}
 }
