@@ -43,9 +43,9 @@ HKL_TEST_SUITE_FUNC(new_copy)
 	copy = hkl_holder_new_copy(holder, axes2);
 
 	// check that private_axes are the same
-	for(i=0; i<hkl_holder_length(holder); ++i) {
-		HklAxis *axis_src = hkl_holder_get_axis(holder, i);
-		HklAxis *axis_copy = hkl_holder_get_axis(copy, i);
+	for(i=0; i<holder->axes_length1; ++i) {
+		HklAxis *axis_src = holder->axes[i];
+		HklAxis *axis_copy = copy->axes[i];
 
 		HKL_ASSERT_EQUAL(0, strcmp(axis_src->name, axis_copy->name));
 	}
@@ -63,13 +63,13 @@ HKL_TEST_SUITE_FUNC(add_rotation_axis)
 
 	// add two different axis
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
-	HKL_ASSERT_EQUAL(1, hkl_holder_length(holder));
+	HKL_ASSERT_EQUAL(1, holder->axes_length1);
 	hkl_holder_add_rotation_axis(holder, "b", 1, 0, 0);
-	HKL_ASSERT_EQUAL(2, hkl_holder_length(holder));
+	HKL_ASSERT_EQUAL(2, holder->axes_length1);
 
 	// can not add two times the same axes, must return the same axis
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
-	HKL_ASSERT_EQUAL(2, hkl_holder_length(holder));
+	HKL_ASSERT_EQUAL(2, holder->axes_length1);
 
 	return HKL_TEST_PASS;
 }
@@ -92,7 +92,7 @@ HKL_TEST_SUITE_FUNC(update)
 	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.c, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(0., holder->q.d, HKL_EPSILON);
 
-	axis = hkl_holder_get_axis(holder, 0);
+	axis = holder->axes[0];
 	hkl_axis_get_config(axis, &config);
 	config.value = G_PI_2;
 	hkl_axis_set_config(axis, &config);

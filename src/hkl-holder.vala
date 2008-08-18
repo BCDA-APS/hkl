@@ -1,27 +1,25 @@
 public class Hkl.Holder {
-	weak List<Axis> axes;
-	List<weak Axis> private_axes;
+	weak List<Axis> _axes;
+	public Axis[] axes;
 	public Quaternion q;
 
-	public Holder(List<Axis> axes)
+	public Holder(List<Axis> _axes)
 	{
-		this.axes = axes;
-		this.private_axes = new List<weak Axis>();
+		this._axes = _axes;
 		q.set(1., 0., 0., 0.);
 	}
 
-	public Holder.copy(Holder src, List<Axis> axes)
+	public Holder.copy(Holder src, List<Axis> _axes)
 	{
-		this.axes = axes;
-		this.private_axes = new List<weak Axis>();
+		this._axes = _axes;
+		this.axes = new Axis[src.axes.length];
 
 		/* populate the private_axes from the axes */
 		uint i = 0U;
-		for(; i<src.private_axes.length; ++i) {
-			weak Axis axis = src.private_axes.get(i);
-			int idx = src.axes.index_of(axis);
-			axis = this.axes.get(idx);
-			axis = this.private_axes.add(axis);
+		for(; i<src.axes.length; ++i) {
+			weak Axis axis = src.axes[i];
+			int idx = src._axes.index_of(axis);
+			axis = this.axes[i] = this._axes.get(idx);
 		}
 
 		/* now copy the quaternion */
@@ -35,29 +33,20 @@ public class Hkl.Holder {
 		weak Axis axis = this.add_rotation(name, axis_v);
 
 		/* axis already in the holder ? */
-		if (!this.private_axes.contains(axis))
-			axis = this.private_axes.add(axis);
-		return axis;
-	}
-
-	public uint length()
-	{
-		return this.private_axes.length;
-	}
-
-	public weak Axis get_axis(int idx)
-	{
-		return this.private_axes.get(idx);
+		foreach(weak Axis p_axis in this.axes)
+			if (axis == p_axis)
+				return axis;
+		int length = this.axes.length;
+		this.axes.resize(length + 1);
+		return this.axes[length] = axis;
 	}
 
 	public void update()
 	{
 		if (this.is_dirty()) {
-			uint i;
 			this.q.set(1., 0., 0., 0.);
-			for(; i<this.private_axes.length; ++i) {
+			foreach(weak Axis axis in this.axes) {
 				Quaternion q;
-				weak Axis axis = this.private_axes.get(i);
 				axis.get_quaternion(q);
 				this.q.times_quaternion(q);
 			}
@@ -73,22 +62,19 @@ public class Hkl.Holder {
 	{
 		uint i;
 		// check if an axis with the same name is in the axis list.
-		for(; i<this.axes.length; ++i) {
-			weak Axis axis = this.axes.get(i);
+		for(; i<this._axes.length; ++i) {
+			weak Axis axis = this._axes.get(i);
 			if (axis.name == name)
 				return axis;
 		}
-		return this.axes.add(new Axis(name, axis_v));
+		return this._axes.add(new Axis(name, axis_v));
 	}
 
 	bool is_dirty()
 	{
-		uint i;
-		for(; i<this.private_axes.length; ++i) {
-			weak Axis axis = this.private_axes.get(i);
+		foreach(weak Axis axis in this.axes)
 			if (axis.config.dirty)
 				return true;
-		}
 		return false;
 	}
 
