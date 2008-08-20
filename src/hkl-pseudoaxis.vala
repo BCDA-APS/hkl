@@ -11,10 +11,12 @@ public class Hkl.PseudoAxis
 	}
 }
 
+/* as vala do not support delegates array for now lets do this */
 public struct Hkl.PseudoAxisEngineFunc
 {
 	public Gsl.MultirootFunction[] f;
 	public string[] axes;
+	public Parameter[] parameters;
 }
 
 public abstract class Hkl.PseudoAxisEngine
@@ -51,8 +53,6 @@ public abstract class Hkl.PseudoAxisEngine
 
 	public virtual bool set(PseudoAxisEngineFunc f, Detector det, Sample sample)
 	{
-		uint i;
-
 		this.detector = det;
 		this.sample = sample;
 		this.function = f;

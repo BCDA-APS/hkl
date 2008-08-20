@@ -1,8 +1,10 @@
 #include <math.h>
 
+#include <hkl-macros.h>
+#include <hkl-constants.h>
 #include <hkl-geometry-factory.h>
-#include <hkl-pseudoaxis-E4CV.h>
 #include <hkl-pseudoaxis-auto.h>
+#include <hkl-pseudoaxis-auto-E4CV.h>
 
 #include "hkl-test.h"
 
@@ -69,14 +71,12 @@ HKL_TEST_SUITE_FUNC(compute_pseudoAxes)
 	HklDetector det;
 	HklSample *sample;
 	char *pseudoaxes[] = {"h", "k", "l"};
-	char *axes[] = {"omega", "chi", "phi", "tth"};
 
 	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
 	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
-	gsl_multiroot_function fm[] = {{E4CV_bissector, 4, engine}};
-	HklPseudoAxisEngineFunc f = {fm, 1, axes, 4};
+	HklPseudoAxisEngineFunc f = E4CV_bissector_func(engine);
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	// geometry -> pseudo
@@ -112,14 +112,12 @@ HKL_TEST_SUITE_FUNC(compute_geometries)
 	HklSample *sample;
 	unsigned int i, j;
 	char *pseudoaxes[] = {"h", "k", "l"};
-	char *axes[] = {"omega", "chi", "phi", "tth"};
 
 	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
 	hkl_detector_init(&det, 1);
 	sample = hkl_sample_new("test");
 	engine = (HklPseudoAxisEngine *)hkl_pseudo_axis_engine_auto_new("hkl", pseudoaxes, 3, geom);
-	gsl_multiroot_function fm[] = {{E4CV_bissector, 4, engine}};
-	HklPseudoAxisEngineFunc f = {fm, 1, axes, 4};
+	HklPseudoAxisEngineFunc f = E4CV_bissector_func(engine);
 	hkl_pseudo_axis_engine_set(engine, &f, &det, sample);
 
 	H = engine->pseudoAxes[0];
