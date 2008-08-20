@@ -14,6 +14,7 @@ public class Hkl.PseudoAxis
 /* as vala do not support delegates array for now lets do this */
 public struct Hkl.PseudoAxisEngineFunc
 {
+	public string name;
 	public Gsl.MultirootFunction[] f;
 	public string[] axes;
 	public Parameter[] parameters;

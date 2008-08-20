@@ -50,6 +50,7 @@ public Hkl.PseudoAxisEngineFunc E4CV_bissector_func(Hkl.PseudoAxisEngine *engine
 	Gsl.MultirootFunction f1 = {E4CV_bissector, 4, engine};
 
 	Hkl.PseudoAxisEngineFunc func;
+	func.name = "bissector";
 	func.f = new Gsl.MultirootFunction[1];
 	func.f[0] = f1;
 	func.axes = new string[4];
@@ -68,6 +69,7 @@ public Hkl.PseudoAxisEngineFunc E4CV_constant_omega_func(Hkl.PseudoAxisEngine *e
 	Hkl.Parameter p1 = {"omega", {-Math.PI, Math.PI}, 0., true};
 
 	Hkl.PseudoAxisEngineFunc func;
+	func.name = "constant omega";
 	func.f = new Gsl.MultirootFunction[1];
 	func.f[0] = f1;
 	func.axes = new string[4];
@@ -87,6 +89,7 @@ public Hkl.PseudoAxisEngineFunc E4CV_constant_chi_func(Hkl.PseudoAxisEngine *eng
 	Hkl.Parameter p1 = {"chi", {-Math.PI, Math.PI}, 0., true};
 
 	Hkl.PseudoAxisEngineFunc func;
+	func.name = "constant chi";
 	func.f = new Gsl.MultirootFunction[1];
 	func.f[0] = f1;
 	func.axes = new string[4];
@@ -106,6 +109,7 @@ public Hkl.PseudoAxisEngineFunc E4CV_constant_phi_func(Hkl.PseudoAxisEngine *eng
 	Hkl.Parameter p1 = {"phi", {-Math.PI, Math.PI}, 0., true};
 
 	Hkl.PseudoAxisEngineFunc func;
+	func.name = "constant phi";
 	func.f = new Gsl.MultirootFunction[1];
 	func.f[0] = f1;
 	func.axes = new string[4];

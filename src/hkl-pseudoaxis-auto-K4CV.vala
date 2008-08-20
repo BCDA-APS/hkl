@@ -50,6 +50,7 @@ public Hkl.PseudoAxisEngineFunc K4CV_bissector_func(Hkl.PseudoAxisEngine *engine
 	Gsl.MultirootFunction f2 = {K4CV_bissector_2, 4, engine};
 
 	Hkl.PseudoAxisEngineFunc func;
+	func.name = "bissector";
 	func.f = new Gsl.MultirootFunction[2];
 	func.f[0] = f1;
 	func.f[1] = f2;
