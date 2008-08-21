@@ -1,19 +1,17 @@
 public class Hkl.Geometry
 {
 	public Source source;
-	public List<Axis> axes;
+	public Axis[] axes;
 	public Holder[] holders;
 
 	public Geometry()
 	{
 		this.source.set(1.54, 1., 0., 0.);
-		this.axes = new List<Axis>();
 	}
 
 	public Geometry.TwoCV()
 	{
 		this.source.set(1.54, 1., 0., 0.);
-		this.axes = new List<Axis>();
 
 		weak Holder h = this.add_holder();
 		h.add_rotation_axis("omega", 0., -1., 0.);
@@ -25,7 +23,6 @@ public class Hkl.Geometry
 	public Geometry.E4CV()
 	{
 		this.source.set(1.54, 1., 0., 0.);
-		this.axes = new List<Axis>();
 
 		weak Holder h = this.add_holder();
 		h.add_rotation_axis("omega", 0., -1., 0.);
@@ -39,7 +36,6 @@ public class Hkl.Geometry
 	public Geometry.K4CV(double alpha)
 	{
 		this.source.set(1.54, 1., 0., 0.);
-		this.axes = new List<Axis>();
 
 		weak Holder h = this.add_holder();
 		h.add_rotation_axis("komega", 0., -1., 0.);
@@ -53,7 +49,6 @@ public class Hkl.Geometry
 	public Geometry.E6C()
 	{
 		this.source.set(1.54, 1., 0., 0.);
-		this.axes = new List<Axis>();
 
 		weak Holder h = this.add_holder();
 		h.add_rotation_axis("mu", 0., 0., 1.);
@@ -69,7 +64,6 @@ public class Hkl.Geometry
 	public Geometry.K6C(double alpha)
 	{
 		this.source.set(1.54, 1., 0., 0.);
-		this.axes = new List<Axis>();
 
 		weak Holder h = this.add_holder();
 		h.add_rotation_axis("mu", 0., 0., 1.);
@@ -85,41 +79,31 @@ public class Hkl.Geometry
 	public Geometry.copy(Geometry src)
 	{
 		this.source = src.source;
-		uint i;
-		this.axes = new List<Axis>();
+		this.axes = new Axis[src.axes.length];
 		this.holders = new Holder[src.holders.length];
 		// make a deep copy of the axes
-		for(i=0U; i<src.axes.length; ++i) {
-			weak Axis axis = src.axes.get(i);
-			axis = this.axes.add(new Axis.copy(axis));
-		}
+		uint idx=0U;
+		foreach(weak Axis axis in src.axes)
+			this.axes[idx++] = new Axis.copy(axis);
 
 		// make a deep copy of the holders
-		uint idx = 0U;
+		idx = 0U;
 		foreach(weak Holder holder in src.holders)
-			this.holders[idx++] = new Holder.copy(holder, this.axes);
+			this.holders[idx++] = new Holder.copy(holder, this);
 	}
 
 	public weak Holder add_holder()
 	{
 		int length = this.holders.length;
 		this.holders.resize(length + 1);
-		return this.holders[length] = new Holder(this.axes);
-	}
-
-	public weak Axis get_axis(uint idx)
-	{
-		return this.axes.get(idx);
+		return this.holders[length] = new Holder(this);
 	}
 
 	public weak Axis? get_axis_by_name(string name)
 	{
-		uint i;
-		for(; i<this.axes.length; ++i) {
-			weak Axis axis = this.axes.get(i);
+		foreach(weak Axis axis in this.axes)
 			if (axis.name == name)
 				return axis;
-		}
 		return null;
 	}
 
@@ -128,19 +112,13 @@ public class Hkl.Geometry
 		foreach(weak Holder holder in this.holders)
 			holder.update();
 
-		uint i=0U;
-		for(; i<this.axes.length; ++i) {
-			weak Axis axis = this.axes.get(i);
+		foreach(weak Axis axis in this.axes)
 			axis.clear_dirty();
-		}
 	}
 
 	public void fprintf(FileStream stream)
 	{
-		uint i;
-		for(i=0U; i<this.axes.length; ++i) {
-			weak Axis axis = this.axes.get(i);
+		foreach(weak Axis axis in this.axes)
 			stream.printf(" %s : %f", axis.name, axis.config.value);
-		}
 	}
 }

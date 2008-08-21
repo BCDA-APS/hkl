@@ -1,6 +1,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <hkl-geometry.h>
 #include <hkl-holder.h>
 #include <hkl-axis.h>
 #include <hkl-list.h>
@@ -15,15 +16,13 @@
 
 HKL_TEST_SUITE_FUNC(new_copy)
 {
-	HklAxis *axis;
-	HklList *axes1, *axes2;
-	HklHolder *holder, *copy;
-	HklVector axis_v = {1, 0, 0};
+	HklGeometry *g1, *g2;
+	HklHolder *holder, *copy, *tmp;
 	unsigned int i;
 
-	axes1 = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
-	axes2 = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
-	holder = hkl_holder_new(axes1);
+	g1 = hkl_geometry_new();
+	g2 = hkl_geometry_new();
+	holder = hkl_holder_new(g1);
 
 	// add two different axis
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
@@ -35,12 +34,11 @@ HKL_TEST_SUITE_FUNC(new_copy)
 	//HKL_ASSERT_POINTER_EQUAL(NULL, copy);
 	
 	// so set a compatible axes2 and copy the holder
-	axis = hkl_axis_new("a", &axis_v);
-	hkl_list_add(axes2, axis);
-	axis = hkl_axis_new("b", &axis_v);
-	hkl_list_add(axes2, axis);
+	tmp = hkl_holder_new(g2);
+	hkl_holder_add_rotation_axis(tmp, "a", 1, 0, 0);
+	hkl_holder_add_rotation_axis(tmp, "b", 1, 0, 0);
 
-	copy = hkl_holder_new_copy(holder, axes2);
+	copy = hkl_holder_new_copy(holder, g2);
 
 	// check that private_axes are the same
 	for(i=0; i<holder->axes_length1; ++i) {
@@ -55,11 +53,11 @@ HKL_TEST_SUITE_FUNC(new_copy)
 
 HKL_TEST_SUITE_FUNC(add_rotation_axis)
 {
-	HklList *axes = NULL;
+	HklGeometry *geom = NULL;
 	HklHolder *holder = NULL;
 
-	axes = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
-	holder = hkl_holder_new(axes);
+	geom = hkl_geometry_new();
+	holder = hkl_holder_new(geom);
 
 	// add two different axis
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
@@ -78,11 +76,11 @@ HKL_TEST_SUITE_FUNC(update)
 {
 	HklAxis *axis = NULL;
 	HklAxisConfig config;
-	HklList *axes = NULL;
+	HklGeometry *geom;
 	HklHolder *holder = NULL;
 
-	axes = hkl_list_new (HKL_TYPE_AXIS, ((GBoxedCopyFunc) (hkl_axis_ref)), hkl_axis_unref);
-	holder = hkl_holder_new(axes);
+	geom = hkl_geometry_new();
+	holder = hkl_holder_new(geom);
 
 	hkl_holder_add_rotation_axis(holder, "a", 1, 0, 0);
 

@@ -1,25 +1,29 @@
 public class Hkl.Holder {
-	weak List<Axis> _axes;
+	weak Geometry geometry;
 	public Axis[] axes;
 	public Quaternion q;
 
-	public Holder(List<Axis> _axes)
+	public Holder(Geometry geometry)
 	{
-		this._axes = _axes;
+		this.geometry = geometry;
 		q.set(1., 0., 0., 0.);
 	}
 
-	public Holder.copy(Holder src, List<Axis> _axes)
+	public Holder.copy(Holder src, Geometry geometry)
 	{
-		this._axes = _axes;
+		this.geometry = geometry;
 		this.axes = new Axis[src.axes.length];
 
 		/* populate the private_axes from the axes */
 		uint i = 0U;
 		for(; i<src.axes.length; ++i) {
 			weak Axis axis = src.axes[i];
-			int idx = src._axes.index_of(axis);
-			axis = this.axes[i] = this._axes.get(idx);
+			uint idx=0U;
+			foreach(weak Axis axiss in src.geometry.axes) {
+				if (axiss == axis)
+					this.axes[i] = this.geometry.axes[idx];
+				++idx;
+			}
 		}
 
 		/* now copy the quaternion */
@@ -60,14 +64,12 @@ public class Hkl.Holder {
 	 */
 	weak Axis add_rotation(string name, Vector axis_v)
 	{
-		uint i;
-		// check if an axis with the same name is in the axis list.
-		for(; i<this._axes.length; ++i) {
-			weak Axis axis = this._axes.get(i);
+		foreach(weak Axis axis in this.geometry.axes)
 			if (axis.name == name)
 				return axis;
-		}
-		return this._axes.add(new Axis(name, axis_v));
+		int length = this.geometry.axes.length;
+		this.geometry.axes.resize(length + 1);
+		return this.geometry.axes[length] = new Axis(name, axis_v);
 	}
 
 	bool is_dirty()
