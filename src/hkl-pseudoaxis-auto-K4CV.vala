@@ -44,12 +44,12 @@ static int K4CV_bissector_2(Gsl.Vector x, void *params, Gsl.Vector f)
 	return  Gsl.Status.SUCCESS;
 }
 
-public Hkl.PseudoAxisEngineFunc K4CV_bissector_func(Hkl.PseudoAxisEngine *engine)
+public Hkl.PseudoAxisEngineAutoFunc K4CV_bissector_func(Hkl.PseudoAxisEngine *engine)
 {
 	Gsl.MultirootFunction f1 = {K4CV_bissector_1, 4, engine};
 	Gsl.MultirootFunction f2 = {K4CV_bissector_2, 4, engine};
 
-	Hkl.PseudoAxisEngineFunc func;
+	Hkl.PseudoAxisEngineAutoFunc func;
 	func.name = "bissector";
 	func.f = new Gsl.MultirootFunction[2];
 	func.f[0] = f1;

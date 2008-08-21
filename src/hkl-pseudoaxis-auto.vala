@@ -1,20 +1,60 @@
+/* as vala do not support delegates array for now lets do this */
+public struct Hkl.PseudoAxisEngineAutoFunc
+{
+	public weak string name;
+	public Gsl.MultirootFunction[] f;
+	public string[] axes;
+	public Parameter[] parameters;
+}
+
 public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 {
 	public Gsl.MultirootFsolver solver;
 	public Gsl.Vector x;
+	public weak PseudoAxisEngineAutoFunc function;
+	public PseudoAxisEngineAutoFunc[] functions;
 
 	public PseudoAxisEngineAuto(string name, string[] names, Geometry g)
 	{
 		base.init(name, names, g);
 	}
 
-	public override bool set(PseudoAxisEngineFunc f, Detector det,
-			Sample sample)
+	/* waiting for vala to let me declare a constructor outside */
+	public PseudoAxisEngineAuto.HKL_E4CV(Geometry g)
 	{
-		bool res = base.set(f, det, sample);
-		this.solver = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, f.axes.length);
-		this.x = new Gsl.Vector(f.axes.length);
-		return res;
+		string[] pseudo_names = {"h", "k", "l"};
+		base.init("hkl", pseudo_names, g);
+		this.functions = new PseudoAxisEngineAutoFunc[4];
+		this.functions[0] = E4CV_bissector_func(this);
+		this.functions[1] = E4CV_constant_omega_func(this);
+		this.functions[2] = E4CV_constant_chi_func(this);
+		this.functions[3] = E4CV_constant_phi_func(this);
+	}
+
+	public override bool set_by_name(string name, Detector det, Sample sample)
+	{
+		uint idx=0U;
+		foreach(weak PseudoAxisEngineAutoFunc func in this.functions) {
+			if (func.name == name)
+				return this.set(idx, det, sample);
+			idx++;
+		}
+		return false;
+	}
+
+	public override bool set(uint idx, Detector det, Sample sample) requires (idx < this.functions.length)
+	{
+		this.detector = det;
+		this.sample = sample;
+
+		this.function = this.functions[idx];
+		this.axes = new Axis[this.function.axes.length];
+		uint i=0U;
+		foreach(weak string s in this.function.axes)
+			this.axes[i++] = this.geometry.get_axis_by_name(s);
+		this.solver = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, this.function.axes.length);
+		this.x = new Gsl.Vector(this.function.axes.length);
+		return true;
 	}
 
 	public override bool compute_geometries()
@@ -86,10 +126,9 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 				status = solver.iterate();
 			}
 			status = Gsl.MultirootTest.residual (solver.f, EPSILON);
-		} while (status == Gsl.Status.CONTINUE && iter < 10000);
+		} while (status == Gsl.Status.CONTINUE && iter < 1000);
 		if (status == Gsl.Status.CONTINUE){
-			stdout.printf("toto %u\n", iter);
-			return (bool)Gsl.Status.ENOMEM;
+			return false;
 		}
 
 		// set the geometry from the gsl_vector
