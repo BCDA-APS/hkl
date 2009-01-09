@@ -123,10 +123,9 @@ public struct Hkl.Interval {
 		double cmin = Math.cos(this.min);
 		double cmax = Math.cos(this.max);
 
-		if (this.max - this.min >= 2 * Math.PI) {
-			min = -1;
-			max = 1;
-		} else {
+		min = -1.0;
+		max = 1.0;
+		if (this.max - this.min < 2 * Math.PI) {
 			int quad_min;
 			int quad_max;
 
@@ -270,11 +269,11 @@ public struct Hkl.Interval {
 		double smin = Math.sin(this.min);
 		double smax = Math.sin(this.max);
 
+		min = -1.0;
+		max = 1.0;
+
 		/* if there is at least one period in b, then a = [-1, 1] */
-		if ( this.max - this.min >= 2.0* Math.PI) {
-			min = -1.0;
-			max = 1.0;
-		} else {
+		if ( this.max - this.min < 2.0* Math.PI) {
 			int quad_min;
 			int quad_max;
 
