@@ -20,7 +20,6 @@ sources_vala = Split("""
          hkl-pseudoaxis-auto.vala
          hkl-pseudoaxis-auto-E4CV.vala
          hkl-pseudoaxis-auto-K4CV.vala
-         gsl.vapi
          """)
 
 sources = Split("""

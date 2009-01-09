@@ -66,6 +66,7 @@ cflags = []
 cxxflags = []
 cppdefines = []
 linkflags = []
+valapkgs = ['gsl']
 valaflags = []
 
 if platform_name == 'linux2':
@@ -87,8 +88,7 @@ if mode == 'debug':
     cflags += ['-g', '-O0']
     cxxflags += ['-g', '-O0']
 elif mode == 'release':
-  valaflags += ['--disable-assert',
-      '--disable-checking']
+  valaflags += ['--disable-assert']
   cppdefines += ['NDEBUG']
   if platform_name == 'linux2': 
     cflags += ['-O2']
@@ -101,6 +101,7 @@ env.AppendUnique(CFLAGS = cflags)
 env.AppendUnique(CXXFLAGS = cxxflags)
 env.AppendUnique(CPPDEFINES = cppdefines)
 env.AppendUnique(LINKFLAGS = linkflags)
+env.AppendUnique(VALAPKGS = valapkgs)
 env.AppendUnique(VALAFLAGS = valaflags)
 
 # Create a builder for tests
