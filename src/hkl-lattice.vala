@@ -1,8 +1,8 @@
 /*
 public static Hkl.Lattice default = {
-		{"a", {0., 11.54}, 1.54, 11.54, false},
-		{"b", {0., 11.54}, 1.54, 11.54, false},
-		{"c", {0., 11.54}, 1.54, 11.54, false},
+		{"a", {0.0, 11.54}, 1.54, 11.54, false},
+		{"b", {0.0, 11.54}, 1.54, 11.54, false},
+		{"c", {0.0, 11.54}, 1.54, 11.54, false},
 		{"alpha", {-Math.PI, Math.PI}, 90*DEGTORAD, false},
 		{"beta", {-Math.PI, Math.PI}, 90*DEGTORAD, false},
 		{"gamma", {-Math.PI, Math.PI}, 90*DEGTORAD, false}
@@ -23,12 +23,12 @@ public struct Hkl.Lattice
 	bool check_lattice_param(double a, double b, double c,
 			double alpha, double beta, double gamma)
 	{
-		double D = 1. - Math.cos(alpha)*Math.cos(alpha)
+		double D = 1.0 - Math.cos(alpha)*Math.cos(alpha)
 			- Math.cos(beta)*Math.cos(beta)
 			- Math.cos(gamma)*Math.cos(gamma)
-			+ 2.*Math.cos(alpha)*Math.cos(beta)*Math.cos(gamma);
+			+ 2.0*Math.cos(alpha)*Math.cos(beta)*Math.cos(gamma);
 
-		if (D < 0.)
+		if (D < 0.0)
 			return false;
 		else
 			return true;
@@ -37,9 +37,9 @@ public struct Hkl.Lattice
 	public Lattice(double a, double b, double c, double alpha, double beta, double gamma)
 	{
 		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)) {
-			this.a.set("a", 0., a, a+10., false);
-			this.b.set("b", 0., b, b+10., false);
-			this.c.set("c", 0., c, c+10., false);
+			this.a.set("a", 0.0, a, a+10.0, false);
+			this.b.set("b", 0.0, b, b+10.0, false);
+			this.c.set("c", 0.0, c, c+10.0, false);
 			this.alpha.set("alpha", -Math.PI, alpha, Math.PI, false);
 			this.beta.set("beta", -Math.PI, beta, Math.PI, false);
 			this.gamma.set("gamma", -Math.PI, gamma, Math.PI, false);
@@ -48,9 +48,9 @@ public struct Hkl.Lattice
 
 	public Lattice.default()
 	{
-		this.a.set("a", 0., 1.54, 11.54, false);
-		this.b.set("b", 0., 1.54, 11.54, false);
-		this.c.set("c", 0., 1.54, 11.54, false);
+		this.a.set("a", 0.0, 1.54, 11.54, false);
+		this.b.set("b", 0.0, 1.54, 11.54, false);
+		this.c.set("c", 0.0, 1.54, 11.54, false);
 		this.alpha.set("alpha", -Math.PI, 90*DEGTORAD, Math.PI, false);
 		this.beta.set("beta", -Math.PI, 90*DEGTORAD, Math.PI, false);
 		this.gamma.set("gamma", -Math.PI, 90*DEGTORAD, Math.PI, false);
@@ -81,7 +81,7 @@ public struct Hkl.Lattice
 		double D = 1 - c_alpha*c_alpha - c_beta*c_beta - c_gamma*c_gamma
 			+ 2*c_alpha*c_beta*c_gamma;
 
-		if (D > 0.)
+		if (D > 0.0)
 			D = Math.sqrt(D);
 		else
 			return false;
@@ -98,12 +98,12 @@ public struct Hkl.Lattice
 		B.m12 = b11 / D * (c_alpha*c_beta - c_gamma);
 		B.m13 = tmp / D * (c_gamma*c_alpha - c_beta);
 
-		B.m21 = 0.;
+		B.m21 = 0.0;
 		B.m22 = b11;
 		B.m23 = tmp / (s_beta*s_gamma) * (c_beta*c_gamma - c_alpha);
 
-		B.m31 = 0.;
-		B.m32 = 0.;
+		B.m31 = 0.0;
+		B.m32 = 0.0;
 		B.m33 = b22;
 
 		return true;
@@ -116,7 +116,7 @@ public struct Hkl.Lattice
 		double c_gamma = Math.cos(this.gamma.value);
 		double D = 1 - c_alpha*c_alpha - c_beta*c_beta - c_gamma*c_gamma + 2*c_alpha*c_beta*c_gamma;
 
-		if (D > 0.)
+		if (D > 0.0)
 			D = Math.sqrt(D);
 		else
 			return false;
@@ -148,7 +148,7 @@ public struct Hkl.Lattice
 
 	public void randomize()
 	{
-		Vector vector_x = {1., 0., 0.};
+		Vector vector_x = {1.0, 0.0, 0.0};
 		Vector a, b, c;
 		Vector axe;
 

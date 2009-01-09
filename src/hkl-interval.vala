@@ -130,11 +130,11 @@ public struct Hkl.Interval {
 			int quad_min;
 			int quad_max;
 
-			quad_min = (int)Math.floor(this.min / Math.PI * 2.) % 4;
+			quad_min = (int)Math.floor(this.min / Math.PI * 2.0) % 4;
 			if (quad_min < 0)
 				quad_min += 4;
 
-			quad_max = (int)Math.floor(this.max / Math.PI * 2.) % 4;
+			quad_max = (int)Math.floor(this.max / Math.PI * 2.0) % 4;
 			if (quad_max < 0)
 				quad_max += 4;
 
@@ -271,18 +271,18 @@ public struct Hkl.Interval {
 		double smax = Math.sin(this.max);
 
 		/* if there is at least one period in b, then a = [-1, 1] */
-		if ( this.max - this.min >= 2. * Math.PI) {
-			min = -1.;
-			max = 1.;
+		if ( this.max - this.min >= 2.0* Math.PI) {
+			min = -1.0;
+			max = 1.0;
 		} else {
 			int quad_min;
 			int quad_max;
 
-			quad_min = (int)Math.floor(this.min / Math.PI * 2.) % 4;
+			quad_min = (int)Math.floor(this.min / Math.PI * 2.0) % 4;
 			if (quad_min < 0)
 				quad_min += 4;
 
-			quad_max = (int)Math.floor(this.max / Math.PI * 2.) % 4;
+			quad_max = (int)Math.floor(this.max / Math.PI * 2.0) % 4;
 			if (quad_max < 0)
 				quad_max += 4;
 
@@ -294,8 +294,8 @@ public struct Hkl.Interval {
 								min = smin;
 								max = smax;
 							} else {
-								min = -1.;
-								max = 1.;
+								min = -1.0;
+								max = 1.0;
 							}
 							break;
 						case 3:
@@ -304,15 +304,15 @@ public struct Hkl.Interval {
 							break;
 						case 1:
 							if (smin > smax) {
-								min = -1.;
+								min = -1.0;
 								max = smin;
 							} else {
-								min = -1.;
+								min = -1.0;
 								max = smax;
 							}
 							break;
 						case 2:
-							min = -1.;
+							min = -1.0;
 							max = smax;
 							break;
 					}
@@ -322,7 +322,7 @@ public struct Hkl.Interval {
 						case 0:
 							if (smin < smax) {
 								min = smin;
-								max = 1.;
+								max = 1.0;
 							} else {
 								min = smax;
 								max = 1;
@@ -330,20 +330,20 @@ public struct Hkl.Interval {
 							break;
 						case 1:
 							if (smin < smax) {
-								min = -1.;
-								max = 1.;
+								min = -1.0;
+								max = 1.0;
 							} else {
 								min = smax;
 								max = smin;
 							}
 							break;
 						case 2:
-							min = -1.;
-							max = 1.;
+							min = -1.0;
+							max = 1.0;
 							break;
 						case 3:
 							min = smin;
-							max = 1.;
+							max = 1.0;
 							break;
 					}
 					break;
@@ -351,13 +351,13 @@ public struct Hkl.Interval {
 					switch (quad_min) {
 						case 0:
 							min = smax;
-							max = 1.;
+							max = 1.0;
 							break;
 						case 1:
 						case 2:
 							if (smin < smax) {
-								min = -1.;
-								max = 1.;
+								min = -1.0;
+								max = 1.0;
 							} else {
 								min = smax;
 								max = smin;
@@ -366,10 +366,10 @@ public struct Hkl.Interval {
 						case 3:
 							if (smin < smax) {
 								min = smin;
-								max = 1.;
+								max = 1.0;
 							} else {
 								min = smax;
-								max = 1.;
+								max = 1.0;
 							}
 							break;
 					}
@@ -377,19 +377,19 @@ public struct Hkl.Interval {
 				case 3:
 					switch (quad_min) {
 						case 0:
-							min = -1.;
-							max = 1.;
+							min = -1.0;
+							max = 1.0;
 							break;
 						case 1:
-							min = -1.;
+							min = -1.0;
 							max = smin;
 							break;
 						case 2:
 							if (smin < smax) {
-								min = -1.;
+								min = -1.0;
 								max = smax;
 							} else {
-								min = -1.;
+								min = -1.0;
 								max = smin;
 							}
 							break;
@@ -398,8 +398,8 @@ public struct Hkl.Interval {
 								min = smin;
 								max = smax;
 							} else {
-								min = -1.;
-								max = 1.;
+								min = -1.0;
+								max = 1.0;
 							}
 							break;
 					}
@@ -418,8 +418,8 @@ public struct Hkl.Interval {
 
 	public void tan()
 	{
-		int quadrant_down = (int)Math.floor(this.min / Math.PI * 2.);
-		int quadrant_up = (int)Math.floor(this.max / Math.PI * 2.);
+		int quadrant_down = (int)Math.floor(this.min / Math.PI * 2.0);
+		int quadrant_up = (int)Math.floor(this.max / Math.PI * 2.0);
 
 		/* if there is at least one period in b or if b contains a Pi/2 + k*Pi, */
 		/* then a = ]-oo, +oo[ */

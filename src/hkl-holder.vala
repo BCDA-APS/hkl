@@ -6,7 +6,7 @@ public class Hkl.Holder {
 	public Holder(Geometry geometry)
 	{
 		this.geometry = geometry;
-		q.set(1., 0., 0., 0.);
+		q.set(1.0, 0.0, 0.0, 0.0);
 	}
 
 	public Holder.copy(Holder src, Geometry geometry)
@@ -48,7 +48,7 @@ public class Hkl.Holder {
 	public void update()
 	{
 		if (this.is_dirty()) {
-			this.q.set(1., 0., 0., 0.);
+			this.q.set(1.0, 0.0, 0.0, 0.0);
 			foreach(weak Axis axis in this.axes) {
 				Quaternion q;
 				axis.get_quaternion(q);

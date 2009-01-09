@@ -6,74 +6,74 @@ public class Hkl.Geometry
 
 	public Geometry()
 	{
-		this.source.set(1.54, 1., 0., 0.);
+		this.source.set(1.054, 1.0, 0.0, 0.0);
 	}
 
 	public Geometry.TwoCV()
 	{
-		this.source.set(1.54, 1., 0., 0.);
+		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
-		h.add_rotation_axis("omega", 0., -1., 0.);
+		h.add_rotation_axis("omega", 0.0, -1.0, 0.0);
 
 		h = this.add_holder();
-		h.add_rotation_axis("tth", 0., -1., 0.);
+		h.add_rotation_axis("tth", 0.0, -1.0, 0.0);
 	}
 
 	public Geometry.E4CV()
 	{
-		this.source.set(1.54, 1., 0., 0.);
+		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
-		h.add_rotation_axis("omega", 0., -1., 0.);
-		h.add_rotation_axis("chi", 1., 0., 0.);
-		h.add_rotation_axis("phi", 0., -1., 0.);
+		h.add_rotation_axis("omega", 0.0, -1.0, 0.0);
+		h.add_rotation_axis("chi", 1.0, 0.0, 0.0);
+		h.add_rotation_axis("phi", 0.0, -1.0, 0.0);
 
 		h = this.add_holder();
-		h.add_rotation_axis("tth", 0., -1., 0.);
+		h.add_rotation_axis("tth", 0.0, -1.0, 0.0);
 	}
 
 	public Geometry.K4CV(double alpha)
 	{
-		this.source.set(1.54, 1., 0., 0.);
+		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
-		h.add_rotation_axis("komega", 0., -1., 0.);
-		h.add_rotation_axis("kappa", 0., -Math.cos(alpha), -Math.sin(alpha));
-		h.add_rotation_axis("kphi", 0., -1., 0.);
+		h.add_rotation_axis("komega", 0.0, -1.0, 0.0);
+		h.add_rotation_axis("kappa", 0.0, -Math.cos(alpha), -Math.sin(alpha));
+		h.add_rotation_axis("kphi", 0.0, -1.0, 0.0);
 
 		h = this.add_holder();
-		h.add_rotation_axis("tth", 0., -1., 0.);
+		h.add_rotation_axis("tth", 0.0, -1.0, 0.0);
 	}
 
 	public Geometry.E6C()
 	{
-		this.source.set(1.54, 1., 0., 0.);
+		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
-		h.add_rotation_axis("mu", 0., 0., 1.);
-		h.add_rotation_axis("omega", 0., -1., 0.);
-		h.add_rotation_axis("chi", 1., 0., 0.);
-		h.add_rotation_axis("phi", 0., -1., 0.);
+		h.add_rotation_axis("mu", 0.0, 0.0, 1.0);
+		h.add_rotation_axis("omega", 0.0, -1.0, 0.0);
+		h.add_rotation_axis("chi", 1.0, 0.0, 0.0);
+		h.add_rotation_axis("phi", 0.0, -1.0, 0.0);
 
 		h = this.add_holder();
-		h.add_rotation_axis("gamma", 0., 0., 1.);
-		h.add_rotation_axis("delta", 0., -1., 0.);
+		h.add_rotation_axis("gamma", 0.0, 0.0, 1.0);
+		h.add_rotation_axis("delta", 0.0, -1.0, 0.0);
 	}
 
 	public Geometry.K6C(double alpha)
 	{
-		this.source.set(1.54, 1., 0., 0.);
+		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
-		h.add_rotation_axis("mu", 0., 0., 1.);
-		h.add_rotation_axis("komega", 0., -1., 0.);
-		h.add_rotation_axis("kappa", 0., -Math.cos(alpha), -Math.sin(alpha));
-		h.add_rotation_axis("kphi", 0., -1., 0.);
+		h.add_rotation_axis("mu", 0.0, 0.0, 1.0);
+		h.add_rotation_axis("komega", 0.0, -1.0, 0.0);
+		h.add_rotation_axis("kappa", 0.0, -Math.cos(alpha), -Math.sin(alpha));
+		h.add_rotation_axis("kphi", 0.0, -1.0, 0.0);
 
 		h = this.add_holder();
-		h.add_rotation_axis("gamma", 0., 0., 1.);
-		h.add_rotation_axis("delta", 0., -1., 0.);
+		h.add_rotation_axis("gamma", 0.0, 0.0, 1.0);
+		h.add_rotation_axis("delta", 0.0, -1.0, 0.0);
 	}
 
 	public Geometry.copy(Geometry src)

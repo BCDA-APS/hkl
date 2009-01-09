@@ -84,7 +84,7 @@ public class Hkl.Sample {
 		if (!sample->compute_UB())
 			return double.NAN;
 
-		double fitness = 0.;
+		double fitness = 0.0;
 		for(i=0U; i<sample->reflections.length; ++i) {
 			weak Reflection reflection = sample->reflections.get(i);
 			Vector UBh = reflection.hkl;
@@ -108,8 +108,8 @@ public class Hkl.Sample {
 	{
 		this.name = name;
 		this.lattice = Lattice.default();
-		this.U.set(1., 0., 0., 0., 1., 0., 0., 0., 1.);
-		this.UB.set(1., 0., 0., 0., 1., 0., 0., 0., 1.);
+		this.U.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+		this.UB.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 		this.compute_UB();
 		this.reflections = new List<Reflection>();
 	}
@@ -225,7 +225,7 @@ public class Hkl.Sample {
 			status = s.iterate();
 			if (status != 0)
 				break;
-			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.);
+			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.0);
 		} while (status == Gsl.Status.CONTINUE && iter < 10000U);
 		Gsl.Error.set_error_handler(null);
 	}

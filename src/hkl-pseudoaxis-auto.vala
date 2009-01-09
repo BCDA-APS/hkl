@@ -121,7 +121,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 			if (status != 0 || iter % 1000 == 0) {
 				// Restart from another point.
 				for(idx=0U; idx<this.axes.length; ++idx)
-					x[idx] = Random.double_range(0., Math.PI);
+					x[idx] = Random.double_range(0.0, Math.PI);
 				solver.set(&f, this.x);
 				status = solver.iterate();
 			}
@@ -137,7 +137,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		idx = 0U;
 		x = solver.x.ptr(0);
 		foreach(weak Axis axis in this.axes) {
-			AxisConfig config = {{0., 0.}, 0., false};
+			AxisConfig config = {{0.0, 0.0}, 0.0, false};
 			axis.get_config(config);
 			config.value = Gsl.Trig.angle_restrict_pos(x[idx++]);
 			axis.set_config(config);
@@ -174,7 +174,7 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	uint idx=0U;
 	double *values = x.ptr(0);
 	foreach(weak Hkl.Axis axis in engine->axes) {
-		Hkl.AxisConfig config = {{0., 0.}, 0., false};
+		Hkl.AxisConfig config = {{0.0, 0.0}, 0.0, false};
 		axis.get_config(config);
 		config.value = values[idx++];
 		axis.set_config(config);

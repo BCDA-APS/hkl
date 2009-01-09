@@ -105,8 +105,8 @@ public struct Hkl.Vector {
 		cos_angle = this.scalar_product(v) / norm;
 
 		// problem with round
-		if (cos_angle >= 1.)
-			angle = 0.;
+		if (cos_angle >= 1.0)
+			angle = 0.0;
 		else
 			if (cos_angle <= -1 )
 				angle = Math.PI;
@@ -125,9 +125,9 @@ public struct Hkl.Vector {
 
 	public void randomize()
 	{
-		this.x = Random.double_range(-1., 1.);
-		this.y = Random.double_range(-1., 1.);
-		this.z = Random.double_range(-1., 1.);
+		this.x = Random.double_range(-1.0, 1.0);
+		this.y = Random.double_range(-1.0, 1.0);
+		this.z = Random.double_range(-1.0, 1.0);
 	}
 
 
@@ -289,7 +289,7 @@ public struct Hkl.Matrix {
 			euler_z = Math.atan2( ty, tx );
 		} else {
 			/*Gimball lock has occurred */
-			euler_x = 0.;              /*Set X-axis angle to zero */
+			euler_x = 0.0;              /*Set X-axis angle to zero */
 			tx       =  this.m22;    /*And calculate Z-axis angle */
 			ty       =  this.m21;
 			euler_z = Math.atan2( ty, tx );
@@ -392,8 +392,8 @@ public struct Hkl.Quaternion
 
 	public void from_angle_and_axe(double angle, Vector v)
 	{
-		double c = Math.cos(angle / 2.);
-		double s = Math.sin(angle / 2.) / v.norm2();
+		double c = Math.cos(angle / 2.0);
+		double s = Math.sin(angle / 2.0) / v.norm2();
 
 		this.a = c;
 		this.b = s * v.x;
@@ -468,7 +468,7 @@ public struct Hkl.Quaternion
 	 *\right)
 	 *\f$
 	 */
-	public void to_matrix(Matrix m) requires (Math.fabs(this.norm2() - 1.) < EPSILON)
+	public void to_matrix(Matrix m) requires (Math.fabs(this.norm2() - 1.0) < EPSILON)
 	{
 		m.m11 = this.a*this.a + this.b*this.b - this.c*this.c - this.d*this.d;
 		m.m12 = 2 * (this.b*this.c - this.a*this.d);
@@ -487,7 +487,7 @@ public struct Hkl.Quaternion
 	 *compute the axe and angle of the unitary quaternion angle [-pi, pi]
 	 *if q is the (1, 0, 0, 0) quaternion return the (0,0,0) axe and a 0 angle
 	 */
-	public void to_angle_and_axe(out double angle, out Vector v) requires ( Math.fabs(this.norm2() - 1.) < EPSILON)
+	public void to_angle_and_axe(out double angle, out Vector v) requires ( Math.fabs(this.norm2() - 1.0) < EPSILON)
 	{
 		double angle_2;
 		double cos_angle_2;
@@ -499,7 +499,7 @@ public struct Hkl.Quaternion
 		angle = 2 * angle_2;
 		// we want an angle between -pi, pi
 		if (angle > Math.PI)
-			angle -= 2. * Math.PI;
+			angle -= 2.0 * Math.PI;
 
 		// compute the axe
 		sin_angle_2 = Math.sin(angle_2);
@@ -509,8 +509,8 @@ public struct Hkl.Quaternion
 			v.y = this.c / sin_angle_2;
 			v.z = this.d / sin_angle_2;
 		} else {
-			angle = 0.;
-			v.x = v.y = v.z = 0.;
+			angle = 0.0;
+			v.x = v.y = v.z = 0.0;
 		}
 	}
 }

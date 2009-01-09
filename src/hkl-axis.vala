@@ -15,7 +15,7 @@ public class Hkl.Axis {
 		this.axis_v = axis_v;
 		this.config.range.min = -Math.PI;
 		this.config.range.max = Math.PI;
-		this.config.value = 0.;
+		this.config.value = 0.0;
 		this.config.dirty = true;
 	}
 

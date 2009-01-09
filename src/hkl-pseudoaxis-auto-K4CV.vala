@@ -14,9 +14,9 @@ static int K4CV_bissector_1(Gsl.Vector x, void *params, Gsl.Vector f)
 	kphi = Gsl.Trig.angle_restrict_symm(angles[2]);
 	tth = Gsl.Trig.angle_restrict_symm(angles[3]);
 
-	omega = komega + Math.atan(Math.tan(kappa/2.)*Math.cos(50 * Hkl.DEGTORAD)) - Math.PI / 2.;
+	omega = komega + Math.atan(Math.tan(kappa/2.0)*Math.cos(50 * Hkl.DEGTORAD)) - Math.PI / 2.0;
 	omega = Gsl.Trig.angle_restrict_symm(omega);
-	f.set(3, tth - 2 *omega);
+	f.set(3, tth - 2.0 *omega);
 
 	return  Gsl.Status.SUCCESS;
 }
@@ -37,9 +37,9 @@ static int K4CV_bissector_2(Gsl.Vector x, void *params, Gsl.Vector f)
 	kphi = Gsl.Trig.angle_restrict_symm(angles[2]);
 	tth = Gsl.Trig.angle_restrict_symm(angles[3]);
 
-	omega = komega + Math.atan(Math.tan(kappa/2.)*Math.cos(50 * Hkl.DEGTORAD)) + Math.PI / 2.;
+	omega = komega + Math.atan(Math.tan(kappa/2.0)*Math.cos(50 * Hkl.DEGTORAD)) + Math.PI / 2.0;
 	omega = Gsl.Trig.angle_restrict_symm(omega);
-	f.set(3, tth - 2 *omega);
+	f.set(3, tth - 2.0 *omega);
 
 	return  Gsl.Status.SUCCESS;
 }
