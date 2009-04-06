@@ -36,7 +36,7 @@ public class Hkl.Axis {
 		this.config.dirty = true;
 	}
 
-	public void get_quaternion(Quaternion q) {
+	public void get_quaternion(out Quaternion q) {
 		q.from_angle_and_axe(this.config.value, this.axis_v);
 	}
 

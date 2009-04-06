@@ -51,7 +51,7 @@ public class Hkl.Holder {
 			this.q.set(1.0, 0.0, 0.0, 0.0);
 			foreach(weak Axis axis in this.axes) {
 				Quaternion q;
-				axis.get_quaternion(q);
+				axis.get_quaternion(out q);
 				this.q.times_quaternion(q);
 			}
 		}
