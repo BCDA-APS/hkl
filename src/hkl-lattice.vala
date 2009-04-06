@@ -73,7 +73,7 @@ public struct Hkl.Lattice
 	 * Get the B matrix from the l parameters return true if everything
 	 * goes fine. false if a problem occure.
 	 */
-	public bool compute_B(Matrix B)
+	public bool compute_B(out Matrix B)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);
@@ -150,7 +150,7 @@ public struct Hkl.Lattice
 	{
 		Vector vector_x = {1.0, 0.0, 0.0};
 		Vector a, b, c;
-		Vector axe;
+		Vector axe = {0.0, 0.0, 0.0};
 
 		// La valeur des angles alpha, beta et gamma ne sont pas indépendant.
 		// Il faut donc gérer les différents cas.
@@ -211,7 +211,7 @@ public struct Hkl.Lattice
 			case 2:
 				if (this.alpha.to_fit) {
 					if (this.beta.to_fit) {// alpha + beta
-						a = b = vector_x;
+						a = b = c = vector_x;
 
 						// randomize b
 						axe.randomize_vector(a);
@@ -224,7 +224,7 @@ public struct Hkl.Lattice
 						this.beta.value = a.angle(c);
 					} else {
 						// alpha + gamma
-						a = c = vector_x;
+						a = b = c = vector_x;
 
 						// randomize c
 						axe.randomize_vector(a);
@@ -238,7 +238,7 @@ public struct Hkl.Lattice
 					}
 				} else {
 					// beta + gamma
-					b = c = vector_x;
+					a = b = c = vector_x;
 
 					// randomize c
 					axe.randomize_vector(b);
@@ -252,6 +252,7 @@ public struct Hkl.Lattice
 				}
 				break;
 			case 3:
+				a = b = c = vector_x;
 				a.randomize();
 				b.randomize_vector(a);
 				c.randomize_vector_vector(b, a);

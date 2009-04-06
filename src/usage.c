@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <hkl-macros.h>
+#include <hkl/hkl-macros.h>
 
 static void report(const char *prefix, const char *err, va_list params)
 {

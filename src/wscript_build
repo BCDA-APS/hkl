@@ -7,5 +7,5 @@ obj.cflags = '-g -Wall -Wno-uninitialized -Wcast-align -Wformat-security -Werror
 obj.target = 'hkl'
 obj.packages = 'gsl'
 obj.uselib = 'GSL GLIB'
-obj.includes = '../include'
+obj.includes = '../ ../include'
 obj.vnum = bld.env['HKL_VERSION']

@@ -26,7 +26,7 @@ public class Hkl.Axis {
 		this.config = src.config;
 	}
 
-	public void get_config(AxisConfig config)
+	public void get_config(out AxisConfig config)
 	{
 		config = this.config;
 	}

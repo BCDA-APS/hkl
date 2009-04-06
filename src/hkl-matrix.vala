@@ -157,7 +157,7 @@ public struct Hkl.Matrix {
 		return det;
 	}
 
-	public void solve(Vector x, Vector b)
+	public void solve(out Vector x, Vector b)
 	{
 		double det = this.det();
 

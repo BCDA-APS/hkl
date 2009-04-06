@@ -105,7 +105,7 @@ public struct Hkl.Quaternion
 	 *\right)
 	 *\f$
 	 */
-	public void to_matrix(Matrix m) requires (Math.fabs(this.norm2() - 1.0) < EPSILON)
+	public void to_matrix(out Matrix m) requires (Math.fabs(this.norm2() - 1.0) < EPSILON)
 	{
 		m.m11 = this.a*this.a + this.b*this.b - this.c*this.c - this.d*this.d;
 		m.m12 = 2 * (this.b*this.c - this.a*this.d);

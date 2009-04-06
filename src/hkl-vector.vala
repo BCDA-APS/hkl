@@ -170,7 +170,7 @@ public struct Hkl.Vector {
 	public void rotated_quaternion(Quaternion qr)
 	{
 		Quaternion q;
-		Quaternion tmp;
+		Quaternion tmp = {0};
 
 		// compute qr * qv * *qr
 		q = qr;

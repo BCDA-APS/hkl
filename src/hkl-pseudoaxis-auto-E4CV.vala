@@ -49,16 +49,7 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_bissector_func(Hkl.PseudoAxisEngine *en
 {
 	Gsl.MultirootFunction f1 = {E4CV_bissector, 4, engine};
 
-	Hkl.PseudoAxisEngineAutoFunc func;
-	func.name = "bissector";
-	func.f = new Gsl.MultirootFunction[1];
-	func.f[0] = f1;
-	func.axes = new string[4];
-	func.axes[0] = "omega";
-	func.axes[1] = "chi";
-	func.axes[2] = "phi";
-	func.axes[3] = "tth";
-	func.parameters = new Hkl.Parameter[0];
+	Hkl.PseudoAxisEngineAutoFunc func = {"bissector", {f1}, {"omega", "chi", "phi", "tth"}, {}};
 
 	return func;
 }
@@ -68,17 +59,7 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_constant_omega_func(Hkl.PseudoAxisEngin
 	Gsl.MultirootFunction f1 = {E4CV_constant_omega, 4, engine};
 	Hkl.Parameter p1 = {"omega", {-Math.PI, Math.PI}, 0.0, true};
 
-	Hkl.PseudoAxisEngineAutoFunc func;
-	func.name = "constant omega";
-	func.f = new Gsl.MultirootFunction[1];
-	func.f[0] = f1;
-	func.axes = new string[4];
-	func.axes[0] = "omega";
-	func.axes[1] = "chi";
-	func.axes[2] = "phi";
-	func.axes[3] = "tth";
-	func.parameters = new Hkl.Parameter[1];
-	func.parameters[0] = p1;
+	Hkl.PseudoAxisEngineAutoFunc func = {"constant_omega", {f1}, {"omega", "chi", "phi", "tth"}, {p1}};
 
 	return func;
 }
@@ -88,17 +69,7 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_constant_chi_func(Hkl.PseudoAxisEngine 
 	Gsl.MultirootFunction f1 = {E4CV_constant_chi, 4, engine};
 	Hkl.Parameter p1 = {"chi", {-Math.PI, Math.PI}, 0.0, true};
 
-	Hkl.PseudoAxisEngineAutoFunc func;
-	func.name = "constant chi";
-	func.f = new Gsl.MultirootFunction[1];
-	func.f[0] = f1;
-	func.axes = new string[4];
-	func.axes[0] = "omega";
-	func.axes[1] = "chi";
-	func.axes[2] = "phi";
-	func.axes[3] = "tth";
-	func.parameters = new Hkl.Parameter[1];
-	func.parameters[0] = p1;
+	Hkl.PseudoAxisEngineAutoFunc func = {"constant_chi", {f1}, {"omega", "chi", "phi", "tth"}, {p1}};
 
 	return func;
 }
@@ -108,17 +79,7 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_constant_phi_func(Hkl.PseudoAxisEngine 
 	Gsl.MultirootFunction f1 = {E4CV_constant_phi, 4, engine};
 	Hkl.Parameter p1 = {"phi", {-Math.PI, Math.PI}, 0.0, true};
 
-	Hkl.PseudoAxisEngineAutoFunc func;
-	func.name = "constant phi";
-	func.f = new Gsl.MultirootFunction[1];
-	func.f[0] = f1;
-	func.axes = new string[4];
-	func.axes[0] = "omega";
-	func.axes[1] = "chi";
-	func.axes[2] = "phi";
-	func.axes[3] = "tth";
-	func.parameters = new Hkl.Parameter[1];
-	func.parameters[0] = p1;
+	Hkl.PseudoAxisEngineAutoFunc func = {"constant_phi", {f1}, {"omega", "chi", "phi", "tth"}, {p1}};
 
 	return func;
 }

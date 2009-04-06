@@ -7,7 +7,7 @@ public struct Hkl.Detector
 		this.idx = idx;
 	}
 
-	public void compute_kf(Geometry g, Vector kf) requires (this.idx < g.holders.length)
+	public void compute_kf(Geometry g, out Vector kf) requires (this.idx < g.holders.length)
 	{
 		g.update();
 

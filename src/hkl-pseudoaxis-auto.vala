@@ -80,14 +80,14 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		// R * UB
 		// for now the 0 holder is the sample holder.
 		weak Holder holder = geom.holders[0];
-		holder.q.to_matrix(RUB);
+		holder.q.to_matrix(out RUB);
 		RUB.times_matrix(this.sample.UB);
 
 		// kf - ki = Q
-		geom.source.compute_ki(ki);
-		this.detector.compute_kf(geom, Q);
+		geom.source.compute_ki(out ki);
+		this.detector.compute_kf(geom, out Q);
 		Q.minus_vector(ki);
-		RUB.solve(hkl, Q);
+		RUB.solve(out hkl, Q);
 
 		// update the pseudoAxes current and consign parts
 		this.pseudoAxes[0].config.value = hkl.x;
@@ -99,8 +99,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 	bool solve(Gsl.MultirootFunction f)
 	{
-		int status;
-		double d;
+		int status = 0;
 		weak Gsl.MultirootFsolver solver = this.solver;
 		double *x = this.x.ptr(0);
 
@@ -137,8 +136,8 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		idx = 0U;
 		x = solver.x.ptr(0);
 		foreach(weak Axis axis in this.axes) {
-			AxisConfig config = {{0.0, 0.0}, 0.0, false};
-			axis.get_config(config);
+			AxisConfig config;
+			axis.get_config(out config);
 			config.value = Gsl.Trig.angle_restrict_pos(x[idx++]);
 			axis.set_config(config);
 		}
@@ -163,7 +162,8 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 
 public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 {
-	Hkl.Vector Hkl, ki, dQ;
+	Hkl.Vector ki, dQ;
+	Hkl.Vector Hkl = {0.0, 0.0, 0.0};
 
 	Hkl.PseudoAxisEngineAuto *engine = params;
 	weak Hkl.PseudoAxis H = engine->pseudoAxes[0];
@@ -174,8 +174,8 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	uint idx=0U;
 	double *values = x.ptr(0);
 	foreach(weak Hkl.Axis axis in engine->axes) {
-		Hkl.AxisConfig config = {{0.0, 0.0}, 0.0, false};
-		axis.get_config(config);
+		Hkl.AxisConfig config;
+		axis.get_config(out config);
 		config.value = values[idx++];
 		axis.set_config(config);
 	}
@@ -189,8 +189,8 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	Hkl.rotated_quaternion(holder.q);
 
 	// kf - ki = Q
-	engine->geometry.source.compute_ki(ki);
-	engine->detector.compute_kf(engine->geometry, dQ);
+	engine->geometry.source.compute_ki(out ki);
+	engine->detector.compute_kf(engine->geometry, out dQ);
 	dQ.minus_vector(ki);
 
 

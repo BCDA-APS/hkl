@@ -31,7 +31,7 @@ public class Hkl.Sample {
 			weak Holder holder_s = g.holders[0];
 
 			// compute Q from angles
-			g.source.compute_ki(ki);
+			g.source.compute_ki(out ki);
 			this._hkl = ki;
 			this._hkl.rotated_quaternion(holder_d.q);
 			this._hkl.minus_vector(ki);
@@ -57,7 +57,7 @@ public class Hkl.Sample {
 	{
 		Matrix B;
 
-		if (!this.lattice.compute_B(B))
+		if (!this.lattice.compute_B(out B))
 			return false;
 
 		this.UB = this.U;
@@ -163,10 +163,10 @@ public class Hkl.Sample {
 				Vector h1c = r1.hkl;
 				Vector h2c = r2.hkl;
 				Matrix B;
-				Matrix Tc;
+				Matrix Tc = {0};
 
 				// Compute matrix Tc from r1 and r2.
-				this.lattice.compute_B(B);
+				this.lattice.compute_B(out B);
 				B.times_vector(h1c);
 				B.times_vector(h2c);
 				Tc.from_two_vector(h1c, h2c);
@@ -185,7 +185,7 @@ public class Hkl.Sample {
 
 	public void affine()
 	{
-		int status;
+		int status = 0;
 
 		// Starting point
 		var x = new Gsl.Vector(9);
@@ -213,10 +213,7 @@ public class Hkl.Sample {
 
 		// Initialize method and iterate
 		Gsl.Error.set_error_handler_off();
-		Gsl.MultiminFunction minex_func;
-		minex_func.n = 9;
-		minex_func.f = mono_crystal_fitness;
-		minex_func.params = this;
+		Gsl.MultiminFunction minex_func = {mono_crystal_fitness, 9, this};
 		var s = new Gsl.MultiminFminimizer(Gsl.MultiminFminimizerTypes.nmsimplex, 9);
 		s.set(&minex_func, x, ss);
 		uint iter = 0;
