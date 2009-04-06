@@ -185,7 +185,7 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	// R * UB * h = Q
 	// for now the 0 holder is the sample holder.
 	weak Hkl.Holder holder = engine->geometry.holders[0];
-	engine->sample.UB.times_vector(Hkl);
+	engine->sample.UB.times_vector(ref Hkl);
 	Hkl.rotated_quaternion(holder.q);
 
 	// kf - ki = Q

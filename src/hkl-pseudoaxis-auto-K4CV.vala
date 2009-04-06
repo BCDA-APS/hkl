@@ -48,8 +48,10 @@ public Hkl.PseudoAxisEngineAutoFunc K4CV_bissector_func(Hkl.PseudoAxisEngine *en
 {
 	Gsl.MultirootFunction f1 = {K4CV_bissector_1, 4, engine};
 	Gsl.MultirootFunction f2 = {K4CV_bissector_2, 4, engine};
+	Gsl.MultirootFunction[] functions = {f1, f2};
+	string[] names = {"komega", "kappa", "kphi", "tth"};
 
-	Hkl.PseudoAxisEngineAutoFunc func = {"bissector", {f1, f2}, {"komega", "kappa", "kphi", "tth"}};
+	Hkl.PseudoAxisEngineAutoFunc func = {"bissector", functions, names};
 
 	return func;
 }

@@ -128,7 +128,7 @@ public struct Hkl.Matrix {
 		this.m33 = tmp.m31 * M1->m13 + tmp.m32 * M1->m23 + tmp.m33 * M1->m33;
 	}
 
-	public void times_vector(Vector v)
+	public void times_vector(ref Vector v)
 	{
 		Vector tmp = v;
 

@@ -109,7 +109,7 @@ public struct Hkl.Lattice
 		return true;
 	}
 
-	public bool compute_reciprocal(Lattice reciprocal)
+	public bool compute_reciprocal(out Lattice reciprocal)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);

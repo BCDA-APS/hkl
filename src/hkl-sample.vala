@@ -88,7 +88,7 @@ public class Hkl.Sample {
 		for(i=0U; i<sample->reflections.length; ++i) {
 			weak Reflection reflection = sample->reflections.get(i);
 			Vector UBh = reflection.hkl;
-			sample->UB.times_vector(UBh);
+			sample->UB.times_vector(ref UBh);
 
 			double tmp = UBh.x - reflection._hkl.x;
 			fitness += tmp * tmp;
@@ -167,8 +167,8 @@ public class Hkl.Sample {
 
 				// Compute matrix Tc from r1 and r2.
 				this.lattice.compute_B(out B);
-				B.times_vector(h1c);
-				B.times_vector(h2c);
+				B.times_vector(ref h1c);
+				B.times_vector(ref h2c);
 				Tc.from_two_vector(h1c, h2c);
 				Tc.transpose();
 
