@@ -113,12 +113,12 @@ public class Hkl.Geometry
 			holder.update();
 
 		foreach(weak Axis axis in this.axes)
-			axis.clear_dirty();
+			axis.changed = false;
 	}
 
 	public void fprintf(FileStream stream)
 	{
 		foreach(weak Axis axis in this.axes)
-			stream.printf(" %s : %f", axis.name, axis.config.value);
+			stream.printf(" %s : %f", axis.name, axis.get_value_unit());
 	}
 }

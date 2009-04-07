@@ -90,9 +90,9 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		RUB.solve(out hkl, Q);
 
 		// update the pseudoAxes current and consign parts
-		this.pseudoAxes[0].config.value = hkl.x;
-		this.pseudoAxes[1].config.value = hkl.y;
-		this.pseudoAxes[2].config.value = hkl.z;
+		this.pseudoAxes[0].value = hkl.x;
+		this.pseudoAxes[1].value = hkl.y;
+		this.pseudoAxes[2].value = hkl.z;
 
 		return true;
 	}
@@ -107,7 +107,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		// must be put in the auto_set method
 		uint idx=0U;
 		foreach(weak Axis axis in this.axes)
-			x[idx++] = axis.config.value;
+			x[idx++] = axis.value;
 
 		// Initialize method 
 		solver.set(&f, this.x);
@@ -135,12 +135,8 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		// to avoid this.
 		idx = 0U;
 		x = solver.x.ptr(0);
-		foreach(weak Axis axis in this.axes) {
-			AxisConfig config;
-			axis.get_config(out config);
-			config.value = Gsl.Trig.angle_restrict_pos(x[idx++]);
-			axis.set_config(config);
-		}
+		foreach(weak Axis axis in this.axes)
+			axis.set_value(Gsl.Trig.angle_restrict_pos(x[idx++]));
 		this.x.memcpy(solver.x);
 		this.geometry.update();
 
@@ -173,14 +169,10 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 	// update the axes from x;
 	uint idx=0U;
 	double *values = x.ptr(0);
-	foreach(weak Hkl.Axis axis in engine->axes) {
-		Hkl.AxisConfig config;
-		axis.get_config(out config);
-		config.value = values[idx++];
-		axis.set_config(config);
-	}
+	foreach(weak Hkl.Axis axis in engine->axes)
+		axis.set_value(values[idx++]);
 	engine->geometry.update();
-	Hkl.set(H.config.value, K.config.value, L.config.value);
+	Hkl.set(H.value, K.value, L.value);
 
 	// R * UB * h = Q
 	// for now the 0 holder is the sample holder.

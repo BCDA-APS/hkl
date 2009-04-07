@@ -1,46 +1,40 @@
-public struct Hkl.AxisConfig {
-	public Interval range;
-	public double value;
-	public bool dirty;
-}
-
-public class Hkl.Axis {
-	public weak string name;
+public class Hkl.Axis : Hkl.Parameter {
 	public Vector axis_v;
-	public AxisConfig config;
+	public Quaternion q;
 
 	/* becareful the name must be a static string */
-	public Axis(string name, Vector axis_v) {
-		this.name = name;
+	public Axis(string name, Vector axis_v)
+	{
+		base(name, -Math.PI, 0.0, Math.PI,
+				false, false,
+				hkl_unit_angle_rad, hkl_unit_angle_deg);
 		this.axis_v = axis_v;
-		this.config.range.min = -Math.PI;
-		this.config.range.max = Math.PI;
-		this.config.value = 0.0;
-		this.config.dirty = true;
+		this.q = Quaternion(1.0, 0.0, 0.0, 0.0);
 	}
 
-	public Axis.copy(Axis src)
+	public Axis.copy(Axis axis)
 	{
-		this.name = src.name;
-		this.axis_v = src.axis_v;
-		this.config = src.config;
+		base.copy(this);
+		this.axis_v = axis.axis_v;
+		this.q = axis.q;
 	}
 
-	public void get_config(out AxisConfig config)
+	public override void set_value(double value)
 	{
-		config = this.config;
+		base.set_value(value);
+		this.q.from_angle_and_axe(this.value, this.axis_v);
 	}
 
-	public void set_config(AxisConfig config) {
-		this.config = config;
-		this.config.dirty = true;
+	public override void set_value_unit(double value)
+	{
+		base.set_value_unit(value);
+		this.q.from_angle_and_axe(this.value, this.axis_v);
 	}
 
-	public void get_quaternion(out Quaternion q) {
-		q.from_angle_and_axe(this.config.value, this.axis_v);
-	}
-
-	public void clear_dirty() {
-		this.config.dirty = false;
+	public override void randomize()
+	{
+		base.randomize();
+		this.q.from_angle_and_axe(this.value, this.axis_v);
+		this.changed = true;
 	}
 }

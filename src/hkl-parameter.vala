@@ -1,9 +1,9 @@
-public struct Hkl.Parameter {
+public class Hkl.Parameter {
 	public weak string name;
 	public Interval range;
 	public double value;
-	public weak Hkl.Unit unit;
-	public weak Hkl.Unit punit;
+	public Hkl.Unit unit;
+	public Hkl.Unit punit;
 	public bool not_to_fit;
 	public bool changed;
 
@@ -15,6 +15,16 @@ public struct Hkl.Parameter {
 		this.set(name, min, value, max, not_to_fit, changed, unit, punit);
 	}
 
+	public Parameter.copy(Parameter parameter)
+	{
+		this.name = parameter.name;
+		this.range = parameter.range;
+		this.value = parameter.value;
+		this.unit = parameter.unit;
+		this.punit = parameter.punit;
+		this.not_to_fit = parameter.not_to_fit;
+		this.changed = parameter.changed;
+	}
 	public void set(string name, double min, double value, double max,
 			bool not_to_fit, bool changed,
 			Hkl.Unit unit, Hkl.Unit punit)
@@ -29,7 +39,31 @@ public struct Hkl.Parameter {
 		this.changed = changed;
 	}
 
-	public void randomize()
+	public double get_value()
+	{
+		return this.value;
+	}
+
+	public double get_value_unit()
+	{
+		double factor = this.unit.factor(this.punit);
+		return factor * this.value;
+	}
+
+	public virtual void set_value(double value)
+	{
+		this.value = value;
+		this.changed = true;
+	}
+
+	public virtual void set_value_unit(double value)
+	{
+		double factor = this.unit.factor(this.punit);
+		this.value = value / factor;
+		this.changed = true;
+	}
+
+	public virtual void randomize()
 	{
 		if (!this.not_to_fit)
 			this.value = Random.double_range(this.range.min, this.range.max);

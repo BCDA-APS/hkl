@@ -1,7 +1,5 @@
-public class Hkl.PseudoAxis
+public class Hkl.PseudoAxis : Hkl.Parameter
 {
-	public weak string name;
-	public AxisConfig config;
 	public weak PseudoAxisEngine engine;
 
 	public PseudoAxis(string name, PseudoAxisEngine engine)

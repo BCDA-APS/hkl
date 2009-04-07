@@ -61,7 +61,8 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_constant_omega_func(Hkl.PseudoAxisEngin
 	Gsl.MultirootFunction f1 = {E4CV_constant_omega, 4, engine};
 	Gsl.MultirootFunction[] functions = {f1};
 	string[] names = {"omega", "chi", "phi", "tth"};
-	Hkl.Parameter p1 = {"omega", {-Math.PI, Math.PI}, 0.0, hkl_unit_angle_rad, hkl_unit_angle_deg, true, false};
+	var p1 = new Hkl.Parameter("omega", -Math.PI, 0.0, Math.PI,
+			false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
 	Hkl.Parameter[] parameters = {p1};
 
 	Hkl.PseudoAxisEngineAutoFunc func = {"constant_omega", functions, names, parameters};
@@ -74,7 +75,8 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_constant_chi_func(Hkl.PseudoAxisEngine 
 	Gsl.MultirootFunction f1 = {E4CV_constant_chi, 4, engine};
 	Gsl.MultirootFunction[] functions = {f1};
 	string[] names = {"omega", "chi", "phi", "tth"};
-	Hkl.Parameter p1 = {"chi", {-Math.PI, Math.PI}, 0.0, hkl_unit_angle_rad, hkl_unit_angle_deg, true, false};
+	var p1 = new Hkl.Parameter("chi", -Math.PI, 0.0, Math.PI,
+			false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
 	Hkl.Parameter[] parameters = {p1};
 
 	Hkl.PseudoAxisEngineAutoFunc func = {"constant_chi", functions, names, parameters};
@@ -87,7 +89,8 @@ public Hkl.PseudoAxisEngineAutoFunc E4CV_constant_phi_func(Hkl.PseudoAxisEngine 
 	Gsl.MultirootFunction f1 = {E4CV_constant_phi, 4, engine};
 	Gsl.MultirootFunction[] functions = {f1};
 	string[] names = {"omega", "chi", "phi", "tth"};
-	Hkl.Parameter p1 = {"phi", {-Math.PI, Math.PI}, 0.0, hkl_unit_angle_rad, hkl_unit_angle_deg, true, false};
+	var p1 = new Hkl.Parameter("phi", -Math.PI, 0.0, Math.PI,
+			false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
 	Hkl.Parameter[] parameters = {p1};
 
 	Hkl.PseudoAxisEngineAutoFunc func = {"constant_phi", functions, names, parameters};

@@ -49,11 +49,8 @@ public class Hkl.Holder {
 	{
 		if (this.is_dirty()) {
 			this.q.set(1.0, 0.0, 0.0, 0.0);
-			foreach(weak Axis axis in this.axes) {
-				Quaternion q;
-				axis.get_quaternion(out q);
-				this.q.times_quaternion(q);
-			}
+			foreach(weak Axis axis in this.axes)
+				this.q.times_quaternion(axis.q);
 		}
 	}
 
@@ -75,7 +72,7 @@ public class Hkl.Holder {
 	bool is_dirty()
 	{
 		foreach(weak Axis axis in this.axes)
-			if (axis.config.dirty)
+			if (axis.changed)
 				return true;
 		return false;
 	}
