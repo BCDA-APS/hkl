@@ -89,14 +89,38 @@ public class Hkl.Geometry
 		// make a deep copy of the holders
 		idx = 0U;
 		foreach(weak Holder holder in src.holders)
-			this.holders[idx++] = new Holder.copy(holder, this);
+			this.holders[idx++].copy(holder, this);
 	}
 
 	public weak Holder add_holder()
 	{
 		int length = this.holders.length;
 		this.holders.resize(length + 1);
-		return this.holders[length] = new Holder(this);
+		this.holders[length] = Holder(this);
+		return this.holders[length];
+	}
+
+	public int add_rotation(string name, Hkl.Vector axis_v)
+	{
+		int i;
+
+		// check if an axis with the same name is on the axis list
+		i = 0;
+		foreach(weak Axis axis in this.axes){
+			if(axis.name == name){
+				if (axis.axis_v.cmp(axis_v))
+					return -1;
+				else
+					return i;
+			}
+			++i;
+		}
+
+		int len = this.axes.length;
+		this.axes.resize(len + 1);
+		this.axes[len] = new Axis(name, axis_v);
+
+		return len;
 	}
 
 	public weak Axis? get_axis_by_name(string name)
