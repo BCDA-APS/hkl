@@ -9,7 +9,7 @@ const Hkl.Unit hkl_unit_angle_rad = {Hkl.UnitType.ANGLE_RAD, "Radian", ""};
 const Hkl.Unit hkl_unit_length_nm = {Hkl.UnitType.LENGTH_NM, "Nano Meter", "nm"};
 
 public struct Hkl.Unit {
-	weak Hkl.UnitType type;
+	Hkl.UnitType type;
 	weak string name;
 	weak string repr;
 

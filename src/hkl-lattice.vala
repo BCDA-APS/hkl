@@ -37,23 +37,23 @@ public struct Hkl.Lattice
 	public Lattice(double a, double b, double c, double alpha, double beta, double gamma)
 	{
 		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)) {
-			this.a.set("a", 0.0, a, a+10.0, false);
-			this.b.set("b", 0.0, b, b+10.0, false);
-			this.c.set("c", 0.0, c, c+10.0, false);
-			this.alpha.set("alpha", -Math.PI, alpha, Math.PI, false);
-			this.beta.set("beta", -Math.PI, beta, Math.PI, false);
-			this.gamma.set("gamma", -Math.PI, gamma, Math.PI, false);
+			this.a.set("a", 0.0, a, a+10.0, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
+			this.b.set("b", 0.0, b, b+10.0, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
+			this.c.set("c", 0.0, c, c+10.0, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
+			this.alpha.set("alpha", -Math.PI, alpha, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
+			this.beta.set("beta", -Math.PI, beta, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
+			this.gamma.set("gamma", -Math.PI, gamma, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
 		}
 	}
 
 	public Lattice.default()
 	{
-		this.a.set("a", 0.0, 1.54, 11.54, false);
-		this.b.set("b", 0.0, 1.54, 11.54, false);
-		this.c.set("c", 0.0, 1.54, 11.54, false);
-		this.alpha.set("alpha", -Math.PI, 90*DEGTORAD, Math.PI, false);
-		this.beta.set("beta", -Math.PI, 90*DEGTORAD, Math.PI, false);
-		this.gamma.set("gamma", -Math.PI, 90*DEGTORAD, Math.PI, false);
+		this.a.set("a", 0.0, 1.54, 11.54, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
+		this.b.set("b", 0.0, 1.54, 11.54, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
+		this.c.set("c", 0.0, 1.54, 11.54, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
+		this.alpha.set("alpha", -Math.PI, 90*DEGTORAD, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
+		this.beta.set("beta", -Math.PI, 90*DEGTORAD, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
+		this.gamma.set("gamma", -Math.PI, 90*DEGTORAD, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
 	}
 
 	public void set(double a, double b, double c,
@@ -158,12 +158,12 @@ public struct Hkl.Lattice
 		this.b.randomize();
 		this.c.randomize();
 
-		uint angles_to_randomize = (uint)this.alpha.to_fit + (uint)this.beta.to_fit + (uint)this.gamma.to_fit;
+		uint angles_to_randomize = (uint)!this.alpha.not_to_fit + (uint)!this.beta.not_to_fit + (uint)!this.gamma.not_to_fit;
 		switch (angles_to_randomize) {
 			case 0:
 				break;
 			case 1:
-				if (this.alpha.to_fit) {// alpha
+				if (!this.alpha.not_to_fit) {// alpha
 					a = b = c = vector_x;
 
 					// randomize b
@@ -176,7 +176,7 @@ public struct Hkl.Lattice
 
 					//compute the alpha angle.
 					this.alpha.value = b.angle(c);
-				} else if (this.beta.to_fit) {
+				} else if (!this.beta.not_to_fit) {
 					// beta
 					a = b = vector_x;
 
@@ -209,8 +209,8 @@ public struct Hkl.Lattice
 				}
 				break;
 			case 2:
-				if (this.alpha.to_fit) {
-					if (this.beta.to_fit) {// alpha + beta
+				if (!this.alpha.not_to_fit) {
+					if (!this.beta.not_to_fit) {// alpha + beta
 						a = b = c = vector_x;
 
 						// randomize b

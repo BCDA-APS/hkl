@@ -204,12 +204,12 @@ public class Hkl.Sample {
 		ss.set(0, 1 * DEGTORAD);
 		ss.set(1, 1 * DEGTORAD);
 		ss.set(2, 1 * DEGTORAD);
-		ss.set(3, (double)this.lattice.a.to_fit);
-		ss.set(4, (double)this.lattice.b.to_fit);
-		ss.set(5, (double)this.lattice.c.to_fit);
-		ss.set(6, (double)this.lattice.alpha.to_fit);
-		ss.set(7, (double)this.lattice.beta.to_fit);
-		ss.set(8, (double)this.lattice.gamma.to_fit);
+		ss.set(3, (double)!this.lattice.a.not_to_fit);
+		ss.set(4, (double)!this.lattice.b.not_to_fit);
+		ss.set(5, (double)!this.lattice.c.not_to_fit);
+		ss.set(6, (double)!this.lattice.alpha.not_to_fit);
+		ss.set(7, (double)!this.lattice.beta.not_to_fit);
+		ss.set(8, (double)!this.lattice.gamma.not_to_fit);
 
 		// Initialize method and iterate
 		Gsl.Error.set_error_handler_off();
