@@ -59,6 +59,14 @@ public class Hkl.PseudoAxisEngine
 	public PseudoAxis[] pseudoAxes;
 	public PseudoAxisEngineList engines;
 
+	public PseudoAxisEngine(string name, string[] names)
+	{
+		this.name = name;
+		this.pseudoAxes = new PseudoAxis[names.length];
+		for(int i=0; i<names.length;++i)
+			this.pseudoAxes[i] = new PseudoAxis(names[i], this);
+	}
+
 	public void add_mode(owned PseudoAxisEngineMode mode)
 	{
 		int len = this.modes.length;
