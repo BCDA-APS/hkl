@@ -1,3 +1,24 @@
+/* This file is part of the hkl library.
+ *
+ * The hkl library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The hkl library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ *                         L'Orme des Merisiers Saint-Aubin
+ *                         BP 48 91192 GIF-sur-YVETTE CEDEX
+ *
+ * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
+ */
 using Gsl;
 
 public class Hkl.Sample {
@@ -5,13 +26,14 @@ public class Hkl.Sample {
 	public Lattice lattice;
 	public Matrix U;
 	public Matrix UB;
-	public List<Reflection> reflections;
+	public Reflection[] reflections;
 
-	public class Reflection {
+	public struct Reflection {
 		public Geometry geometry;
 		public Detector detector;
 		public Vector hkl;
 		public Vector _hkl;
+		public int flag;
 
 		public Reflection(Geometry g, Detector det,
 				double h, double k, double l)
@@ -68,7 +90,6 @@ public class Hkl.Sample {
 
 	static double mono_crystal_fitness(Gsl.Vector x, void *params)
 	{
-		uint i;
 		Sample *sample = params;
 
 		double euler_x = x.get(0);
@@ -85,8 +106,7 @@ public class Hkl.Sample {
 			return double.NAN;
 
 		double fitness = 0.0;
-		for(i=0U; i<sample->reflections.length; ++i) {
-			weak Reflection reflection = sample->reflections.get(i);
+		foreach(weak Reflection reflection in sample->reflections){
 			Vector UBh = reflection.hkl;
 			sample->UB.times_vector(ref UBh);
 
@@ -111,7 +131,6 @@ public class Hkl.Sample {
 		this.U.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 		this.UB.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 		this.compute_UB();
-		this.reflections = new List<Reflection>();
 	}
 
 	public Sample.copy(Sample src)
@@ -123,10 +142,10 @@ public class Hkl.Sample {
 		this.U = src.U;
 		this.UB = src.UB;
 		/* make a deep copy of the reflections */
-		this.reflections = new List<Reflection>();
-		for(i=0; i<src.reflections.length; ++i) {
-			weak Reflection reflection = src.reflections.get(i);
-			reflection = this.reflections.add(new Reflection.copy(reflection));
+		this.reflections = new Reflection[src.reflections.length];
+		i=0;
+		foreach(weak Reflection reflection in src.reflections){
+			this.reflections[i++] = Reflection.copy(reflection);
 		}
 	}
 
@@ -137,18 +156,23 @@ public class Hkl.Sample {
 			&& Math.fabs(k) < EPSILON
 			&& Math.fabs(l) < EPSILON)
 			return null;
-		else
-			return this.reflections.add(new Reflection(g, det, h, k, l));
+		else{
+			int len = this.reflections.length;
+			this.reflections.resize(len + 1);
+			this.reflections[len] = Reflection(g, det, h, k, l);
+			return this.reflections[len];
+		}
 	}
 
 	public weak Reflection get_reflection(uint idx)
 	{
-		return this.reflections.get(idx);
+		return this.reflections[idx];
 	}
 
 	public bool del_reflection(uint idx)
 	{
-		return this.reflections.del(idx);
+		return true;
+		//return this.reflections.del(idx);
 	}
 
 	public bool compute_UB_busing_levy(uint idx1, uint idx2)
@@ -156,8 +180,8 @@ public class Hkl.Sample {
 		if (idx1 < this.reflections.length 
 				&& idx2 < this.reflections.length) {
 
-			weak Reflection r1 = this.reflections.get(idx1);
-			weak Reflection r2 = this.reflections.get(idx2);
+			weak Reflection r1 = this.reflections[idx1];
+			weak Reflection r2 = this.reflections[idx2];
 
 			if (!r1.hkl.is_colinear(r2.hkl)) {
 				Vector h1c = r1.hkl;

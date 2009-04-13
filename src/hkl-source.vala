@@ -24,13 +24,18 @@ public struct Hkl.Source
 	public double wave_length;
 	public Vector direction;
 
-	public Source(double wave_length, double x, double y, double z) requires (wave_length > EPSILON && Math.sqrt(x*x + y*y + z*z) > EPSILON)
+	public Source(double wave_length, double x, double y, double z) 
+	{
+		this.set(wave_length, x, y, z);
+	}
+
+	public void set(double wave_length, double x, double y, double z)
 	{
 		double norm = Math.sqrt(x*x + y*y + z*z);
 
 		this.wave_length = wave_length;
 		this.direction.set(x, y, z);
-		this.direction.div_double(norm);
+		this.direction.div_double(norm);		
 	}
 
 	/** compare two sources */
@@ -51,9 +56,8 @@ public struct Hkl.Source
 		ki.times_double(k);
 	}
 
-	void fprintf(FileStream f)
+	public void fprintf(FileStream f)
 	{
 		f.printf("%f", this.wave_length);
-		this.direction.fprintf(f);
 	}
 }

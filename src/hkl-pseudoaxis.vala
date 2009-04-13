@@ -1,3 +1,25 @@
+/* This file is part of the hkl library.
+ *
+ * The hkl library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The hkl library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ *                         L'Orme des Merisiers Saint-Aubin
+ *                         BP 48 91192 GIF-sur-YVETTE CEDEX
+ *
+ * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
+ */
+
 public class Hkl.PseudoAxis : Hkl.Parameter
 {
 	public weak PseudoAxisEngine engine;
@@ -7,38 +29,137 @@ public class Hkl.PseudoAxis : Hkl.Parameter
 		this.name = name;
 		this.engine = engine;
 	}
+
+	public new void fprintf(FileStream f)
+	{
+		base.fprintf(f);
+		f.printf(" %p", this.engine);
+	}
 }
 
-public abstract class Hkl.PseudoAxisEngine
+public abstract class Hkl.PseudoAxisEngineMode
+{
+	public string name;
+	public abstract bool init(Geometry geometry, Detector detector, Sample sample);
+	public abstract bool get(Geometry geometry, Detector detector, Sample sample);
+	public abstract bool set(Geometry geometry, Detector detector, Sample sample);
+	public Parameter[] parameters;
+	public string[] axes_names;
+}
+
+public class Hkl.PseudoAxisEngine
 {
 	public weak string name;
-	public int is_initialized;
-	public int is_readable;
-	public int is_writable;
 	public Geometry geometry;
 	public Detector detector;
 	public weak Sample sample;
+	public PseudoAxisEngineMode[] modes;
+	public weak PseudoAxisEngineMode mode;
 	public Axis[] axes;
 	public PseudoAxis[] pseudoAxes;
-	public List<Geometry> geometries;
+	public PseudoAxisEngineList engines;
 
-	public abstract bool set(uint idx, Detector det, Sample sample);
-	public abstract bool set_by_name(string name, Detector det, Sample sample);
-	public abstract bool compute_geometries();
-	public abstract bool compute_pseudoAxes(Geometry g);
-
-	public bool init(string name, string[] names, Geometry g)
+	public void add_mode(owned PseudoAxisEngineMode mode)
 	{
-		this.name = name;
-		this.is_initialized = 0;
-		this.is_readable = 0;
-		this.is_writable = 0;
-		this.geometry = new Geometry.copy(g);
-		this.pseudoAxes = new PseudoAxis[names.length];
-		this.geometries = new List<Geometry>();
-		uint idx=0U;
-		foreach(weak string s in names)
-			this.pseudoAxes[idx++] = new PseudoAxis(s, this);
-		return true;
+		int len = this.modes.length;
+		this.modes.resize(len + 1);
+		this.modes[len] = mode;
+	}
+
+	public void add_geometry(double[] x) requires (x.length == this.axes.length)
+	{
+		int i=0;
+		foreach(weak Axis axis in this.axes)
+			axis.set_value(Gsl.Trig.angle_restrict_symm(x[i++]));
+		this.engines.geometries.add(this.geometry);
+	}
+
+	public void select_mode(int idx) requires (idx < this.modes.length)
+	{
+		this.mode = this.modes[idx];
+	}
+
+	public void prepare_internal(Geometry geometry, Detector detector, Sample sample)
+	{
+		this.geometry = new Geometry.copy(geometry);
+		this.detector = detector;
+		this.sample = sample;
+		this.axes.resize(this.mode.axes_names.length);
+		int i=0;
+		foreach(weak string name in this.mode.axes_names)
+			this.axes[i++] = this.geometry.get_axis_by_name(name);
+		this.engines.geometries.clear();
+	}
+
+	public void fprintf(FileStream f)
+	{
+		f.printf("\nPseudoAxesEngine : \"%s\"", this.name);
+		if(this.mode != null){
+			f.printf(" %s", this.mode.name);
+			foreach(weak Parameter parameter in this.mode.parameters)
+				f.printf(" \"%s\" = %g", parameter.name, parameter.value);
+		}
+		foreach(weak PseudoAxis pseudoAxis in this.pseudoAxes){
+			f.printf("\n     ");
+			pseudoAxis.fprintf(f);
+		}
+		if(this.engines.geometries.geometries.length > 0)
+			this.engines.geometries.fprintf(f);
+		f.printf("\n");
+	}
+}
+
+public class Hkl.PseudoAxisEngineList
+{
+	public PseudoAxisEngine[] engines;
+	public GeometryList geometries;
+
+	public void add(PseudoAxisEngine engine)
+	{
+		int len = engines.length;
+		engines.resize(len + 1);
+		engines[len] = engine;
+	}
+
+	public weak PseudoAxisEngine? get_by_name(string name)
+	{
+		foreach(weak PseudoAxisEngine engine in this.engines){
+			if(engine.name == name)
+				return engine;
+		}
+		return null;
+	}
+
+	public weak PseudoAxis? get_pseudo_axis_by_name(string name)
+	{
+		foreach(weak PseudoAxisEngine engine in this.engines){
+			foreach(weak PseudoAxis pseudoaxis in engine.pseudoAxes){
+				if (pseudoaxis.name == name)
+					return pseudoaxis;
+			}
+		}
+		return null;
+	}
+
+	public void clear()
+	{
+		this.engines.resize(0);
+	}
+
+	public bool getter(Geometry geometry, Detector detector, Sample sample)
+	{
+		bool res = true;
+
+		foreach(weak PseudoAxisEngine engine in this.engines)
+			if(!engine.mode.get(geometry, detector, sample))
+				res = false;
+
+		return res;
+	}
+
+	public void fprintf(FileStream f)
+	{
+		foreach(weak PseudoAxisEngine engine in this.engines)
+			engine.fprintf(f);
 	}
 }

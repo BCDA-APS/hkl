@@ -23,8 +23,8 @@ public class Hkl.Parameter {
 	public weak string name;
 	public Interval range;
 	public double value;
-	public Hkl.Unit unit;
-	public Hkl.Unit punit;
+	public Hkl.Unit? unit;
+	public Hkl.Unit? punit;
 	public bool not_to_fit;
 	public bool changed;
 
@@ -88,5 +88,23 @@ public class Hkl.Parameter {
 	{
 		if (!this.not_to_fit)
 			this.value = Random.double_range(this.range.min, this.range.max);
+	}
+
+	public void fprintf(FileStream f)
+	{
+		double factor = this.unit.factor(this.punit);
+		if (this.punit != null)
+			f.printf("\"%s\" : %f %s [%f : %f]",
+					this.name,
+					this.value * factor,
+					this.punit.repr,
+					this.range.min * factor,
+					this.range.max * factor);
+		else
+			f.printf("\"%s\" : %f [%f : %f]",
+					this.name,
+					this.value * factor,
+					this.range.min * factor,
+					this.range.max * factor);
 	}
 }

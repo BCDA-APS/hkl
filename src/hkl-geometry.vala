@@ -185,3 +185,47 @@ public class Hkl.Geometry
 			stream.printf(" %s : %f", axis.name, axis.get_value_unit());
 	}
 }
+
+public abstract class Hkl.GeometryList
+{
+	public Geometry[] geometries;
+	public abstract void multiply(int idx);
+
+	public void add(Geometry geometry)
+	{
+	}
+
+	public void clear()
+	{
+	}
+
+	public void fprintf(FileStream f)
+	{
+		if(this.geometries.length > 0){
+			foreach(weak Axis axis in this.geometries[0].axes)
+				axis.fprintf(f);
+
+			int i=0;
+			foreach(weak Geometry geometry in this.geometries){
+				f.printf("\n%d :", i++);
+				foreach(weak Axis axis in geometry.axes){
+					double value = axis.get_value_unit();
+					if (axis.punit != null)
+						f.printf(" % 9.6g %s", value, axis.punit.repr);
+					else
+						f.printf(" % 9.6g", value);
+
+				}
+				f.printf("\n   ");
+				foreach(weak Axis axis in geometry.axes){
+					double value = Gsl.Trig.angle_restrict_symm(axis.value) * axis.unit.factor(axis.punit);
+					if (axis.punit != null)
+						f.printf(" % 9.6g %s", value, axis.punit.repr);
+					else
+						f.printf(" % 9.6g", value);
+				}
+				f.printf("\n");
+			}
+		}
+	}
+}
