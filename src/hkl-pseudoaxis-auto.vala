@@ -9,138 +9,39 @@ public struct Hkl.PseudoAxisEngineAutoFunc
 
 public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 {
-	public Gsl.MultirootFsolver solver;
-	public Gsl.Vector x;
-	public weak PseudoAxisEngineAutoFunc function;
-	public PseudoAxisEngineAutoFunc[] functions;
-
-	public PseudoAxisEngineAuto(string name, string[] names, Geometry g)
+	public PseudoAxisEngineAuto(string name, string[] names)
 	{
-		base.init(name, names, g);
+		base(name, names);
 	}
 
-	/* waiting for vala to let me declare a constructor outside */
-	public PseudoAxisEngineAuto.HKL_E4CV(Geometry g)
+	public bool solve_function(Gsl.MultirootFunction f)
 	{
-		string[] pseudo_names = {"h", "k", "l"};
-		base.init("hkl", pseudo_names, g);
-		this.functions = new PseudoAxisEngineAutoFunc[4];
-		this.functions[0] = E4CV_bissector_func(this);
-		this.functions[1] = E4CV_constant_omega_func(this);
-		this.functions[2] = E4CV_constant_chi_func(this);
-		this.functions[3] = E4CV_constant_phi_func(this);
-	}
+		int i;
+		size_t len = this.axes.length;
+		double[] x0 = new double[len];
+		bool[] degenerated = new bool[len];
+		int[] op_len = new int[len];
+		bool res;
+		Gsl.Vector _x; /* use to compute sectors in perm_r (avoid copy) */ 
+		Gsl.Vector _f; /* use to test sectors in perm_r (avoid copy) */ 
 
-	public override bool set_by_name(string name, Detector det, Sample sample)
-	{
-		uint idx=0U;
-		foreach(weak PseudoAxisEngineAutoFunc func in this.functions) {
-			if (func.name == name)
-				return this.set(idx, det, sample);
-			idx++;
-		}
-		return false;
-	}
-
-	public override bool set(uint idx, Detector det, Sample sample) requires (idx < this.functions.length)
-	{
-		this.detector = det;
-		this.sample = sample;
-
-		this.function = this.functions[idx];
-		this.axes = new Axis[this.function.axes.length];
-		uint i=0U;
-		foreach(weak string s in this.function.axes)
-			this.axes[i++] = this.geometry.get_axis_by_name(s);
-		this.solver = new Gsl.MultirootFsolver(Gsl.MultirootFsolverTypes.hybrids, this.function.axes.length);
-		this.x = new Gsl.Vector(this.function.axes.length);
-		return true;
-	}
-
-	public override bool compute_geometries()
-	{
-		//first clear the geometries.
-		this.geometries.clear();
-		bool res = false;
-		foreach(weak Gsl.MultirootFunction f in this.function.f) {
-			res |= this.solve(f);
-			this.compute_equivalent_geometries(f);
+		_x = new Gsl.Vector(len);
+		_f = new Gsl.Vector(len);
+		res = this.find_first_geometry(f, degenerated);
+		if (res) {
+			int[] p = new int[len];
+			/* use first solution as starting point for permutations */
+			for(i=0; i<len; ++i){
+				x0[i] = this.axes[i].value;
+				if (degenerated[i])
+					op_len[i] = 1;
+				else
+					op_len[i] = 4;
+			}
+			for (i=0; i<op_len[0]; ++i)
+				perm_r(op_len, p, 0, i, f, x0, _x, _f);
 		}
 		return res;
-	}
-
-	public override bool compute_pseudoAxes(Geometry geom)
-	{
-		Matrix RUB;
-		Vector hkl, ki, Q;
-
-		// update the geometry internals
-		geom.update();
-
-		// R * UB
-		// for now the 0 holder is the sample holder.
-		weak Holder holder = geom.holders[0];
-		holder.q.to_matrix(out RUB);
-		RUB.times_matrix(this.sample.UB);
-
-		// kf - ki = Q
-		geom.source.compute_ki(out ki);
-		this.detector.compute_kf(geom, out Q);
-		Q.minus_vector(ki);
-		RUB.solve(out hkl, Q);
-
-		// update the pseudoAxes current and consign parts
-		this.pseudoAxes[0].value = hkl.x;
-		this.pseudoAxes[1].value = hkl.y;
-		this.pseudoAxes[2].value = hkl.z;
-
-		return true;
-	}
-
-	bool solve(Gsl.MultirootFunction f)
-	{
-		int status = 0;
-		weak Gsl.MultirootFsolver solver = this.solver;
-		double *x = this.x.ptr(0);
-
-		// get the starting point from the geometry
-		// must be put in the auto_set method
-		uint idx=0U;
-		foreach(weak Axis axis in this.axes)
-			x[idx++] = axis.value;
-
-		// Initialize method 
-		solver.set(&f, this.x);
-
-		// iterate to find the solution
-		uint iter = 0U;
-		do {
-			++iter;
-			status = solver.iterate();
-			if (status != 0 || iter % 1000 == 0) {
-				// Restart from another point.
-				for(idx=0U; idx<this.axes.length; ++idx)
-					x[idx] = Random.double_range(0.0, Math.PI);
-				solver.set(&f, this.x);
-				status = solver.iterate();
-			}
-			status = Gsl.MultirootTest.residual (solver.f, EPSILON);
-		} while (status == Gsl.Status.CONTINUE && iter < 1000);
-		if (status == Gsl.Status.CONTINUE){
-			return false;
-		}
-
-		// set the geometry from the gsl_vector
-		// in a futur version the geometry must contain a gsl_vector
-		// to avoid this.
-		idx = 0U;
-		x = solver.x.ptr(0);
-		foreach(weak Axis axis in this.axes)
-			axis.set_value(Gsl.Trig.angle_restrict_pos(x[idx++]));
-		this.x.memcpy(solver.x);
-		this.geometry.update();
-
-		return true;
 	}
 
 	bool compute_equivalent_geometries(Gsl.MultirootFunction f)
@@ -152,6 +53,79 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		for (uint i=0U; i<n; ++i)
 			perm_r(n, 4, perm, 0, i, f, geom);
 		return true;
+	}
+
+	/** 
+	 * @brief this private method try to find the first solution
+	 * 
+	 * @param self the current HklPseudoAxeEngine.
+	 * @param f The function to use for the computation.
+	 * 
+	 * If a solution was found it also check for degenerated axes.
+	 * A degenerated axes is an Axes with no effect on the function.
+	 * @see find_degenerated
+	 * @return HKL_SUCCESS (0) or HKL_FAIL (-1). 
+	 */
+	bool find_first_geometry(Gsl.MultirootFunction f,
+			bool[] degenerated)
+	{
+		Gsl.MultirootFsolverType* T;
+		Gsl.MultirootFsolver s;
+		Gsl.Vector x;
+		size_t len = this.axes.length;
+		double *x_data;
+		double[] x_data0 = new double[len];
+		size_t iter = 0;
+		int status;
+		bool res = false;
+		size_t i;
+
+		// get the starting point from the geometry
+		// must be put in the auto_set method
+		x = new Gsl.Vector(len);
+		x_data = x.ptr(0);
+		for(i=0; i<len; ++i)
+			x_data[i] = this.axes[i].value;
+
+		// keep a copy of the first axes positions to deal with degenerated axes
+		GLib.Memory.copy(x_data0, x_data, len * sizeof(double));
+
+		// Initialize method 
+		T = (Gsl.MultirootFsolverType*)Gsl.MultirootFsolverTypes.hybrid;
+		s = new Gsl.MultirootFsolver(T, len);
+		s.set(&f, x);
+
+		// iterate to find the solution
+		do {
+			++iter;
+			status = s.iterate();
+			if (status > 0 || iter % 1000 == 0) {
+				// Restart from another point.
+				for(i=0; i<len; ++i)
+					x_data[i] = GLib.Random.double_range(0, GLib.Math.PI);
+				s.set(&f, x);
+				status = s.iterate();
+			}
+			status = Gsl.MultirootTest.residual(s.f, EPSILON);
+		} while (status == Gsl.Status.CONTINUE && iter < 1000);
+
+		if (status != Gsl.Status.CONTINUE) {		
+			// this.find_degenerated_axes(f, s.x, s.f, degenerated);
+
+			// set the geometry from the gsl_vector
+			// in a futur version the geometry must contain a gsl_vector
+			// to avoid this.
+			x_data = s.x.ptr(0);
+			for(i=0; i<len; ++i)
+				if (degenerated[i])
+					this.axes[i].set_value(x_data0[i]);
+				else
+					this.axes[i].set_value(x_data[i]);
+			this.geometry.update();
+
+			res = true;
+		}
+		return res;
 	}
 
 }
@@ -206,13 +180,11 @@ public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
  * 2 -> pi + angle
  * 3 -> -angle
  */
-static void change_sector(double *x, uint[] sector)
+static void change_sector(double *x, double[] x0, uint[] sector)
 {
 	uint i;
 	for(i=0U; i<sector.length; ++i) {
-		double value;
-
-		value = x[i];
+		double value = x0[i];
 		switch (sector[i]) {
 			case 0:
 				break;
@@ -231,79 +203,42 @@ static void change_sector(double *x, uint[] sector)
 }
 
 /** 
- * @brief Test if an angle combination is compatible with a
- * pseudoAxisEngine
+ * @brief Test if an angle combination is compatible with q function.
  * 
  * @param x The vector of angles to test.
- * @param engine The pseudoAxeEngine used for the test.
+ * @param function The gsl_multiroot_function used for the test.
+ * @param f a gsl_vector use to compute the result (optimization)
  */
-static void test_sector(Gsl.Vector x, Gsl.MultirootFunction func)
+static bool test_sector(Gsl.Vector x,
+		Gsl.MultirootFunction function,
+		Gsl.Vector f)
 {
-	uint i;
+	size_t i;
+	double *f_data = f.ptr(0);
 
-	var F = new Gsl.Vector(x.size);
-	double *f = F.ptr(0);
+	function.f(x, function.params, f);
 
-	func.f(x, func.params, F);
-	bool ko = false;
-	for(i=0;i<x.size; ++i) {
-		if (Math.fabs(f[i]) > Hkl.EPSILON) {
-			ko = true;
-			break;
-		}
-	}
-	if (!ko) {
-		Hkl.PseudoAxisEngine *engine = func.params;
-		engine->geometries.add(new Hkl.Geometry.copy(engine->geometry));
-		/*
-		   var J = new Gsl.Matrix(x.size, f.size);
-		   Gsl.multiroot_fdjacobian(&function.f, x, f,
-		   Hkl.SQRT_DBL_EPSILON, J);
-		 */
-		/*	
-			fprintf(stdout, "\n");
-			hkl_geometry_fprintf(stdout, engine->geom);
-			fprintf(stdout, "\n ");
-			for(i=0;i<x->size;++i)
-			fprintf(stdout, " %d", gsl_vector_int_get(p, i));
-			fprintf(stdout, "   ");
-			for(i=0;i<x->size;++i)
-			fprintf(stdout, " %f", gsl_vector_get(f, i));
-			fprintf(stdout, "\n");
-			for(i=0;i<state->n;++i) {
-			fprintf(stdout, "\n   ");
-			for(j=0;j<state->n;++j)
-			fprintf(stdout, " %f", gsl_matrix_get(J, i, j));
-			}
-			fprintf(stdout, "\n");
-		 */
-	}
+	for(i=0; i<f.size; ++i)
+		if (Math.fabs(f_data[i]) > Hkl.EPSILON)
+			return false;
+
+	return true;
 }
 
-/* 
- * @brief compute the permutation and test its validity.
- * 
- * @param n number of axes
- * @param k number of operation per axes. (4 for now)
- * @param p The vector containing the current permutation.
- * @param z The index of the axes we are permution.
- * @param x the current operation to set.
- * @param engine The engine for the validity test.
- * @param geom The starting point of all geometry permutations.
- */
-static void perm_r(uint n, int k,
-		uint[] p, int z, uint x,
-		Gsl.MultirootFunction f, Gsl.Vector geom)
+static void perm_r(int[] op_len, uint[] p, int axes_idx,
+		int op, Gsl.MultirootFunction f, double[] x0,
+		Gsl.Vector _x, Gsl.Vector _f)
 {
-	uint i;
+	int i;
+	double *x_data = _x.ptr(0);
+	Hkl.PseudoAxisEngine *engine = f.params;
 
-	p[z++] = x;
-	if (z == k) {
-		Hkl.PseudoAxisEngineAuto *engine = f.params;
-		engine->x.memcpy(geom);
-		change_sector(engine->x.ptr(0), p);
-		test_sector(engine->x, f);
+	p[axes_idx++] = op;
+	if (axes_idx == p.length) {
+		change_sector(x_data, x0, p);
+		if (test_sector(_x, f, _f))
+			engine->add_geometry(_x);
 	} else
-		for (i=0; i<n; ++i)
-			perm_r(n, k, p, z, i, f, geom);
+		for (i=0; i<op_len[axes_idx]; ++i)
+			perm_r(op_len, p, axes_idx, i, f, x0, _x, _f);
 }
