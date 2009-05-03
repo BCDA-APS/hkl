@@ -1,3 +1,5 @@
+using Gsl;
+
 static int E4CV_bissector(Gsl.Vector x, void *params, Gsl.Vector f)
 {
 	double omega, tth;
@@ -16,7 +18,7 @@ static int E4CV_constant_omega(Gsl.Vector x, void *params, Gsl.Vector f)
 {
 	Hkl.PseudoAxisEngineAuto *engine = params;
 	double omega = x.get(0);
-	double omega_c = engine->function.parameters[0].value;
+	double omega_c = engine->mode.parameters[0].value;
 
 	RUBh_minus_Q(x, params, f);
 	f.set(3, omega - omega_c);
@@ -27,7 +29,7 @@ static int E4CV_constant_chi(Gsl.Vector x, void *params, Gsl.Vector f)
 {
 	Hkl.PseudoAxisEngineAuto *engine = params;
 	double chi = x.get(1);
-	double chi_c = engine->function.parameters[0].value;
+	double chi_c = engine->mode.parameters[0].value;
 
 	RUBh_minus_Q(x, params, f);
 	f.set(3, chi - chi_c);
@@ -38,7 +40,7 @@ static int E4CV_constant_phi(Gsl.Vector x, void *params, Gsl.Vector f)
 {
 	Hkl.PseudoAxisEngineAuto *engine = params;
 	double phi = x.get(2);
-	double phi_c = engine->function.parameters[0].value;
+	double phi_c = engine->mode.parameters[0].value;
 
 	RUBh_minus_Q(x, params, f);
 	f.set(3, phi - phi_c);

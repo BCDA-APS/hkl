@@ -29,7 +29,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		_f = new Gsl.Vector(len);
 		res = this.find_first_geometry(f, degenerated);
 		if (res) {
-			int[] p = new int[len];
+			uint[] p = new uint[len];
 			/* use first solution as starting point for permutations */
 			for(i=0; i<len; ++i){
 				x0[i] = this.axes[i].value;
@@ -42,17 +42,6 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 				perm_r(op_len, p, 0, i, f, x0, _x, _f);
 		}
 		return res;
-	}
-
-	bool compute_equivalent_geometries(Gsl.MultirootFunction f)
-	{
-		uint n = this.axes.length;
-		var perm = new uint[n];
-		var geom = new Gsl.Vector(n);
-		geom.memcpy(this.x);
-		for (uint i=0U; i<n; ++i)
-			perm_r(n, 4, perm, 0, i, f, geom);
-		return true;
 	}
 
 	/** 
@@ -76,7 +65,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 		double *x_data;
 		double[] x_data0 = new double[len];
 		size_t iter = 0;
-		int status;
+		int status = 0;
 		bool res = false;
 		size_t i;
 

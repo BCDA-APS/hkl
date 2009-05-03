@@ -74,11 +74,12 @@ public class Hkl.PseudoAxisEngine
 		this.modes[len] = mode;
 	}
 
-	public void add_geometry(double[] x) requires (x.length == this.axes.length)
+	public void add_geometry(Gsl.Vector x) requires (x.size == this.axes.length)
 	{
+		double *x_data = x.data;
 		int i=0;
 		foreach(weak Axis axis in this.axes)
-			axis.set_value(Gsl.Trig.angle_restrict_symm(x[i++]));
+			axis.set_value(Gsl.Trig.angle_restrict_symm(x_data[i++]));
 		this.engines.geometries.add(this.geometry);
 	}
 
