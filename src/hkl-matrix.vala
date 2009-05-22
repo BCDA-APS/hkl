@@ -45,6 +45,15 @@ public struct Hkl.Matrix {
 		this.m33 = m33;
 	}
 
+	[CCode (instance_pos=-1)]
+	public void fprintf(FileStream file)
+	{
+		file.printf("|%f, %f, %f|\n", this.m11, this.m12, this.m13);
+		file.printf("|%f, %f, %f|\n", this.m21, this.m22, this.m23);
+		file.printf("|%f, %f, %f|\n", this.m31, this.m32, this.m33);
+	}
+
+
 	public bool cmp(Matrix m)
 	{
 		if ((Math.fabs(this.m11 - m.m11) > EPSILON)
