@@ -263,4 +263,22 @@ public struct Hkl.Lattice
 				break;
 		}
 	}
+
+	[CCode (instance_pos=-1)]
+	public void fprintf(FileStream f)
+	{
+		f.printf("\n");
+		this.a.fprintf(f);
+		f.printf("\n");
+		this.b.fprintf(f);
+		f.printf("\n");
+		this.c.fprintf(f);
+		f.printf("\n");
+		this.alpha.fprintf(f);
+		f.printf("\n");
+		this.beta.fprintf(f);
+		f.printf("\n");
+		this.gamma.fprintf(f);
+	}
+
 }
