@@ -73,7 +73,7 @@ public struct Hkl.Lattice
 	 * Get the B matrix from the l parameters return true if everything
 	 * goes fine. false if a problem occure.
 	 */
-	public bool compute_B(out Matrix B)
+	public bool get_B(out Matrix B)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);

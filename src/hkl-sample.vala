@@ -79,7 +79,7 @@ public class Hkl.Sample {
 	{
 		Matrix B;
 
-		if (!this.lattice.compute_B(out B))
+		if (!this.lattice.get_B(out B))
 			return false;
 
 		this.UB = this.U;
@@ -190,7 +190,7 @@ public class Hkl.Sample {
 				Matrix Tc = {0};
 
 				// Compute matrix Tc from r1 and r2.
-				this.lattice.compute_B(out B);
+				this.lattice.get_B(out B);
 				B.times_vector(ref h1c);
 				B.times_vector(ref h2c);
 				Tc.from_two_vector(h1c, h2c);
