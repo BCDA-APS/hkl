@@ -437,4 +437,9 @@ public struct Hkl.Interval {
 		this.min = Math.atan(this.min);
 		this.max = Math.atan(this.max);
 	}
+
+	public double length()
+	{
+		return this.max - this.min;
+	}
 }
