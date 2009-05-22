@@ -84,6 +84,26 @@ public class Hkl.Parameter {
 		this.changed = true;
 	}
 
+	public void get_range_unit(out double min, out double max)
+	{
+		double factor = this.unit.factor(this.punit);
+		min = factor * this.range.min;
+		max = factor * this.range.max;
+	}
+
+	public void set_range(double min, double max)
+	{
+		this.range.min = min;
+		this.range.max = max;
+	}
+
+	public void set_range_unit(double min, double max)
+	{
+		double factor = this.unit.factor(this.punit);
+		this.range.min = min / factor;
+		this.range.max = max / factor;
+	}
+
 	public virtual void randomize()
 	{
 		if (!this.not_to_fit)
