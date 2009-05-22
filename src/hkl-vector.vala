@@ -24,11 +24,22 @@ public struct Hkl.Vector {
 	public double y;
 	public double z;
 
+	public Vector(double x, double y, double z)
+	{
+		this.set(x, y, z);
+	}
+
 	public void set(double x, double y, double z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	[CCode (instance_pos=-1)]
+	public void fprintf(FileStream f)
+	{
+		f.printf("|%f, %f, %f|", this.x, this.y, this.z);
 	}
 
 	public bool cmp(Vector v)
@@ -51,6 +62,13 @@ public struct Hkl.Vector {
 			return false;
 		else
 			return true;
+	}
+
+	public void add_vector(Vector v)
+	{
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
 	}
 
 	public void minus_vector(Vector v)
@@ -107,16 +125,6 @@ public struct Hkl.Vector {
 		this.z = tmp.x * v.y - tmp.y * v.x;
 	}
 
-	public double norm2()
-	{
-		return Math.sqrt(this.scalar_product(this));
-	}
-
-	public void normalize()
-	{
-		this.div_double(this.norm2());
-	}
-
 	public double angle(Vector v)
 	{
 		double angle;
@@ -134,6 +142,34 @@ public struct Hkl.Vector {
 			else
 				angle = Math.acos(cos_angle);
 		return angle;
+	}
+
+	public double oriented_angle(Vector vector,
+				     Vector ref)
+	{
+		double angle = this.angle(vector);
+		Vector tmp = this;
+		Vector ref_u = ref;
+
+		tmp.vectorial_product(vector);
+		tmp.normalize();
+		ref_u.normalize();
+		if (tmp.is_opposite(ref_u))
+			angle = -angle;
+		return angle;
+	}
+
+	public bool normalize()
+	{
+		bool res = false;
+
+		double norm = this.norm2();
+		if (norm > EPSILON){
+			this.div_double(norm);
+			res = true;
+		}
+
+		return res;
 	}
 
 	public bool is_colinear(Vector v)
@@ -188,6 +224,12 @@ public struct Hkl.Vector {
 		this.z += (c + (1 - c) * axe_n.z * axe_n.z) * tmp.z;
 	}
 
+	public double norm2()
+	{
+		return Math.sqrt(this.scalar_product(this));
+	}
+
+
 	public void rotated_quaternion(Quaternion qr)
 	{
 		Quaternion q;
@@ -205,6 +247,31 @@ public struct Hkl.Vector {
 		this.x = q.b;
 		this.y = q.c;
 		this.z = q.d;
+	}
+
+	/**
+	 * @brief check if the hkl_vector is null
+	 * @return true if all |elements| are below HKL_EPSILON, false otherwise
+	 * @todo test
+	 */
+	public bool is_null()
+	{
+		bool res = true;
+		if ((Math.fabs(this.x) > EPSILON)
+		    || (Math.fabs(this.y) > EPSILON)
+		    || (Math.fabs(this.z) > EPSILON))
+			res = false;
+
+		return res;
+	}
+
+	public void project_on_plan(Vector plan)
+	{
+		Vector tmp = plan;
+
+		tmp.normalize();
+		tmp.times_double(this.scalar_product(tmp));
+		this.minus_vector(tmp);
 	}
 
 }
