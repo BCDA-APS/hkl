@@ -56,6 +56,7 @@ public struct Hkl.Source
 		ki.times_double(k);
 	}
 
+	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{
 		f.printf("%f", this.wave_length);

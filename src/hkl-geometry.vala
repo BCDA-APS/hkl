@@ -179,6 +179,7 @@ public class Hkl.Geometry
 		return distance;
 	}
 
+	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream stream)
 	{
 		foreach(weak Axis axis in this.axes)
@@ -199,6 +200,7 @@ public abstract class Hkl.GeometryList
 	{
 	}
 
+	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{
 		if(this.geometries.length > 0){

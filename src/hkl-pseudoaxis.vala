@@ -30,6 +30,7 @@ public class Hkl.PseudoAxis : Hkl.Parameter
 		this.engine = engine;
 	}
 
+	[CCode (instance_pos=-1)]
 	public new void fprintf(FileStream f)
 	{
 		base.fprintf(f);
@@ -100,6 +101,7 @@ public class Hkl.PseudoAxisEngine
 		this.engines.geometries.clear();
 	}
 
+	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{
 		f.printf("\nPseudoAxesEngine : \"%s\"", this.name);
@@ -166,6 +168,7 @@ public class Hkl.PseudoAxisEngineList
 		return res;
 	}
 
+	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{
 		foreach(weak PseudoAxisEngine engine in this.engines)

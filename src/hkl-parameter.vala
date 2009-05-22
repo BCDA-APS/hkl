@@ -90,6 +90,7 @@ public class Hkl.Parameter {
 			this.value = Random.double_range(this.range.min, this.range.max);
 	}
 
+	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{
 		double factor = this.unit.factor(this.punit);
