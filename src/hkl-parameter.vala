@@ -33,7 +33,7 @@ public class Hkl.Parameter {
 			 bool not_to_fit, bool changed,
 			 Hkl.Unit unit, Hkl.Unit punit)
 	{
-		this.set(name, min, value, max, not_to_fit, changed, unit, punit);
+		this.init(name, min, value, max, not_to_fit, changed, unit, punit);
 	}
 
 	public Parameter.copy(Parameter parameter)
@@ -46,9 +46,10 @@ public class Hkl.Parameter {
 		this.not_to_fit = parameter.not_to_fit;
 		this.changed = parameter.changed;
 	}
-	public void set(string name, double min, double value, double max,
-			bool not_to_fit, bool changed,
-			Hkl.Unit unit, Hkl.Unit punit)
+
+	public void init(string name, double min, double value, double max,
+			 bool not_to_fit, bool changed,
+			 Hkl.Unit unit, Hkl.Unit punit)
 	{
 		this.name = name;
 		this.range.min = min;

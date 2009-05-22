@@ -36,7 +36,7 @@ public class Hkl.Sample {
 		public int flag;
 
 		public Reflection(Geometry g, Detector det,
-				double h, double k, double l)
+				  double h, double k, double l)
 		{
 			Vector ki;
 
@@ -91,16 +91,17 @@ public class Hkl.Sample {
 	static double mono_crystal_fitness(Gsl.Vector x, void *params)
 	{
 		Sample *sample = params;
+		double *x_data = x.ptr(0);
 
-		double euler_x = x.get(0);
-		double euler_y = x.get(1);
-		double euler_z = x.get(2);
-		sample->lattice.a.value = x.get(3);
-		sample->lattice.b.value = x.get(4);
-		sample->lattice.c.value = x.get(5);
-		sample->lattice.alpha.value = x.get(6);
-		sample->lattice.beta.value = x.get(7);
-		sample->lattice.gamma.value = x.get(8);
+		double euler_x = x_data[0];
+		double euler_y = x_data[1];
+		double euler_z = x_data[2];
+		sample->lattice.a.value = x_data[3];
+		sample->lattice.b.value = x_data[4];
+		sample->lattice.c.value = x_data[5];
+		sample->lattice.alpha.value = x_data[6];
+		sample->lattice.beta.value = x_data[7];
+		sample->lattice.gamma.value = x_data[8];
 		sample->U.from_euler(euler_x, euler_y, euler_z);
 		if (!sample->compute_UB())
 			return double.NAN;
@@ -149,22 +150,45 @@ public class Hkl.Sample {
 		}
 	}
 
-	public weak Reflection? add_reflection(Geometry g, Detector det,
-			double h, double k, double l)
+	public bool set_lattice(double a, double b, double c,
+				double alpha, double beta, double gamma)
 	{
-		if (Math.fabs(h) < EPSILON
-			&& Math.fabs(k) < EPSILON
-			&& Math.fabs(l) < EPSILON)
-			return null;
-		else{
-			int len = this.reflections.length;
-			this.reflections.resize(len + 1);
-			this.reflections[len] = Reflection(g, det, h, k, l);
-			return this.reflections[len];
-		}
+		bool status;
+		
+		status = this.lattice.set(a, b, c, alpha, beta, gamma);
+		if (status)
+			this.compute_UB();
+		return status;
 	}
 
-	public weak Reflection get_reflection(uint idx)
+	public bool set_U_from_euler(double x, double y, double z)
+	{
+		this.U.from_euler(x, y, z);
+		this.compute_UB();
+
+		return true;
+	}
+
+	public void hkl_sample_get_UB(out Matrix UB)
+	{
+		this.compute_UB();
+		UB = this.UB;
+	}
+
+
+	public weak Reflection? add_reflection(Geometry g, Detector det,
+					       double h, double k, double l) requires (
+						       Math.fabs(h) >= EPSILON
+						       || Math.fabs(k) >= EPSILON
+						       || Math.fabs(l) < EPSILON)
+	{
+		int len = this.reflections.length;
+		this.reflections.resize(len + 1);
+		this.reflections[len] = Reflection(g, det, h, k, l);
+		return this.reflections[len];
+	}
+
+	public weak Reflection get_ith_reflection(uint idx)
 	{
 		return this.reflections[idx];
 	}
@@ -207,7 +231,7 @@ public class Hkl.Sample {
 		return false;
 	}
 
-	public void affine()
+	public double affine()
 	{
 		int status = 0;
 
@@ -249,7 +273,46 @@ public class Hkl.Sample {
 			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.0);
 		} while (status == Gsl.Status.CONTINUE && iter < 10000U);
 		Gsl.Error.set_error_handler(null);
+
+		return s.size;
 	}
 
+	public double get_reflection_mesured_angle(int idx1, int idx2)
+	{
+		if (idx1 > this.reflections.length
+		    || idx2 > this.reflections.length)
+			return double.NAN;
+		
+		return this.reflections[idx1]._hkl.angle(this.reflections[idx2]._hkl);
+	}
+
+	public double get_reflection_theoretical_angle(int idx1, int idx2)
+	{
+		if (idx1 > this.reflections.length
+		    || idx2 > this.reflections.length)
+			return double.NAN;
+
+		Vector hkl1;
+		Vector hkl2;
+
+		hkl1 = this.reflections[idx1].hkl;
+		hkl2 = this.reflections[idx2].hkl;
+		this.UB.times_vector(ref hkl1);
+		this.UB.times_vector(ref hkl2);
+
+		return hkl1.angle(hkl2);
+	}
+
+	[CCode (instance_pos=-1)]
+	public void fprintf(FileStream f)
+	{
+		f.printf("\nSample name: \"%s\"", this.name);
+
+		f.printf("\nLattice parameters:");
+		f.printf("\n ");
+		this.lattice.fprintf(f);
+		f.printf("\nUB:\n");
+		this.UB.fprintf(f);
+	}
 }
 

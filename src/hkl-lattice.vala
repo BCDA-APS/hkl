@@ -36,37 +36,60 @@ public struct Hkl.Lattice
 
 	public Lattice(double a, double b, double c, double alpha, double beta, double gamma)
 	{
-		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)) {
-			this.a.set("a", 0.0, a, a+10.0, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
-			this.b.set("b", 0.0, b, b+10.0, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
-			this.c.set("c", 0.0, c, c+10.0, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
-			this.alpha.set("alpha", -Math.PI, alpha, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
-			this.beta.set("beta", -Math.PI, beta, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
-			this.gamma.set("gamma", -Math.PI, gamma, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
+		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)){
+			this.a     = new Parameter("a", 0.0, a, a+10.0,
+						   false, false,
+						   hkl_unit_length_nm, hkl_unit_length_nm);
+			this.b     = new Parameter("b", 0.0, b, b+10.0,
+						   false, false,
+						   hkl_unit_length_nm, hkl_unit_length_nm);
+			this.c     = new Parameter("c", 0.0, c, c+10.0,
+						   false, false,
+						   hkl_unit_length_nm, hkl_unit_length_nm);
+			this.alpha = new Parameter("alpha", -Math.PI, alpha, Math.PI,
+						   false, false,
+						   hkl_unit_angle_rad, hkl_unit_angle_deg);
+			this.beta  = new Parameter("beta", -Math.PI, beta, Math.PI,
+						   false, false,
+						   hkl_unit_angle_rad, hkl_unit_angle_deg);
+			this.gamma = new Parameter("gamma", -Math.PI, gamma, Math.PI,
+						   false, false,
+						   hkl_unit_angle_rad, hkl_unit_angle_deg);
 		}
 	}
 
 	public Lattice.default()
 	{
-		this.a.set("a", 0.0, 1.54, 11.54, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
-		this.b.set("b", 0.0, 1.54, 11.54, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
-		this.c.set("c", 0.0, 1.54, 11.54, false, false, hkl_unit_length_nm, hkl_unit_length_nm);
-		this.alpha.set("alpha", -Math.PI, 90*DEGTORAD, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
-		this.beta.set("beta", -Math.PI, 90*DEGTORAD, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
-		this.gamma.set("gamma", -Math.PI, 90*DEGTORAD, Math.PI, false, false, hkl_unit_angle_rad, hkl_unit_angle_deg);
+		this.a     = new Parameter("a", 0.0, 1.54, 11.54,
+					   false, false,
+					   hkl_unit_length_nm, hkl_unit_length_nm);
+		this.b     = new Parameter("b", 0.0, 1.54, 11.54,
+					   false, false,
+					   hkl_unit_length_nm, hkl_unit_length_nm);
+		this.c     = new Parameter("c", 0.0, 1.54, 11.54,
+					   false, false,
+					   hkl_unit_length_nm, hkl_unit_length_nm);
+		this.alpha = new Parameter("alpha", -Math.PI, 90*DEGTORAD, Math.PI,
+					   false, false,
+					   hkl_unit_angle_rad, hkl_unit_angle_deg);
+		this.beta  = new Parameter("beta", -Math.PI, 90*DEGTORAD, Math.PI,
+					   false, false,
+					   hkl_unit_angle_rad, hkl_unit_angle_deg);
+		this.gamma = new Parameter("gamma", -Math.PI, 90*DEGTORAD, Math.PI,
+					   false, false,
+					   hkl_unit_angle_rad, hkl_unit_angle_deg);
 	}
 
-	public void set(double a, double b, double c,
-			double alpha, double beta, double gamma)
+	public bool set(double a, double b, double c,
+			double alpha, double beta, double gamma) requires (this.check_lattice_param(a, b, c, alpha, beta, gamma))
 	{
-		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)) {
-			this.a.value = a;
-			this.b.value = b;
-			this.c.value = c;
-			this.alpha.value = alpha;
-			this.beta.value = beta;
-			this.gamma.value = gamma;
-		}
+		this.a.value = a;
+		this.b.value = b;
+		this.c.value = c;
+		this.alpha.value = alpha;
+		this.beta.value = beta;
+		this.gamma.value = gamma;
+		return true;
 	}
 
 	/* 
