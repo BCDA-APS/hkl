@@ -129,19 +129,19 @@ public class Hkl.Axis : Hkl.Parameter {
 	}
 
 
-	public override void set_value(double value)
+	public new void set_value(double value)
 	{
 		base.set_value(value);
 		this.update();
 	}
 
-	public override void set_value_unit(double value)
+	public new void set_value_unit(double value)
 	{
 		base.set_value_unit(value);
 		this.update();
 	}
 
-	public override void randomize()
+	public new void randomize()
 	{
 		base.randomize();
 		this.update();

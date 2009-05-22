@@ -71,13 +71,13 @@ public class Hkl.Parameter {
 		return factor * this.value;
 	}
 
-	public virtual void set_value(double value)
+	public void set_value(double value)
 	{
 		this.value = value;
 		this.changed = true;
 	}
 
-	public virtual void set_value_unit(double value)
+	public void set_value_unit(double value)
 	{
 		double factor = this.unit.factor(this.punit);
 		this.value = value / factor;
