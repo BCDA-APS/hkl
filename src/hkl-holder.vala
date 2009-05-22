@@ -37,8 +37,15 @@ public struct Hkl.Holder {
 		this.q = src.q;
 	}
 
+	public void update()
+	{
+		this.q.set(1.0, 0.0, 0.0, 0.0);
+		foreach(uint idx in this.idx)
+			this.q.times_quaternion(this.geometry.axes[idx].q);
+	}
+
 	public weak Axis? add_rotation_axis(string name,
-			double x, double y, double z)
+					    double x, double y, double z)
 	{
 		Vector axis_v = {x, y, z};
 		int idx = this.geometry.add_rotation(name, axis_v);
@@ -53,12 +60,5 @@ public struct Hkl.Holder {
 		this.idx[len] = idx;
 
 		return this.geometry.axes[idx];
-	}
-
-	public void update()
-	{
-		this.q.set(1.0, 0.0, 0.0, 0.0);
-		foreach(uint idx in this.idx)
-			this.q.times_quaternion(this.geometry.axes[idx].q);
 	}
 }
