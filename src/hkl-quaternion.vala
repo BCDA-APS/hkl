@@ -42,6 +42,13 @@ public struct Hkl.Quaternion
 		this.d = d;
 	}
 
+	[CCode (instance_pos=-1)]
+	public void fprintf(FileStream file)
+	{
+		file.printf("<%f, %f, %f, %f>", this.a, this.b, this.c, this.d);
+	}
+
+
 	public void from_vector(Vector v)
 	{
 		this.a = 0;
