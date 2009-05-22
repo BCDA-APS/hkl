@@ -106,8 +106,10 @@ public class Hkl.Parameter {
 
 	public virtual void randomize()
 	{
-		if (!this.not_to_fit)
+		if (!this.not_to_fit){
 			this.value = Random.double_range(this.range.min, this.range.max);
+			this.changed = true;
+		}
 	}
 
 	[CCode (instance_pos=-1)]
