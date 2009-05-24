@@ -85,9 +85,9 @@ public struct Hkl.Matrix {
 		y = z;
 		y.vectorial_product(x);
 
-		this.m11 = x.x; this.m12 = y.x; this.m13 = z.x;
-		this.m21 = x.y; this.m22 = y.y; this.m23 = z.y;
-		this.m31 = x.z; this.m32 = y.z; this.m33 = z.z;
+		this.m11 = x.data[0]; this.m12 = y.data[0]; this.m13 = z.data[0];
+		this.m21 = x.data[1]; this.m22 = y.data[1]; this.m23 = z.data[1];
+		this.m31 = x.data[2]; this.m32 = y.data[2]; this.m33 = z.data[2];
 	}
 
 	public void from_euler(double euler_x, double euler_y, double euler_z)
@@ -162,9 +162,9 @@ public struct Hkl.Matrix {
 	{
 		Vector tmp = v;
 
-		v.x = tmp.x * this.m11 + tmp.y * this.m12 + tmp.z * this.m13;
-		v.y = tmp.x * this.m21 + tmp.y * this.m22 + tmp.z * this.m23;
-		v.z = tmp.x * this.m31 + tmp.y * this.m32 + tmp.z * this.m33;
+		v.data[0] = tmp.data[0] * this.m11 + tmp.data[1] * this.m12 + tmp.data[2] * this.m13;
+		v.data[1] = tmp.data[0] * this.m21 + tmp.data[1] * this.m22 + tmp.data[2] * this.m23;
+		v.data[2] = tmp.data[0] * this.m31 + tmp.data[1] * this.m32 + tmp.data[2] * this.m33;
 	}
 
 	public void transpose()
@@ -192,17 +192,17 @@ public struct Hkl.Matrix {
 		double det = this.det();
 
 		if (Math.fabs(det) > EPSILON) {
-			x.x =   b.x * (this.m22*this.m33 - this.m23*this.m32);
-			x.x += -b.y * (this.m12*this.m33 - this.m13*this.m32);
-			x.x +=  b.z * (this.m12*this.m23 - this.m13*this.m22);
+			x.data[0] =   b.data[0] * (this.m22*this.m33 - this.m23*this.m32);
+			x.data[0] += -b.data[1] * (this.m12*this.m33 - this.m13*this.m32);
+			x.data[0] +=  b.data[2] * (this.m12*this.m23 - this.m13*this.m22);
 
-			x.y =  -b.x * (this.m21*this.m33 - this.m23*this.m31);
-			x.y +=  b.y * (this.m11*this.m33 - this.m13*this.m31);
-			x.y += -b.z * (this.m11*this.m23 - this.m13*this.m21);
+			x.data[1] =  -b.data[0] * (this.m21*this.m33 - this.m23*this.m31);
+			x.data[1] +=  b.data[1] * (this.m11*this.m33 - this.m13*this.m31);
+			x.data[1] += -b.data[2] * (this.m11*this.m23 - this.m13*this.m21);
 
-			x.z =   b.x * (this.m21*this.m32 - this.m22*this.m31);
-			x.z += -b.y * (this.m11*this.m32 - this.m12*this.m31);
-			x.z +=  b.z * (this.m11*this.m22 - this.m12*this.m21);
+			x.data[2] =   b.data[0] * (this.m21*this.m32 - this.m22*this.m31);
+			x.data[2] += -b.data[1] * (this.m11*this.m32 - this.m12*this.m31);
+			x.data[2] +=  b.data[2] * (this.m11*this.m22 - this.m12*this.m21);
 
 			x.div_double(det);
 		}

@@ -44,9 +44,7 @@ public class Hkl.Sample {
 
 			this.geometry = new Geometry.copy(g);
 			this.detector = det;
-			this.hkl.x = h;
-			this.hkl.y = k;
-			this.hkl.z = l;
+			this.hkl.set(h, k, l);
 
 			// compute the _hkl using only the axes of the geometry
 			weak Holder holder_d = g.holders[det.idx];
@@ -73,9 +71,7 @@ public class Hkl.Sample {
 
 		public void set_hkl(double h, double k, double l) requires (Math.fabs(h) + Math.fabs(k) + Math.fabs(l) < EPSILON)
 		{
-			this.hkl.x = h;
-			this.hkl.y = k;
-			this.hkl.z = l;
+			this.hkl.set(h, k, l);
 		}
 
 		public void set_flag(bool flag)
@@ -122,15 +118,8 @@ public class Hkl.Sample {
 		foreach(weak Reflection reflection in sample->reflections){
 			Vector UBh = reflection.hkl;
 			sample->UB.times_vector(ref UBh);
-
-			double tmp = UBh.x - reflection._hkl.x;
-			fitness += tmp * tmp;
-
-			tmp = UBh.y - reflection._hkl.y;
-			fitness += tmp * tmp;
-
-			tmp = UBh.z - reflection._hkl.z;
-			fitness += tmp * tmp;
+			UBh.minus_vector(reflection._hkl);
+			fitness += UBh.norm2();
 		}
 		return fitness;
 	}

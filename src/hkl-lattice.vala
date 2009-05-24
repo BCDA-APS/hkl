@@ -169,11 +169,12 @@ public struct Hkl.Lattice
 		return true;
 	}
 
+	/* optimize the assignation */
 	public void randomize()
 	{
-		Vector vector_x = {1.0, 0.0, 0.0};
+		Vector vector_x = {{1.0, 0.0, 0.0}};
 		Vector a, b, c;
-		Vector axe = {0.0, 0.0, 0.0};
+		Vector axe = {{0.0, 0.0, 0.0}};
 
 		// La valeur des angles alpha, beta et gamma ne sont pas indépendant.
 		// Il faut donc gérer les différents cas.
@@ -187,7 +188,9 @@ public struct Hkl.Lattice
 				break;
 			case 1:
 				if (!this.alpha.not_to_fit) {// alpha
-					a = b = c = vector_x;
+					a = vector_x;
+					b = vector_x;
+					c = vector_x;
 
 					// randomize b
 					axe.randomize_vector(a);
@@ -201,7 +204,8 @@ public struct Hkl.Lattice
 					this.alpha.value = b.angle(c);
 				} else if (!this.beta.not_to_fit) {
 					// beta
-					a = b = vector_x;
+					a = vector_x;
+					b = vector_x;
 
 					// randomize b
 					axe.randomize_vector(a);
@@ -216,7 +220,8 @@ public struct Hkl.Lattice
 					this.beta.value = a.angle(c);
 				} else {
 					// gamma
-					a = c = vector_x;
+					a = vector_x;
+					c = vector_x;
 
 					// randomize c
 					axe.randomize_vector(a);
@@ -234,7 +239,9 @@ public struct Hkl.Lattice
 			case 2:
 				if (!this.alpha.not_to_fit) {
 					if (!this.beta.not_to_fit) {// alpha + beta
-						a = b = c = vector_x;
+						a = vector_x;
+						b = vector_x;
+						c = vector_x;
 
 						// randomize b
 						axe.randomize_vector(a);
@@ -247,7 +254,9 @@ public struct Hkl.Lattice
 						this.beta.value = a.angle(c);
 					} else {
 						// alpha + gamma
-						a = b = c = vector_x;
+						a = vector_x;
+						b = vector_x;
+						c = vector_x;
 
 						// randomize c
 						axe.randomize_vector(a);
@@ -261,7 +270,9 @@ public struct Hkl.Lattice
 					}
 				} else {
 					// beta + gamma
-					a = b = c = vector_x;
+					a = vector_x;
+					b = vector_x;
+					c = vector_x;
 
 					// randomize c
 					axe.randomize_vector(b);
@@ -275,7 +286,9 @@ public struct Hkl.Lattice
 				}
 				break;
 			case 3:
-				a = b = c = vector_x;
+				a = vector_x;
+				b = vector_x;
+				c = vector_x;
 				a.randomize();
 				b.randomize_vector(a);
 				c.randomize_vector_vector(b, a);

@@ -48,7 +48,7 @@ public struct Hkl.Holder {
 	public weak Axis? add_rotation_axis(string name,
 					    double x, double y, double z)
 	{
-		Vector axis_v = {x, y, z};
+		Vector axis_v = {{x, y, z}};
 		int idx = this.geometry.add_rotation(name, axis_v);
 
 		/* check that the axis is not already in the holder */

@@ -26,7 +26,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	void update()
 	{
 		if(this.changed)
-			this.q.from_angle_and_axe(this.value, this.axis_v);		
+			this.q.from_angle_and_axis(this.value, this.axis_v);		
 	}
 	
 	/*
@@ -150,7 +150,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	/* to optimize */
 	public void get_quaternion(out Quaternion q)
 	{
-		q.from_angle_and_axe(this.value, this.axis_v);
+		q.from_angle_and_axis(this.value, this.axis_v);
 	}
 
 	[CCode (instance_pos=-1)]
