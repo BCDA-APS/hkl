@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <hkl-list.h>
+#include <hkl.h>
 
 #include "hkl-test.h"
 

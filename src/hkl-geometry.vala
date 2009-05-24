@@ -20,7 +20,7 @@
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
 
-public struct Hkl.Holder {
+public class Hkl.Holder {
 	public weak Geometry geometry;
 	public int[] idx;
 	public Quaternion q;
@@ -158,11 +158,11 @@ public class Hkl.Geometry
 			this.holders[idx++].copy(holder, this);
 	}
 
-	public weak Holder add_holder()
+	public unowned Holder add_holder()
 	{
 		int length = this.holders.length;
 		this.holders.resize(length + 1);
-		this.holders[length] = Holder(this);
+		this.holders[length] = new Holder(this);
 		return this.holders[length];
 	}
 

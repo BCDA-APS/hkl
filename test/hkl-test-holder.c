@@ -1,11 +1,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <hkl-geometry.h>
-#include <hkl-holder.h>
-#include <hkl-axis.h>
-#include <hkl-list.h>
-#include <hkl-constants.h>
+#include <hkl.h>
 
 #include "hkl-test.h"
 

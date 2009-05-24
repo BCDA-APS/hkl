@@ -21,8 +21,7 @@
  */
 #include <math.h>
 
-#include <hkl/hkl-vector.h>
-#include <hkl/hkl-matrix.h>
+#include <hkl.h>
 
 #include "hkl-test.h"
 

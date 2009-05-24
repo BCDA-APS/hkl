@@ -21,7 +21,7 @@
  */
 #include <math.h>
 
-#include <hkl/hkl-pseudoaxis-factory.h>
+#include <hkl.h>
 
 #include "hkl-test.h"
 

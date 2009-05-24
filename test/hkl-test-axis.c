@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <hkl/hkl-axis.h>
+#include "hkl.h"
 
 #include "hkl-test.h"
 
