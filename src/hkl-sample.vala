@@ -33,7 +33,7 @@ public class Hkl.Sample {
 		public Detector detector;
 		public Vector hkl;
 		public Vector _hkl;
-		public int flag;
+		public bool flag;
 
 		public Reflection(Geometry g, Detector det,
 				  double h, double k, double l)
@@ -69,6 +69,18 @@ public class Hkl.Sample {
 			this.detector = src.detector;
 			this.hkl = src.hkl;
 			this._hkl = src._hkl;
+		}
+
+		public void set_hkl(double h, double k, double l) requires (Math.fabs(h) + Math.fabs(k) + Math.fabs(l) < EPSILON)
+		{
+			this.hkl.x = h;
+			this.hkl.y = k;
+			this.hkl.z = l;
+		}
+
+		public void set_flag(bool flag)
+		{
+			this.flag = flag;
 		}
 	}
 
@@ -316,3 +328,30 @@ public class Hkl.Sample {
 	}
 }
 
+public class Hkl.SampleList
+{
+	public Sample[] samples;
+	weak Sample? current;
+
+	public SampleList()
+	{
+		this.current = null;
+	}
+
+	public Sample? append(Sample sample)
+	{
+		if (this.get_idx_from_name(sample.name) >= 0)
+			return null;
+
+		int len = this.samples.length;
+		this.samples.resize(len + 1);
+		this.samples[len] = sample;
+
+		return sample;
+	}
+
+	public int get_idx_from_name(string name)
+	{
+		return 2;
+	}
+}
