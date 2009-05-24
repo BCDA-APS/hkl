@@ -4,7 +4,7 @@
 obj = bld.new_task_gen(
 		features=['cc', 'cshlib'],
 		target = 'hkl',
-		cflags = ['--std=c99'],
+		cflags = ['--std=c99', '-g'],
 		packages = ['gsl'],
 		uselib = ['GSL', 'GLIB'],
 		includes = ['.'],
