@@ -1,8 +1,28 @@
+/* This file is part of the hkl library.
+ *
+ * The hkl library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The hkl library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ *                         L'Orme des Merisiers Saint-Aubin
+ *                         BP 48 91192 GIF-sur-YVETTE CEDEX
+ *
+ * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
+ */
 #define _GNU_SOURCE
 #include <math.h>
 
-#include <hkl-interval.h>
-#include <hkl-constants.h>
+#include <hkl/hkl-interval.h>
 
 #include "hkl-test.h"
 
@@ -17,30 +37,30 @@ HKL_TEST_SUITE_FUNC(cmp)
 	HklInterval interval;
 
 	interval = interval_ref;
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&interval_ref, &interval));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&interval_ref, &interval));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(add_interval)
+HKL_TEST_SUITE_FUNC(plus_interval)
 {
 	HklInterval i_ref = {-2, 8};
 	HklInterval i1 = {-1, 4};
 	HklInterval i2 = {-1, 4};
 
-	hkl_interval_add_interval(&i1, &i2);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i1));
+	hkl_interval_plus_interval(&i1, &i2);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(add_double)
+HKL_TEST_SUITE_FUNC(plus_double)
 {
 	HklInterval i_ref = {-1, 9};
 	HklInterval i1 = {-2, 8};
 
-	hkl_interval_add_double(&i1, 1);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i1));
+	hkl_interval_plus_double(&i1, 1);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
 }
@@ -52,7 +72,7 @@ HKL_TEST_SUITE_FUNC(times_interval)
 	HklInterval i2 = {-1, 4};
 
 	hkl_interval_times_interval(&i1, &i2);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i1));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
 }
@@ -63,7 +83,7 @@ HKL_TEST_SUITE_FUNC(times_double)
 	HklInterval i1 = {-9, 36};
 
 	hkl_interval_times_double(&i1, -3);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i1));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
 }
@@ -74,7 +94,7 @@ HKL_TEST_SUITE_FUNC(divides_double)
 	HklInterval i1 = {-108, 27};
 
 	hkl_interval_divides_double(&i1, -3);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i1));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
 }
@@ -84,8 +104,8 @@ HKL_TEST_SUITE_FUNC(contain_zero)
 	HklInterval i1 = {-9, 36};
 	HklInterval i2 = {-108, -27};
 
-	HKL_ASSERT_EQUAL(TRUE, hkl_interval_contain_zero(&i1));
-	HKL_ASSERT_EQUAL(FALSE, hkl_interval_contain_zero(&i2));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_contain_zero(&i1));
+	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_interval_contain_zero(&i2));
 
 	return HKL_TEST_PASS;
 }
@@ -109,7 +129,7 @@ HKL_TEST_SUITE_FUNC(cos)
 	i_ref.min = min_ref;\
 	i_ref.max = max_ref;\
 	hkl_interval_cos(&i);\
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i));\
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i));\
 } while(0)
 
 	// 1st max(0)
@@ -166,7 +186,7 @@ HKL_TEST_SUITE_FUNC(acos)
 	HklInterval i = {-.5, .5};
 
 	hkl_interval_acos(&i);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i));
 
 	return HKL_TEST_PASS;
 }
@@ -189,7 +209,7 @@ HKL_TEST_SUITE_FUNC(sin)
 	i_ref.min = min_ref;\
 	i_ref.max = max_ref;\
 	hkl_interval_sin(&i);\
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i));\
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i));\
 } while(0)
 
 	// 1st max(0)
@@ -249,7 +269,7 @@ HKL_TEST_SUITE_FUNC(asin)
 	HklInterval i = {-.5, .5};
 
 	hkl_interval_asin(&i);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i));
 
 	return HKL_TEST_PASS;
 }
@@ -266,7 +286,7 @@ HKL_TEST_SUITE_FUNC(tan)
 	i_ref.min = min_ref;\
 	i_ref.max = max_ref;\
 	hkl_interval_tan(&i);\
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i));\
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i));\
 } while(0)
 
 	TAN(-100, -89, -INFINITY, INFINITY);
@@ -287,7 +307,22 @@ HKL_TEST_SUITE_FUNC(atan)
 	HklInterval i = {-10, 10};
 
 	hkl_interval_atan(&i);
-	HKL_ASSERT_EQUAL(0, hkl_interval_cmp(&i_ref, &i));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i));
+
+	return HKL_TEST_PASS;
+}
+
+HKL_TEST_SUITE_FUNC(length)
+{
+	HklInterval interval;
+
+	interval.min = 10;
+	interval.max = 11;
+	HKL_ASSERT_DOUBLES_EQUAL(1, hkl_interval_length(&interval), HKL_EPSILON);
+
+	interval.min = -11;
+	interval.max = -10;
+	HKL_ASSERT_DOUBLES_EQUAL(1, hkl_interval_length(&interval), HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -295,8 +330,8 @@ HKL_TEST_SUITE_FUNC(atan)
 HKL_TEST_SUITE_BEGIN
 
 HKL_TEST( cmp );
-HKL_TEST( add_interval );
-HKL_TEST( add_double );
+HKL_TEST( plus_interval );
+HKL_TEST( plus_double );
 HKL_TEST( times_interval );
 HKL_TEST( times_double );
 HKL_TEST( divides_double );
@@ -307,5 +342,6 @@ HKL_TEST( sin );
 HKL_TEST( asin );
 HKL_TEST( tan );
 HKL_TEST( atan );
+HKL_TEST( length );
 
 HKL_TEST_SUITE_END

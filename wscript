@@ -24,4 +24,4 @@ def configure(conf):
 	conf.env['HKL_VERSION'] = VERSION.split('-')[0]
 
 def build(bld):
-	bld.add_subdirs('src')
+	bld.add_subdirs('src test')

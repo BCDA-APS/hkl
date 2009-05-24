@@ -1,7 +1,28 @@
+/* This file is part of the hkl library.
+ *
+ * The hkl library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The hkl library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ *                         L'Orme des Merisiers Saint-Aubin
+ *                         BP 48 91192 GIF-sur-YVETTE CEDEX
+ *
+ * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
+ */
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <hkl-macros.h>
+#include <hkl/hkl-macros.h>
 
 #include "hkl-test.h"
 
@@ -57,12 +78,12 @@ int hkl_tests_run(struct hkl_tests * tests)
 	for(i=0; i<tests->len; i++) {
 		struct hkl_test *test = &tests->tests[i];
 		if (!hkl_test_run(test)) {
-			printf("\n%s:%d: FAIL %s\n", test->file, test->line, test->name);
+			fprintf(stderr, "\n%s:%d: FAIL %s\n", test->file, test->line, test->name);
 			exit(-1);
 			res = -1;
 			break;
 		} else
-			printf(".");
+			fprintf(stdout, ".");
 	}
 	printf("\n");
 	return res;
