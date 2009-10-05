@@ -172,9 +172,9 @@ public struct Hkl.Lattice
 	/* optimize the assignation */
 	public void randomize()
 	{
-		Vector vector_x = {{1.0, 0.0, 0.0}};
+		Vector vector_x = Vector(1.0, 0.0, 0.0);
 		Vector a, b, c;
-		Vector axe = {{0.0, 0.0, 0.0}};
+		Vector axe = Vector(0.0, 0.0, 0.0);
 
 		// La valeur des angles alpha, beta et gamma ne sont pas indépendant.
 		// Il faut donc gérer les différents cas.

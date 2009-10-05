@@ -20,7 +20,7 @@
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
 public struct Hkl.Vector {
-	public double[3] data;
+	public double data[3];
 
 	public Vector(double x, double y, double z)
 	{

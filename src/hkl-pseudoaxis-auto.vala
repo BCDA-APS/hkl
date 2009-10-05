@@ -122,7 +122,7 @@ public class Hkl.PseudoAxisEngineAuto : Hkl.PseudoAxisEngine
 public static int RUBh_minus_Q(Gsl.Vector x, void *params, Gsl.Vector f)
 {
 	Hkl.Vector ki, dQ;
-	Hkl.Vector Hkl = {{0.0, 0.0, 0.0}};
+	Hkl.Vector Hkl = Hkl.Vector(0.0, 0.0, 0.0);
 
 	Hkl.PseudoAxisEngineAuto *engine = params;
 	weak Hkl.PseudoAxis H = engine->pseudoAxes[0];

@@ -21,7 +21,7 @@
  */
 public struct Hkl.Quaternion
 {
-	public double[4] data;
+	public double data[4];
 
 	public Quaternion(double a, double b, double c, double d)
 	{
