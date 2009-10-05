@@ -1,42 +1,43 @@
+<<<<<<< HEAD:src/hkl-pseudoaxis-factory.h
 #ifndef __HKL_PSEUDOAXIS_TWOC_VERTICAL_H__
 #define __HKL_PSEUDOAXIS_TWOC_VERTICAL_H__
 
 #include <stdarg.h>
 #include <hkl-pseudoaxis.h>
+=======
+/* This file is part of the hkl library.
+ *
+ * The hkl library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The hkl library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ *                         L'Orme des Merisiers Saint-Aubin
+ *                         BP 48 91192 GIF-sur-YVETTE CEDEX
+ *
+ * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
+ */
+#ifndef __HKL_PSEUDOAXIS_FACTORY_H__
+#define __HKL_PSEUDOAXIS_FACTORY_H__
+
+#include <hkl/hkl-geometry-factory.h>
+#include <hkl/hkl-pseudoaxis.h>
+>>>>>>> 36e37104c318d56670e42e1f578a4d0ff81e357e:include/hkl/hkl-pseudoaxis-factory.h
 
 HKL_BEGIN_DECLS
 
-static HklPseudoAxisEngine *hkl_pseudoAxisEngine_new_hkl(void)
-{
-	HklPseudoAxisEngine *engine = NULL;
-	engine = malloc(sizeof(*engine));
-	if (!engine)
-		die("Can not allocate memory for an HklPseudoAxisEngine");
 
-	engine->is_initialized = 0;
-	engine->is_readable = 0;
-	engine->is_writable = 0;
-	engine->g_init = NULL;
-	engine->init = NULL;
-	engine->update = &hkl_pseudoAxisEngine_hkl_update;
-	engine->set = NULL;
-
-	hkl_pseudoAxisEngine_add_pseudoAxes(engine, "h", "k", "l");
-
-	return engine;
-}
-
-static HklPseudoAxisEngine TwoCircleVertical = 
-{
-	0,
-	0,
-	0,
-	NULL,
-	&TwoC_Vertical_hkl_init;
-	&TwoC_Vertical_hkl_update;
-	&TwoC_Vertical_hkl_set;
-}
+extern HklPseudoAxisEngineList *hkl_pseudo_axis_engine_list_factory(HklGeometryType type);
 
 HKL_END_DECLS
 
-#endif /* __HKL_PSEUDOAXIS_TWOC_VERTICAL_H__ */
+#endif /* __HKL_PSEUDOAXIS_FACTORY_H__ */

@@ -189,7 +189,7 @@ public class Hkl.Sample {
 		return this.reflections[len];
 	}
 
-	public weak Reflection get_ith_reflection(uint idx)
+	public weak Reflection? get_ith_reflection(uint idx)
 	{
 		return this.reflections[idx];
 	}

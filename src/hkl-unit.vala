@@ -25,9 +25,9 @@ public enum Hkl.UnitType{
 	LENGTH_NM
 }
 
-const Hkl.Unit hkl_unit_angle_deg = {Hkl.UnitType.ANGLE_DEG, "Degree", "°"};
-const Hkl.Unit hkl_unit_angle_rad = {Hkl.UnitType.ANGLE_RAD, "Radian", ""};
-const Hkl.Unit hkl_unit_length_nm = {Hkl.UnitType.LENGTH_NM, "Nano Meter", "nm"};
+public const Hkl.Unit hkl_unit_angle_deg = {Hkl.UnitType.ANGLE_DEG, "Degree", "°"};
+public const Hkl.Unit hkl_unit_angle_rad = {Hkl.UnitType.ANGLE_RAD, "Radian", ""};
+public const Hkl.Unit hkl_unit_length_nm = {Hkl.UnitType.LENGTH_NM, "Nano Meter", "nm"};
 
 public struct Hkl.Unit {
 	public Hkl.UnitType type;

@@ -175,3 +175,38 @@ public class Hkl.PseudoAxisEngineList
 			engine.fprintf(f);
 	}
 }
+
+public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.GeometryType type)
+{
+	Hkl.PseudoAxisEngineList list = new Hkl.PseudoAxisEngineList();
+
+	switch(type){
+	case Hkl.GeometryType.TWOC_VERTICAL:
+		break;
+	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
+		list.add(new Hkl.PseudoAxisEnginehkl_pseudo_axis_engine_e4cv_hkl_new());
+		list.add(hkl_pseudo_axis_engine_e4cv_psi_new());
+		list.add(hkl_pseudo_axis_engine_q_new());
+		break;
+	case Hkl.GeometryType.KAPPA4C_VERTICAL:
+		//self->geometries->multiply = hkl_geometry_list_multiply_k4c_real;
+		list.add(hkl_pseudo_axis_engine_k4cv_hkl_new());
+		list.add(hkl_pseudo_axis_engine_eulerians_new());
+		list.add(hkl_pseudo_axis_engine_k4cv_psi_new());
+		list.add(hkl_pseudo_axis_engine_q_new());
+		break;
+	case Hkl.GeometryType.EULERIAN6C:
+		list.add(hkl_pseudo_axis_engine_e6c_hkl_new());
+		list.add(hkl_pseudo_axis_engine_e6c_psi_new());
+		list.add(hkl_pseudo_axis_engine_q2_new());
+		break;
+	case Hkl.GeometryType.KAPPA6C:
+		//self->geometries->multiply = hkl_geometry_list_multiply_k6c_real;
+		list.add(hkl_pseudo_axis_engine_k6c_hkl_new());
+		list.add(hkl_pseudo_axis_engine_eulerians_new());
+		list.add(hkl_pseudo_axis_engine_k6c_psi_new());
+		list.add(hkl_pseudo_axis_engine_q2_new());
+		break;
+	}
+	return list;
+}

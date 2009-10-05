@@ -22,21 +22,19 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include <math.h>
-
 #include <hkl.h>
 
-#include "hkl-test.h"
-
-#define SET_AXES(geometry, mu, komega, kappa, kphi, gamma, delta) do{\
-	hkl_geometry_set_values_v(geometry, 6,\
-				  mu * HKL_DEGTORAD,\
-				  komega * HKL_DEGTORAD,\
-				  kappa * HKL_DEGTORAD,\
-				  kphi * HKL_DEGTORAD,\
-				  gamma * HKL_DEGTORAD,\
-				  delta * HKL_DEGTORAD);\
-} while(0)
+#define SET_AXES(geometry, mu, komega, kappa, kphi, gamma, delta) do{	\
+		double values[] = {					\
+			mu * HKL_DEGTORAD,				\
+			komega * HKL_DEGTORAD,				\
+			kappa * HKL_DEGTORAD,				\
+			kphi * HKL_DEGTORAD,				\
+			gamma * HKL_DEGTORAD,				\
+			delta * HKL_DEGTORAD				\
+		};							\
+		hkl_geometry_set_values_v(geometry, values, 6);		\
+	} while(0)
 
 static void hkl_test_bench()
 {
@@ -49,10 +47,11 @@ static void hkl_test_bench()
 	double *H, *K, *L, h, k, l;
 	int res, n;
 	struct timeval debut, fin, dt;
+	double parameters[] = {50 * HKL_DEGTORAD};
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_KAPPA6C, 50 * HKL_DEGTORAD);
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_KAPPA6C);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
+	sample = hkl_sample_new("test");
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
 
 	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "hkl");
 
@@ -70,7 +69,7 @@ static void hkl_test_bench()
 	for(j=0; j<HKL_LIST_LEN(engine->modes); ++j){
 		hkl_pseudo_axis_engine_select_mode(engine, j);
 		if (HKL_LIST_LEN(engine->mode->parameters))
-			engine->mode->parameters[0].value = 1.;
+			engine->mode->parameters[0]->value = 1.;
 
 		gettimeofday(&debut, NULL);
 		for(i=0; i<n; ++i){
@@ -97,10 +96,11 @@ hkl_test_bench_eulerians()
 	HklSample *sample;
 	size_t i, f_idx;
 	double *Omega, *Chi, *Phi;
+	double parameters[] = {50 * HKL_DEGTORAD};
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_KAPPA6C, 50 * HKL_DEGTORAD);
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_KAPPA6C);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
+	sample = hkl_sample_new("test");
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
 
 	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "eulerians");
 
@@ -111,7 +111,7 @@ hkl_test_bench_eulerians()
 	for(f_idx=0; f_idx<HKL_LIST_LEN(engine->modes); ++f_idx) {
 		hkl_pseudo_axis_engine_select_mode(engine, f_idx);
 		if (f_idx>0)
-			engine->mode->parameters[0].value = 1.;
+			engine->mode->parameters[0]->value = 1.;
 
 		double omega, chi, phi;
 		int res;

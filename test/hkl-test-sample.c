@@ -19,7 +19,6 @@
  *
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
-#include <math.h>
 #include <hkl.h>
 
 #include "hkl-test.h"
@@ -29,16 +28,21 @@
 #endif
 #define HKL_TEST_SUITE_NAME sample
 
-#define SET_ANGLES(geom, a, b, c, d) hkl_geometry_set_values_v(geom, 4,	\
-							      (a) * HKL_DEGTORAD, \
-							      (b) * HKL_DEGTORAD, \
-							      (c) * HKL_DEGTORAD, \
-							      (d) * HKL_DEGTORAD)
+#define SET_ANGLES(geom, a, b, c, d) do{				\
+		double values[] = {					\
+			(a) * HKL_DEGTORAD,				\
+			(b) * HKL_DEGTORAD,				\
+			(c) * HKL_DEGTORAD,				\
+			(d) * HKL_DEGTORAD				\
+		};							\
+		hkl_geometry_set_values_v(geom, values, 4);		\
+	}while(0);
+
 HKL_TEST_SUITE_FUNC(new)
 {
 	HklSample *sample;
 
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	sample = hkl_sample_new("test");
 
 	hkl_sample_free(sample);
 
@@ -51,9 +55,10 @@ HKL_TEST_SUITE_FUNC(add_reflection)
 	HklGeometry *geom;
 	HklSample *sample;
 	HklSampleReflection *ref;
+	double *parameters = NULL;
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
+	sample = hkl_sample_new("test");
 
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
 
@@ -70,13 +75,16 @@ HKL_TEST_SUITE_FUNC(get_reflection)
 	HklSample *sample;
 	HklSampleReflection *ref;
 	HklSampleReflection *ref2;
+	double *parameters = NULL;
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
+	sample = hkl_sample_new("test");
 
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
 	ref2 = hkl_sample_get_ith_reflection(sample, 0);
+	HKL_ASSERT_EQUAL(0, !ref);
 	HKL_ASSERT_POINTER_EQUAL(ref, ref2);
+	HKL_ASSERT_EQUAL(1, HKL_LIST_LEN(sample->reflections));
 
 	ref = hkl_sample_add_reflection(sample, geom, &det, -1, 0, 0);
 	ref = hkl_sample_add_reflection(sample, geom, &det, 0, 1, 0);
@@ -93,9 +101,10 @@ HKL_TEST_SUITE_FUNC(del_reflection)
 	HklGeometry *geom;
 	HklSample *sample;
 	HklSampleReflection *ref;
+	double *parameters = NULL;
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
+	sample = hkl_sample_new("test");
 
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
 	hkl_sample_del_reflection(sample, 0);
@@ -113,12 +122,13 @@ HKL_TEST_SUITE_FUNC(compute_UB_busing_levy)
 	HklGeometry *geom;
 	HklSample *sample;
 	HklSampleReflection *ref;
-	HklMatrix m_I = {{{1,0,0}, {0,1,0}, {0, 0, 1}}};
-	HklMatrix m_ref = {{{1., 0., 0.}, {0., 0., 1.}, {0.,-1., 0.}}};
+	HklMatrix m_I = {1,0,0, 0,1,0, 0, 0, 1};
+	HklMatrix m_ref = {1., 0., 0., 0., 0., 1., 0.,-1., 0.};
+	double *parameters = NULL;
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
 
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	sample = hkl_sample_new("test");
 
 	SET_ANGLES(geom, 30, 0, 0, 60);
 	ref = hkl_sample_add_reflection(sample, geom, &det, 0, 0, 1);
@@ -151,17 +161,18 @@ HKL_TEST_SUITE_FUNC(affine)
 	HklGeometry *geom;
 	HklSample *sample;
 	HklSampleReflection *ref;
-	HklMatrix m_ref = {{{1., 0., 0.}, {0., 1., 0.}, {0., 0., 1.}}};
+	HklMatrix m_ref = {1., 0., 0., 0., 1., 0., 0., 0., 1.};
+	double *parameters = NULL;
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
 
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
-	sample->lattice->a->value = 1;
-	sample->lattice->b->value = 5;
-	sample->lattice->c->value = 4;
-	sample->lattice->alpha->value = 92 * HKL_DEGTORAD;
-	sample->lattice->beta->value = 81 * HKL_DEGTORAD;
-	sample->lattice->gamma->value = 90 * HKL_DEGTORAD;
+	sample = hkl_sample_new("test");
+	sample->lattice.a->value = 1;
+	sample->lattice.b->value = 5;
+	sample->lattice.c->value = 4;
+	sample->lattice.alpha->value = 92 * HKL_DEGTORAD;
+	sample->lattice.beta->value = 81 * HKL_DEGTORAD;
+	sample->lattice.gamma->value = 90 * HKL_DEGTORAD;
 
 	SET_ANGLES(geom, 30, 0, 90, 60);
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
@@ -180,12 +191,12 @@ HKL_TEST_SUITE_FUNC(affine)
 
 	hkl_sample_affine(sample);
 
-	a = sample->lattice->a->value;
-	b = sample->lattice->b->value;
-	c = sample->lattice->c->value;
-	alpha = sample->lattice->alpha->value;
-	beta = sample->lattice->beta->value;
-	gamma = sample->lattice->gamma->value;
+	a = sample->lattice.a->value;
+	b = sample->lattice.b->value;
+	c = sample->lattice.c->value;
+	alpha = sample->lattice.alpha->value;
+	beta = sample->lattice.beta->value;
+	gamma = sample->lattice.gamma->value;
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &sample->U));
 	HKL_ASSERT_DOUBLES_EQUAL(1.54, a, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(1.54, b, HKL_EPSILON);
@@ -206,10 +217,11 @@ HKL_TEST_SUITE_FUNC(get_reflections_xxx_angle)
 	HklGeometry *geom;
 	HklSample *sample;
 	HklSampleReflection *ref;
+	double *parameters = NULL;
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_EULERIAN4C_VERTICAL);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
 
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	sample = hkl_sample_new("test");
 	hkl_sample_set_lattice(sample,
 			       1.54, 1.54, 1.54,
 			       90*HKL_DEGTORAD, 90*HKL_DEGTORAD,90*HKL_DEGTORAD);
@@ -269,8 +281,8 @@ HKL_TEST_SUITE_FUNC(list_append_sample)
 	HklSample *sample2;
 
 	samples = hkl_sample_list_new();
-	sample1 = hkl_sample_new("test1", HKL_SAMPLE_MONOCRYSTAL);
-	sample2 = hkl_sample_new("test2", HKL_SAMPLE_MONOCRYSTAL);
+	sample1 = hkl_sample_new("test1");
+	sample2 = hkl_sample_new("test2");
 
 	HKL_ASSERT_POINTER_EQUAL(sample1, hkl_sample_list_append(samples, sample1));
 	HKL_ASSERT_EQUAL(0, hkl_sample_list_get_idx_from_name(samples, "test1"));
@@ -293,7 +305,7 @@ HKL_TEST_SUITE_FUNC(list_select_current)
 	HklSample *sample;
 
 	samples = hkl_sample_list_new();
-	sample = hkl_sample_new("test", HKL_SAMPLE_MONOCRYSTAL);
+	sample = hkl_sample_new("test");
 
 	hkl_sample_list_append(samples, sample);
 
@@ -302,6 +314,30 @@ HKL_TEST_SUITE_FUNC(list_select_current)
 
 
 	hkl_sample_list_free(samples); // also release sample
+
+	return HKL_TEST_PASS;
+}
+
+HKL_TEST_SUITE_FUNC(list_clear)
+{
+	size_t i;
+	HklSampleList *samples;
+	HklSample *sample1;
+	HklSample *sample2;
+
+	samples = hkl_sample_list_new();
+	for(i=0; i<2; ++i){ // two times to see if the clear has no side effect
+		sample1 = hkl_sample_new("test1");
+		sample2 = hkl_sample_new("test2");
+
+		hkl_sample_list_append(samples, sample1);
+		hkl_sample_list_append(samples, sample2);
+		hkl_sample_list_clear(samples);
+
+		HKL_ASSERT_EQUAL(0, hkl_sample_list_len(samples));
+	}
+
+	hkl_sample_list_free(samples); // also relase sample1 and sample2
 
 	return HKL_TEST_PASS;
 }
@@ -319,6 +355,7 @@ HKL_TEST( get_reflections_xxx_angle );
 HKL_TEST( list_new );
 HKL_TEST( list_append_sample );
 HKL_TEST( list_select_current );
+HKL_TEST( list_clear );
 
 HKL_TEST_SUITE_END
 

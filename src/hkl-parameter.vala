@@ -20,7 +20,7 @@
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
 public class Hkl.Parameter {
-	public weak string name;
+	public string name;
 	public Interval range;
 	public double value;
 	public Hkl.Unit? unit;
@@ -28,12 +28,18 @@ public class Hkl.Parameter {
 	public bool not_to_fit;
 	public bool changed;
 
-	/* becarefull only static name */
 	public Parameter(string name, double min, double value, double max,
 			 bool not_to_fit, bool changed,
-			 Hkl.Unit unit, Hkl.Unit punit)
+			 Hkl.Unit? unit, Hkl.Unit? punit)
 	{
-		this.init(name, min, value, max, not_to_fit, changed, unit, punit);
+		this.name = name;
+		this.range.min = min;
+		this.value = value;
+		this.range.max = max;
+		this.not_to_fit = not_to_fit;
+		this.changed = changed;
+		this.unit = unit;
+		this.punit = punit;
 	}
 
 	public Parameter.copy(Parameter parameter)
@@ -45,20 +51,6 @@ public class Hkl.Parameter {
 		this.punit = parameter.punit;
 		this.not_to_fit = parameter.not_to_fit;
 		this.changed = parameter.changed;
-	}
-
-	public void init(string name, double min, double value, double max,
-			 bool not_to_fit, bool changed,
-			 Hkl.Unit unit, Hkl.Unit punit)
-	{
-		this.name = name;
-		this.range.min = min;
-		this.range.max = max;
-		this.value = value;
-		this.unit = unit;
-		this.punit = punit;
-		this.not_to_fit = not_to_fit;
-		this.changed = changed;
 	}
 
 	public double get_value()

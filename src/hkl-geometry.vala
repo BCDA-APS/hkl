@@ -65,8 +65,47 @@ public class Hkl.Holder {
 	}
 }
 
+public enum Hkl.GeometryType
+{
+	TWOC_VERTICAL,
+	EULERIAN4C_VERTICAL,
+	KAPPA4C_VERTICAL,
+	EULERIAN6C,
+	KAPPA6C,
+}
+
+public Hkl.Geometry hkl_geometry_factory_new(Hkl.GeometryType type, double[] parameters)
+{
+	Hkl.Geometry geom;
+
+	switch(type) {
+		case Hkl.GeometryType.TWOC_VERTICAL:
+			geom = new Hkl.Geometry.TwoCV();
+			break;
+		case Hkl.GeometryType.EULERIAN4C_VERTICAL:
+			geom = new Hkl.Geometry.E4CV();
+			break;
+		case Hkl.GeometryType.KAPPA4C_VERTICAL:
+			geom = new Hkl.Geometry.K4CV(parameters[0]);
+			break;
+		case Hkl.GeometryType.EULERIAN6C:
+			geom = new Hkl.Geometry.E6C();
+			break;
+		case Hkl.GeometryType.KAPPA6C:
+			geom = new Hkl.Geometry.K6C(parameters[0]);
+			break;
+		default:
+			geom = new Hkl.Geometry.E4CV();
+			break;
+	}
+
+	return geom;
+}
+
+
 public class Hkl.Geometry
 {
+	public string name;
 	public Source source;
 	public Axis[] axes;
 	public Holder[] holders;
@@ -78,6 +117,7 @@ public class Hkl.Geometry
 
 	public Geometry.TwoCV()
 	{
+		this.name = "TwoCV";
 		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -89,6 +129,7 @@ public class Hkl.Geometry
 
 	public Geometry.E4CV()
 	{
+		this.name = "E4CV";
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -102,6 +143,7 @@ public class Hkl.Geometry
 
 	public Geometry.K4CV(double alpha)
 	{
+		this.name = "K4CV";
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -115,6 +157,7 @@ public class Hkl.Geometry
 
 	public Geometry.E6C()
 	{
+		this.name = "E6C";
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -130,6 +173,7 @@ public class Hkl.Geometry
 
 	public Geometry.K6C(double alpha)
 	{
+		this.name = "K6C";
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -145,6 +189,7 @@ public class Hkl.Geometry
 
 	public Geometry.copy(Geometry src)
 	{
+		this.name = src.name;
 		this.source = src.source;
 		this.axes = new Axis[src.axes.length];
 		this.holders = new Holder[src.holders.length];
@@ -292,10 +337,9 @@ public class Hkl.Geometry
 
 }
 
-public abstract class Hkl.GeometryList
+public class Hkl.GeometryList
 {
 	public Geometry[] geometries;
-	public abstract void multiply();
 
 	public void add(Geometry geometry)
 	{
