@@ -53,7 +53,6 @@
 HKL_TEST_SUITE_FUNC(new)
 {
 	HklPseudoAxisEngine *engine = hkl_pseudo_axis_engine_e6c_hkl_new();
-	hkl_pseudo_axis_engine_free(engine);
 
 	return HKL_TEST_PASS;
 }
@@ -93,10 +92,6 @@ HKL_TEST_SUITE_FUNC(getter)
 	SET_AXES(geom, 0., 45., 0., 135., 0., 90.);
 	hkl_pseudo_axis_engine_getter(engine, geom, &det, sample);
 	CHECK_PSEUDOAXES(engine, 1., 0., -1.);
-
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -154,10 +149,6 @@ HKL_TEST_SUITE_FUNC(degenerated)
 			}
 		}
 	}
-
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -217,10 +208,6 @@ HKL_TEST_SUITE_FUNC(q2)
 			}
 		}
 	}
-
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }

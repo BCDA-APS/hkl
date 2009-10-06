@@ -43,7 +43,6 @@
 HKL_TEST_SUITE_FUNC(new)
 {
 	HklPseudoAxisEngine *engine = hkl_pseudo_axis_engine_k6c_hkl_new();
-	hkl_pseudo_axis_engine_free(engine);
 
 	return HKL_TEST_PASS;
 }
@@ -101,10 +100,6 @@ HKL_TEST_SUITE_FUNC(degenerated)
 			}
 		}
 	}
-
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -165,10 +160,6 @@ HKL_TEST_SUITE_FUNC(eulerians)
 			HKL_ASSERT_DOUBLES_EQUAL(180. * HKL_DEGTORAD, *Phi, HKL_EPSILON);
 		}
 	}
-
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -241,9 +232,6 @@ HKL_TEST_SUITE_FUNC(manip)
 			hkl_pseudo_axis_engine_list_fprintf(stdout, engines);
 		}
 	}
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -303,10 +291,6 @@ HKL_TEST_SUITE_FUNC(q2)
 			}
 		}
 	}
-
-	hkl_pseudo_axis_engine_list_free(engines);
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }

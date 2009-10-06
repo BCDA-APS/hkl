@@ -18,8 +18,8 @@ def set_options(opt):
 
 def configure(conf):
 	conf.check_tool('compiler_cc vala')
-	conf.check_cfg(package='gsl', atleast_version='1.12')
-	conf.check_cfg(package='glib-2.0', uselib_store='GLIB', atleast_version='2.10.0', mandatory=1, args='--cflags --libs')
+	conf.check_cfg(package='gsl', atleast_version='1.12', mandatory=1, args='--cflags --libs')
+	conf.check_cfg(package='gobject-2.0', uselib_store='GOBJECT', atleast_version='2.12.0', mandatory=1, args='--cflags --libs')
 	conf.env['HKL_VERSION'] = VERSION.split('-')[0]
 
 def build(bld):

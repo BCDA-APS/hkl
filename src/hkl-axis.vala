@@ -53,7 +53,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	/*
 	 * check if the angle or its equivalent is in between [min, max]
 	 */
-	bool is_value_compatible_with_range()
+	public bool is_value_compatible_with_range()
 	{
 		double c = Math.cos(this.value);
 		Interval c_r = this.range;

@@ -44,8 +44,6 @@ HKL_TEST_SUITE_FUNC(new)
 
 	sample = hkl_sample_new("test");
 
-	hkl_sample_free(sample);
-
 	return HKL_TEST_PASS;
 }
 
@@ -61,9 +59,6 @@ HKL_TEST_SUITE_FUNC(add_reflection)
 	sample = hkl_sample_new("test");
 
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
-
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -89,9 +84,6 @@ HKL_TEST_SUITE_FUNC(get_reflection)
 	ref = hkl_sample_add_reflection(sample, geom, &det, -1, 0, 0);
 	ref = hkl_sample_add_reflection(sample, geom, &det, 0, 1, 0);
 
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
-
 	return HKL_TEST_PASS;
 }
 
@@ -109,9 +101,6 @@ HKL_TEST_SUITE_FUNC(del_reflection)
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
 	hkl_sample_del_reflection(sample, 0);
 	HKL_ASSERT_EQUAL(0, HKL_LIST_LEN(sample->reflections));
-
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -147,9 +136,6 @@ HKL_TEST_SUITE_FUNC(compute_UB_busing_levy)
 
 	hkl_sample_compute_UB_busing_levy(sample, 2, 3);
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &sample->U));
-
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
 
 	return HKL_TEST_PASS;
 }
@@ -205,9 +191,6 @@ HKL_TEST_SUITE_FUNC(affine)
 	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, beta, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90 * HKL_DEGTORAD, gamma, HKL_EPSILON);
 
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
-
 	return HKL_TEST_PASS;
 }
 
@@ -257,9 +240,6 @@ HKL_TEST_SUITE_FUNC(get_reflections_xxx_angle)
 				 hkl_sample_get_reflection_mesured_angle(sample, 1, 2),
 				 HKL_EPSILON);
 
-	hkl_sample_free(sample);
-	hkl_geometry_free(geom);
-
 	return HKL_TEST_PASS;
 }
 
@@ -268,8 +248,6 @@ HKL_TEST_SUITE_FUNC(list_new)
 	HklSampleList *samples;
 
 	samples = hkl_sample_list_new();
-
-	hkl_sample_list_free(samples);
 
 	return HKL_TEST_PASS;
 }
@@ -294,8 +272,6 @@ HKL_TEST_SUITE_FUNC(list_append_sample)
 	// can not have two samples with the same name.
 	HKL_ASSERT_POINTER_EQUAL(NULL, hkl_sample_list_append(samples, sample1));
 
-	hkl_sample_list_free(samples); // also relase sample1 and sample2
-
 	return HKL_TEST_PASS;
 }
 
@@ -311,9 +287,6 @@ HKL_TEST_SUITE_FUNC(list_select_current)
 
 	HKL_ASSERT_EQUAL(HKL_SUCCESS, hkl_sample_list_select_current(samples, "test"));
 	HKL_ASSERT_EQUAL(HKL_FAIL, hkl_sample_list_select_current(samples, "tests"));
-
-
-	hkl_sample_list_free(samples); // also release sample
 
 	return HKL_TEST_PASS;
 }
@@ -336,8 +309,6 @@ HKL_TEST_SUITE_FUNC(list_clear)
 
 		HKL_ASSERT_EQUAL(0, hkl_sample_list_len(samples));
 	}
-
-	hkl_sample_list_free(samples); // also relase sample1 and sample2
 
 	return HKL_TEST_PASS;
 }

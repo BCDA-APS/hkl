@@ -61,8 +61,6 @@ HKL_TEST_SUITE_FUNC(new)
 	HKL_ASSERT_POINTER_EQUAL(&hkl_unit_angle_rad, p->unit);
 	HKL_ASSERT_POINTER_EQUAL(&hkl_unit_angle_deg, p->punit);
 
-	hkl_parameter_free(p);
-
 	return HKL_TEST_PASS;
 }
 
@@ -84,8 +82,6 @@ HKL_TEST_SUITE_FUNC(new_copy)
 	HKL_ASSERT_EQUAL(copy->changed, p.changed);
 	HKL_ASSERT_POINTER_EQUAL(&hkl_unit_angle_rad, copy->unit);
 	HKL_ASSERT_POINTER_EQUAL(&hkl_unit_angle_deg, copy->punit);
-
-	hkl_parameter_free(copy);
 
 	return HKL_TEST_PASS;
 }

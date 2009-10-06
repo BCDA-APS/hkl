@@ -50,8 +50,6 @@ HKL_TEST_SUITE_FUNC(add_holder)
 
 	HKL_ASSERT_POINTER_EQUAL(holder, g->holders[1]);
 
-	hkl_geometry_free(g);
-
 	return HKL_TEST_PASS;
 }
 
@@ -75,8 +73,6 @@ HKL_TEST_SUITE_FUNC(get_axis)
 	HKL_ASSERT_EQUAL(0, !hkl_geometry_get_axis_by_name(g, "B"));
 	HKL_ASSERT_EQUAL(0, !hkl_geometry_get_axis_by_name(g, "C"));
 	HKL_ASSERT_EQUAL(1, !hkl_geometry_get_axis_by_name(g, "D"));
-
-	hkl_geometry_free(g);
 
 	return HKL_TEST_PASS;
 }
@@ -110,8 +106,6 @@ HKL_TEST_SUITE_FUNC(update)
 	// now axis1 is clean
 	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_axis_get_changed(axis1));
 
-	hkl_geometry_free(g);
-
 	return HKL_TEST_PASS;
 }
 
@@ -131,8 +125,6 @@ HKL_TEST_SUITE_FUNC(set_values)
 	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(g->axes[0]), HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(g->axes[1]), HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(g->axes[2]), HKL_EPSILON);
-
-	hkl_geometry_free(g);
 
 	return HKL_TEST_PASS;
 }
@@ -156,9 +148,6 @@ HKL_TEST_SUITE_FUNC(distance)
 	hkl_geometry_set_values_v(g1, values_1, 3);
 	hkl_geometry_set_values_v(g2, values_2, 3);
 	HKL_ASSERT_DOUBLES_EQUAL(3, hkl_geometry_distance(g1, g2), HKL_EPSILON);
-
-	hkl_geometry_free(g1);
-	hkl_geometry_free(g2);
 
 	return HKL_TEST_PASS;
 }
@@ -200,9 +189,6 @@ HKL_TEST_SUITE_FUNC(list)
 	HKL_ASSERT_DOUBLES_EQUAL(10*HKL_DEGTORAD, hkl_axis_get_value(&list->geometries[1]->axes[0]), HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(30*HKL_DEGTORAD, hkl_axis_get_value(&list->geometries[2]->axes[0]), HKL_EPSILON);
 
-	hkl_geometry_free(g);
-	hkl_geometry_list_free(list);
-
 	return HKL_TEST_PASS;
 }
 
@@ -234,9 +220,6 @@ HKL_TEST_SUITE_FUNC( list_multiply_from_range )
 	hkl_geometry_list_add(list, g);
 
 	hkl_geometry_list_multiply_from_range(list);
-
-	hkl_geometry_free(g);
-	hkl_geometry_list_free(list);
 
 	return HKL_TEST_PASS;
 }

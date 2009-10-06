@@ -45,8 +45,6 @@ HKL_TEST_SUITE_FUNC( new )
 	HKL_ASSERT_EQUAL(HKL_FALSE, ((HklParameter *)axis)->not_to_fit);
 	HKL_ASSERT_EQUAL(HKL_TRUE, ((HklParameter *)axis)->changed);
 
-	hkl_axis_free(axis);
-
 	return HKL_TEST_PASS;
 }
 
@@ -70,8 +68,6 @@ HKL_TEST_SUITE_FUNC( get_quaternions )
 	HKL_ASSERT_DOUBLES_EQUAL(-1./sqrt(2.), q.data[1], HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[2], HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[3], HKL_EPSILON);
-
-	hkl_axis_free(axis);
 
 	return HKL_TEST_PASS;
 }
@@ -104,8 +100,6 @@ HKL_TEST_SUITE_FUNC( is_value_compatible_with_range )
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_axis_is_value_compatible_with_range(axis1));
 	hkl_axis_set_value_unit(axis1, -405);
 	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_axis_is_value_compatible_with_range(axis1));
-
-	hkl_axis_free(axis1);
 
 	return HKL_TEST_PASS;
 }
@@ -143,8 +137,6 @@ HKL_TEST_SUITE_FUNC( set_value_smallest_in_range )
 	hkl_axis_set_value_smallest_in_range(axis);
 	HKL_ASSERT_DOUBLES_EQUAL(-190, hkl_axis_get_value_unit(axis), HKL_EPSILON);
 
-	hkl_axis_free(axis);
-
 	return HKL_TEST_PASS;
 }
 
@@ -169,9 +161,6 @@ HKL_TEST_SUITE_FUNC( get_value_closest )
 
 	hkl_axis_set_value_unit(axis2, -85);
 	HKL_ASSERT_DOUBLES_EQUAL(-260*HKL_DEGTORAD, hkl_axis_get_value_closest(axis1, axis2), HKL_EPSILON);
-
-	hkl_axis_free(axis1);
-	hkl_axis_free(axis2);
 
 	return HKL_TEST_PASS;
 }

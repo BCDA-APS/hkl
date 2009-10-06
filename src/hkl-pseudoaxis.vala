@@ -179,12 +179,12 @@ public class Hkl.PseudoAxisEngineList
 public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.GeometryType type)
 {
 	Hkl.PseudoAxisEngineList list = new Hkl.PseudoAxisEngineList();
-
+/*
 	switch(type){
 	case Hkl.GeometryType.TWOC_VERTICAL:
 		break;
 	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
-		list.add(new Hkl.PseudoAxisEnginehkl_pseudo_axis_engine_e4cv_hkl_new());
+		list.add(hkl_pseudo_axis_engine_e4cv_hkl_new());
 		list.add(hkl_pseudo_axis_engine_e4cv_psi_new());
 		list.add(hkl_pseudo_axis_engine_q_new());
 		break;
@@ -208,5 +208,6 @@ public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.Geometry
 		list.add(hkl_pseudo_axis_engine_q2_new());
 		break;
 	}
+*/
 	return list;
 }

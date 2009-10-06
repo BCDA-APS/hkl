@@ -6,7 +6,7 @@ obj = bld.new_task_gen(
 		target = 'hkl',
 		cflags = ['--std=c99', '-g'],
 		packages = ['gsl'],
-		uselib = ['GSL', 'GLIB'],
+		uselib = ['GSL', 'GOBJECT'],
 		includes = ['.'],
 		vnum = bld.env['HKL_VERSION'])
 obj.find_sources_in_dirs('.')

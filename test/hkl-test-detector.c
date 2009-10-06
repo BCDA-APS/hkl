@@ -50,8 +50,6 @@ HKL_TEST_SUITE_FUNC(compute_kf)
 	hkl_detector_compute_kf(&det, geom, &kf);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&kf_ref, &kf));
 
-	hkl_geometry_free(geom);
-
 	return HKL_TEST_PASS;
 }
 

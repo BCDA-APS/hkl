@@ -9,7 +9,7 @@ obj.cflags = '-g'
 obj.includes = '. ../src'
 obj.rpath = bld.bdir + '/default/src'
 obj.unit_test = 1
-obj.uselib = 'GSL'
+obj.uselib = 'GSL GOBJECT'
 obj.uselib_local = 'hkl'
 obj.install_path = None
 
@@ -20,6 +20,6 @@ obj.cflags = '-g'
 obj.includes = '. ../src'
 obj.rpath = bld.bdir + '/default/src'
 obj.unit_test = 1
-obj.uselib = 'GSL'
+obj.uselib = 'GSL GOBJECT'
 obj.uselib_local = 'hkl'
 obj.install_path = None

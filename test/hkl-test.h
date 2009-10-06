@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "hkl-list.h"
+
 #define HKL_TEST_PASS 1
 #define HKL_TEST_FAIL 0
 
