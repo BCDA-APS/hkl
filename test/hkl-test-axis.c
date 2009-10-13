@@ -34,7 +34,7 @@
 HKL_TEST_SUITE_FUNC( new )
 {
 	HklAxis *axis;
-	HklVector v = {{1, 0, 0}};
+	HklVector v = {1, 0, 0};
 
 	axis = hkl_axis_new("omega", &v);
 
@@ -51,23 +51,23 @@ HKL_TEST_SUITE_FUNC( new )
 HKL_TEST_SUITE_FUNC( get_quaternions )
 {
 	HklAxis *axis;
-	HklVector v = {{1, 0, 0}};
+	HklVector v = {1, 0, 0};
 	HklQuaternion q;
 
 	axis = hkl_axis_new("omega", &v);
 
 	hkl_axis_get_quaternion(axis, &q);
-	HKL_ASSERT_DOUBLES_EQUAL(1., q.data[0], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[1], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[2], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[3], HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, HKL_EPSILON);
 
-	((HklParameter *)axis)->value = -M_PI_2;
+	hkl_axis_set_value(axis, -M_PI_2);
 	hkl_axis_get_quaternion(axis, &q);
-	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2.), q.data[0], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(-1./sqrt(2.), q.data[1], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[2], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(0., q.data[3], HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2.), q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(-1./sqrt(2.), q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., q.d, HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }
@@ -75,7 +75,7 @@ HKL_TEST_SUITE_FUNC( get_quaternions )
 HKL_TEST_SUITE_FUNC( is_value_compatible_with_range )
 {
 	HklAxis *axis1;
-	HklVector v = {{1, 0, 0}};
+	HklVector v = {1, 0, 0};
 
 	axis1 = hkl_axis_new("omega", &v);
 
@@ -107,7 +107,7 @@ HKL_TEST_SUITE_FUNC( is_value_compatible_with_range )
 HKL_TEST_SUITE_FUNC( set_value_smallest_in_range )
 {
 	HklAxis *axis;
-	HklVector v = {{1, 0, 0}};
+	HklVector v = {1, 0, 0};
 
 	axis = hkl_axis_new("omega", &v);
 
@@ -143,7 +143,7 @@ HKL_TEST_SUITE_FUNC( set_value_smallest_in_range )
 HKL_TEST_SUITE_FUNC( get_value_closest )
 {
 	HklAxis *axis1, *axis2;
-	HklVector v = {{1, 0, 0}};
+	HklVector v = {1, 0, 0};
 
 	axis1 = hkl_axis_new("omega", &v);
 	axis2 = hkl_axis_new("omega", &v);

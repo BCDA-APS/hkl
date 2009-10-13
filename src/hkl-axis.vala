@@ -26,7 +26,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	void update()
 	{
 		if(this.changed)
-			this.q.from_angle_and_axis(this.value, this.axis_v);		
+			this.q = Quaternion.from_angle_and_axis(this.value, this.axis_v);		
 	}
 	
 	/*
@@ -35,7 +35,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	 * CAUSION angle MUST be in [min, max] otherwise...
 	 */
 	static void find_angle(double current, ref double angle, ref double distance,
-			       double min, double max, double delta_angle)
+						   double min, double max, double delta_angle)
 	{
 		double new_angle = angle;
 		double new_distance = distance;
@@ -55,21 +55,28 @@ public class Hkl.Axis : Hkl.Parameter {
 	 */
 	public bool is_value_compatible_with_range()
 	{
-		double c = Math.cos(this.value);
-		Interval c_r = this.range;
+        double value;
+        bool res = false;
+        Interval range;
 
-		c_r.cos();
+        value = this.value;
+        range = this.range;
 
-		if (c_r.min <= c && c <= c_r.max) {
-			double s = Math.sin(this.value);
-			Interval s_r = this.range;
+        if(range.length() > 2*Math.PI)
+                res = true;
+        else{
+                range.angle_restrict_symm();
+                value = Gsl.Trig.angle_restrict_symm(value);
 
-			s_r.sin();
-
-			if (s_r.min <= s && s <= s_r.max)
-				return true;
-		}
-		return false; 
+                if(range.min <= range.max){
+                        if(range.min <= value && range.max >= value)
+                                res = true;
+                }else{
+                        if(value <= range.max || value >= range.min)
+                                res = true;
+                }
+        }
+        return res;
 	}
 
 
@@ -77,17 +84,22 @@ public class Hkl.Axis : Hkl.Parameter {
 	public Axis(string name, Vector axis_v)
 	{
 		base(name, -Math.PI, 0.0, Math.PI,
-				false, false,
-				hkl_unit_angle_rad, hkl_unit_angle_deg);
+			 false, true,
+			 hkl_unit_angle_rad, hkl_unit_angle_deg);
 		this.axis_v = axis_v;
 		this.q = Quaternion(1.0, 0.0, 0.0, 0.0);
 	}
 
 	public Axis.copy(Axis axis)
 	{
-		base.copy(this);
+		base.copy(axis);
 		this.axis_v = axis.axis_v;
 		this.q = axis.q;
+	}
+
+	public new double get_value()
+	{
+		return this.value;
 	}
 
 	public double get_value_closest(Axis axis)
@@ -128,6 +140,15 @@ public class Hkl.Axis : Hkl.Parameter {
 		return factor * this.get_value_closest(axis);
 	}
 
+	public bool get_changed()
+	{
+		return this.changed;
+	}
+
+	public void set_changed(bool changed)
+	{
+		this.changed = changed;
+	}
 
 	public new void set_value(double value)
 	{
@@ -135,10 +156,33 @@ public class Hkl.Axis : Hkl.Parameter {
 		this.update();
 	}
 
+	public new double get_value_unit()
+	{
+		return base.get_value_unit();
+	}
+
 	public new void set_value_unit(double value)
 	{
 		base.set_value_unit(value);
 		this.update();
+	}
+
+	public void set_value_smallest_in_range()
+	{
+		if(this.value < this.range.min)
+			this.set_value(this.value + 2*Math.PI*Math.ceil((this.range.min - this.value)/(2*Math.PI)));
+		else
+			this.set_value(this.value - 2*Math.PI*Math.floor((this.value - this.range.min)/(2*Math.PI)));
+	}
+
+	public new void set_range(double min, double max)
+	{
+		base.set_range(min, max);
+	}
+
+	public new void set_range_unit(double min, double max)
+	{
+		base.set_range_unit(min, max);
 	}
 
 	public new void randomize()
@@ -150,7 +194,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	/* to optimize */
 	public void get_quaternion(out Quaternion q)
 	{
-		q.from_angle_and_axis(this.value, this.axis_v);
+		q = this.q;
 	}
 
 	[CCode (instance_pos=-1)]

@@ -22,7 +22,7 @@
 using Gsl;
 
 public class Hkl.Sample {
-	public weak string name;
+	public string name;
 	public Lattice lattice;
 	public Matrix U;
 	public Matrix UB;
@@ -36,7 +36,7 @@ public class Hkl.Sample {
 		public bool flag;
 
 		public Reflection(Geometry g, Detector det,
-				  double h, double k, double l)
+						  double h, double k, double l)
 		{
 			Vector ki;
 
@@ -129,7 +129,7 @@ public class Hkl.Sample {
 	public Sample(string name)
 	{
 		this.name = name;
-		this.lattice = Lattice.default();
+		this.lattice = new Lattice.default();
 		this.U.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 		this.UB.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 		this.compute_UB();
@@ -151,6 +151,11 @@ public class Hkl.Sample {
 		}
 	}
 
+	public void set_name(string name)
+		{
+			this.name = name;
+		}
+
 	public bool set_lattice(double a, double b, double c,
 				double alpha, double beta, double gamma)
 	{
@@ -162,6 +167,7 @@ public class Hkl.Sample {
 		return status;
 	}
 
+	/* TODO test */
 	public bool set_U_from_euler(double x, double y, double z)
 	{
 		this.U.from_euler(x, y, z);
@@ -306,15 +312,42 @@ public class Hkl.Sample {
 
 	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
-	{
-		f.printf("\nSample name: \"%s\"", this.name);
+		{
+			f.printf("\nSample name: \"%s\"", this.name);
 
-		f.printf("\nLattice parameters:");
-		f.printf("\n ");
-		this.lattice.fprintf(f);
-		f.printf("\nUB:\n");
-		this.UB.fprintf(f);
-	}
+			f.printf("\nLattice parameters:");
+			f.printf("\n ");
+			this.lattice.a.fprintf(f);
+			f.printf("\n ");
+			this.lattice.b.fprintf(f);
+			f.printf("\n ");
+			this.lattice.c.fprintf(f);
+			f.printf("\n ");
+			this.lattice.alpha.fprintf(f);
+			f.printf("\n ");
+			this.lattice.beta.fprintf(f);
+			f.printf("\n ");
+			this.lattice.gamma.fprintf(f);
+			f.printf("\nUB:\n");
+			this.UB.fprintf(f);
+
+			if(this.reflections.length > 0){
+				f.printf("Reflections:");
+				f.printf("\n");
+				f.printf("i %-10.6s %-10.6s %-10.6s", "h", "k", "l");
+				foreach(weak Axis axis in this.reflections[0].geometry.axes){
+					f.printf(" %-10.6s", axis.name);
+				}
+				int i=0;
+				foreach(weak Reflection reflection in this.reflections){
+					f.printf("\n%d %-10.6f %-10.6f %-10.6f", i++, 
+							 reflection.hkl.x, reflection.hkl.y, reflection.hkl.z);
+					foreach(weak Axis axis in reflection.geometry.axes){
+						f.printf(" %-10.6f", axis.get_value_unit());
+					}
+				}
+			}
+		}
 }
 
 public class Hkl.SampleList
@@ -326,6 +359,17 @@ public class Hkl.SampleList
 	{
 		this.current = null;
 	}
+
+	public void clear()
+		{
+			this.samples.resize(0);
+			this.current = null;
+		}
+
+	public int len()
+		{
+			return this.samples.length;
+		}
 
 	public Sample? append(Sample sample)
 	{
@@ -341,6 +385,60 @@ public class Hkl.SampleList
 
 	public int get_idx_from_name(string name)
 	{
-		return 2;
+		int i=0;
+		foreach(weak Sample sample in this.samples){
+			if (name == sample.name)
+				return i;
+			i++;
+		}
+		return -1;
 	}
+
+	public void del(Sample sample)
+		{
+			if (this.current == sample)
+				this.current = null;
+			Sample[] samples = new Sample[this.samples.length - 1];
+
+			uint idx=0u;
+			foreach(Sample sample_it in this.samples){
+				if (sample_it == sample)
+					idx + 1;
+				else{
+					samples[idx] = sample_it;
+				}
+			}
+		}
+
+	/* TODO test */
+	public Sample get_ith(uint idx) requires (idx < this.samples.length)
+		{
+			return this.samples[idx];
+		}
+
+	/* TODO test */
+	public Sample? get_by_name(string name)
+		{
+			int idx = this.get_idx_from_name(name);
+			if (idx >= 0)
+				return this.samples[idx];
+			return null;
+		}
+
+	public int select_current(string name)
+		{
+			int	idx = this.get_idx_from_name(name);
+			if (idx >= 0)
+				this.current = this.samples[idx];
+
+			return idx;
+	}
+
+	[CCode (instance_pos=-1)]
+	public void fprintf(FileStream f)
+		{
+			foreach(weak Sample sample in this.samples){
+				sample.fprintf(f);
+			}
+		}
 }

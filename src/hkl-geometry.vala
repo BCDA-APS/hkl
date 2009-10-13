@@ -42,7 +42,7 @@ public class Hkl.Holder {
 		{
 			this.q.set(1.0, 0.0, 0.0, 0.0);
 			foreach(uint idx in this.idx)
-			this.q.times_quaternion(this.geometry.axes[idx].q);
+				this.q.times_quaternion(this.geometry.axes[idx].q);
 		}
 
 	public weak Axis? add_rotation_axis(string name,
@@ -54,8 +54,8 @@ public class Hkl.Holder {
 
 			/* check that the axis is not already in the holder */
 			foreach(uint idxx in this.idx)
-			if (idx == idxx)
-				return null;
+				if (idx == idxx)
+					return null;
 
 			int len = this.idx.length;
 			this.idx.resize(len + 1);
@@ -71,7 +71,7 @@ public enum Hkl.GeometryType
 		EULERIAN4C_VERTICAL,
 		KAPPA4C_VERTICAL,
 		EULERIAN6C,
-		KAPPA6C,
+		KAPPA6C
 		}
 
 public Hkl.Geometry hkl_geometry_factory_new(Hkl.GeometryType type, double[] parameters)
@@ -112,7 +112,7 @@ public class Hkl.Geometry
 
 	public Geometry()
 		{
-			this.source.set(1.054, 1.0, 0.0, 0.0);
+			this.source.set(SOURCE_DEFAULT_WAVE_LENGTH, 1.0, 0.0, 0.0);
 		}
 
 	public Geometry.TwoCV()
@@ -196,12 +196,21 @@ public class Hkl.Geometry
 			// make a deep copy of the axes
 			uint idx=0U;
 			foreach(weak Axis axis in src.axes)
-			this.axes[idx++] = new Axis.copy(axis);
+				this.axes[idx++] = new Axis.copy(axis);
 
 			// make a deep copy of the holders
 			idx = 0U;
 			foreach(weak Holder holder in src.holders)
-			this.holders[idx++].copy(holder, this);
+				this.holders[idx++] = new Holder.copy(holder, this);
+		}
+
+	public void init_geometry(Hkl.Geometry geometry)
+		{
+			uint idx = 0u;
+
+			foreach(weak Axis axis in this.axes)
+			axis.set_value(geometry.axes[idx++].get_value());
+			this.update();
 		}
 
 	public unowned Holder add_holder()
@@ -217,32 +226,32 @@ public class Hkl.Geometry
 			bool ko = false;
 
 			foreach(weak Axis axis in this.axes)
-			if(axis.changed){
-				ko = true;
-				break;
-			}
+				if(axis.changed){
+					ko = true;
+					break;
+				}
 
 			if(ko){
 				foreach(weak Holder holder in this.holders)
-				holder.update();
+					holder.update();
 
 				foreach(weak Axis axis in this.axes)
-				axis.changed = false;
+					axis.changed = false;
 			}
 		}
 
 	public weak Axis? get_axis_by_name(string name)
 		{
 			foreach(weak Axis axis in this.axes)
-			if (axis.name == name)
-				return axis;
+				if (axis.name == name)
+					return axis;
 			return null;
 		}
 
 	public void randomize()
 		{
 			foreach(weak Axis axis in this.axes)
-			axis.randomize();
+				axis.randomize();
 			this.update();
 		}
 
@@ -251,7 +260,7 @@ public class Hkl.Geometry
 			uint idx=0;
 
 			foreach(weak Axis axis in this.axes)
-			axis.set_value(values[idx++]);
+				axis.set_value(values[idx++]);
 			this.update();
 			return true;
 		}
@@ -262,7 +271,7 @@ public class Hkl.Geometry
 			int i=0;
 
 			foreach(weak Axis axis in this.axes)
-			distance += Math.fabs(axis.value - geometry.axes[i++].value);
+				distance += Math.fabs(axis.value - geometry.axes[i++].value);
 
 			return distance;
 		}
@@ -309,7 +318,7 @@ public class Hkl.Geometry
 	public void fprintf(FileStream stream)
 		{
 			foreach(weak Axis axis in this.axes)
-			stream.printf(" %s : %f", axis.name, axis.get_value_unit());
+				stream.printf(" %s : %f", axis.name, axis.get_value_unit());
 		}
 
 	/* only used by Holder */
@@ -352,14 +361,15 @@ public class Hkl.GeometryList
 				this._multiply(geometry);
 		}
 
+	// look for a owne transfer to optimize the code.
 	public void add(Geometry geometry)
 		{
 			bool ok = true;
 			foreach(weak Geometry geom in this.geometries)
-			if(geometry.distance_orthodromic(geom) < EPSILON){
-				ok = false;
-				break;
-			}
+				if(geometry.distance_orthodromic(geom) < EPSILON){
+					ok = false;
+					break;
+				}
 			if(ok){
 				int len = this.geometries.length;
 				this.geometries.resize(len + 1);
@@ -406,12 +416,61 @@ public class Hkl.GeometryList
 			this.geometries = geometries;
 		}
 
+	void perm_r(Hkl.Geometry reference, Hkl.Geometry geometry, bool[] perm, uint axis_idx)
+		{
+			if (axis_idx == geometry.axes.length){
+				if(reference.distance(geometry) > EPSILON)
+					this.add(new Hkl.Geometry.copy(geometry));
+			}else{
+				if(perm[axis_idx] == true){
+					Hkl.Axis axis;
+					double max;
+					double value;
+					double value0;
+
+					axis = geometry.axes[axis_idx];
+					max = axis.range.max;
+					value = axis.get_value();
+					value0 = value;
+					do{
+						this.perm_r(reference, geometry, perm, axis_idx + 1);
+						value +=  2*Math.PI;
+						if(value <= (max + EPSILON))
+							axis.set_value(value);
+					}while(value <= (max + EPSILON));
+					axis.set_value(value0);
+				} else
+					this.perm_r(reference, geometry, perm, axis_idx + 1);
+			}	
+		}
+
+	public void multiply_from_range()
+		{
+			foreach(weak Geometry reference in this.geometries){
+				Hkl.Geometry geometry;
+
+				geometry = new Hkl.Geometry.copy(reference);
+				bool[] perm = new bool[geometry.axes.length];
+
+				// find axes to permute and the first solution of thoses axes;
+				uint i=0u;
+				foreach(weak Axis axis in geometry.axes){
+					perm[i] = axis.is_value_compatible_with_range();
+					if (perm[i++] == true)
+						axis.set_value_smallest_in_range();
+				
+				}
+
+				this.perm_r(reference, geometry, perm, 0);
+			}
+		}
+
 	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 		{
 			if(this.geometries.length > 0){
 				foreach(weak Axis axis in this.geometries[0].axes)
-				axis.fprintf(f);
+					axis.fprintf(f);
 
 				int i=0;
 				foreach(weak Geometry geometry in this.geometries){
@@ -440,19 +499,19 @@ public class Hkl.GeometryList
 
 /* use only for the GeometryList */
 static void kappa_2_kappap(double komega, double kappa, double kphi, double alpha,
-                           out double komegap, out double kappap, out double kphip)
+			   out double komegap, out double kappap, out double kphip)
 {
-        double p;
-        double omega;
-        double phi;
+	double p;
+	double omega;
+	double phi;
 
-        p = Math.atan(Math.tan(kappa/2.0) * Math.cos(alpha));
-        omega = komega + p - Math.PI_2;
-        phi = kphi + p + Math.PI_2;
+	p = Math.atan(Math.tan(kappa/2.0) * Math.cos(alpha));
+	omega = komega + p - Math.PI_2;
+	phi = kphi + p + Math.PI_2;
 
-        komegap = Gsl.Trig.angle_restrict_symm(2*omega - komega);
-        kappap = -kappa;
-        kphip = Gsl.Trig.angle_restrict_symm(2*phi - kphi);
+	komegap = Gsl.Trig.angle_restrict_symm(2*omega - komega);
+	kappap = -kappa;
+	kphip = Gsl.Trig.angle_restrict_symm(2*phi - kphi);
 
 }
 
@@ -460,18 +519,18 @@ public class Hkl.GeometryListKappa4C : Hkl.GeometryList
 {
 	public void _multiply(Hkl.Geometry geometry)
 	{
-        Hkl.Geometry copy;
-        double komega, komegap;
-        double kappa, kappap;
-        double kphi, kphip;
+		Hkl.Geometry copy;
+		double komega, komegap;
+		double kappa, kappap;
+		double kphi, kphip;
 
-        komega = geometry.axes[0].get_value();
-        kappa = geometry.axes[1].get_value();
-        kphi = geometry.axes[2].get_value();
+		komega = geometry.axes[0].get_value();
+		kappa = geometry.axes[1].get_value();
+		kphi = geometry.axes[2].get_value();
 
-        kappa_2_kappap(komega, kappa, kphi, 50 * DEGTORAD, out komegap, out kappap, out kphip);
+		kappa_2_kappap(komega, kappa, kphi, 50 * DEGTORAD, out komegap, out kappap, out kphip);
 
-        copy = new Hkl.Geometry.copy(geometry);
+		copy = new Hkl.Geometry.copy(geometry);
 		copy.axes[0].set_value(komegap);
 		copy.axes[1].set_value(kappap);
 		copy.axes[2].set_value(kphip);
@@ -485,18 +544,18 @@ public class Hkl.GeometryListKappa6C : Hkl.GeometryList
 {
 	public void _multiply(Hkl.Geometry geometry)
 	{
-        Hkl.Geometry copy;
-        double komega, komegap;
-        double kappa, kappap;
-        double kphi, kphip;
+		Hkl.Geometry copy;
+		double komega, komegap;
+		double kappa, kappap;
+		double kphi, kphip;
 
-        komega = geometry.axes[1].get_value();
-        kappa = geometry.axes[2].get_value();
-        kphi = geometry.axes[3].get_value();
+		komega = geometry.axes[1].get_value();
+		kappa = geometry.axes[2].get_value();
+		kphi = geometry.axes[3].get_value();
 
-        kappa_2_kappap(komega, kappa, kphi, 50 * DEGTORAD, out komegap, out kappap, out kphip);
+		kappa_2_kappap(komega, kappa, kphi, 50 * DEGTORAD, out komegap, out kappap, out kphip);
 
-        copy = new Hkl.Geometry.copy(geometry);
+		copy = new Hkl.Geometry.copy(geometry);
 		copy.axes[1].set_value(komegap);
 		copy.axes[2].set_value(kappap);
 		copy.axes[3].set_value(kphip);

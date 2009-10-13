@@ -21,7 +21,10 @@
  */
 public struct Hkl.Quaternion
 {
-	public double data[4];
+	public double a;
+	public double b;
+	public double c;
+	public double d;
 
 	public Quaternion(double a, double b, double c, double d)
 	{
@@ -30,7 +33,7 @@ public struct Hkl.Quaternion
 
 	public Quaternion.from_vector(Vector v)
 	{
-		this.set(0.0, v.data[0], v.data[1], v.data[2]);
+		this.set(0.0, v.x, v.y, v.z);
 	}
 
 	public Quaternion.from_angle_and_axis(double angle, Vector v)
@@ -38,31 +41,31 @@ public struct Hkl.Quaternion
 		double c = Math.cos(angle / 2.0);
 		double s = Math.sin(angle / 2.0) / v.norm2();
 
-		this.set(c, s * v.data[0], s * v.data[1], s * v.data[2]);
+		this.set(c, s*v.x, s*v.y, s*v.z);
 	}
 
 	public void set(double a, double b, double c, double d)
 	{
-		this.data[0] = a;
-		this.data[1] = b;
-		this.data[2] = c;
-		this.data[3] = d;
+		this.a = a;
+		this.b = b;
+		this.c = c;
+		this.d = d;
 	}
 
 	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream file)
 	{
-		file.printf("<%f, %f, %f, %f>", this.data[0], this.data[1], this.data[2], this.data[3]);
+		file.printf("<%f, %f, %f, %f>", this.a, this.b, this.c, this.d);
 	}
 
 
 	/**compare two hkl_quaternions */
 	public bool cmp(Quaternion q)
 	{
-		if ((Math.fabs(this.data[0] - q.data[0]) > EPSILON)
-				|| (Math.fabs(this.data[1] - q.data[1]) > EPSILON)
-				|| (Math.fabs(this.data[2] - q.data[2]) > EPSILON)
-				|| (Math.fabs(this.data[3] - q.data[3]) > EPSILON))
+		if ((Math.fabs(this.a - q.a) > EPSILON)
+				|| (Math.fabs(this.b - q.b) > EPSILON)
+				|| (Math.fabs(this.c - q.c) > EPSILON)
+				|| (Math.fabs(this.d - q.d) > EPSILON))
 			return true;
 		else
 			return false;
@@ -70,10 +73,10 @@ public struct Hkl.Quaternion
 
 	public void minus_quaternion(Quaternion q)
 	{
-		this.data[0] -= q.data[0];
-		this.data[1] -= q.data[1];
-		this.data[2] -= q.data[2];
-		this.data[3] -= q.data[3];
+		this.a -= q.a;
+		this.b -= q.b;
+		this.c -= q.c;
+		this.d -= q.d;
 	}
 
 	public void times_quaternion(Quaternion q)
@@ -86,23 +89,23 @@ public struct Hkl.Quaternion
 		else
 			Q = &q;
 
-		this.data[0] = tmp.data[0] * Q->data[0] - tmp.data[1] * Q->data[1] - tmp.data[2] * Q->data[2] - tmp.data[3] * Q->data[3];
-		this.data[1] = tmp.data[0] * Q->data[1] + tmp.data[1] * Q->data[0] + tmp.data[2] * Q->data[3] - tmp.data[3] * Q->data[2];
-		this.data[2] = tmp.data[0] * Q->data[2] - tmp.data[1] * Q->data[3] + tmp.data[2] * Q->data[0] + tmp.data[3] * Q->data[1];
-		this.data[3] = tmp.data[0] * Q->data[3] + tmp.data[1] * Q->data[2] - tmp.data[2] * Q->data[1] + tmp.data[3] * Q->data[0];
+		this.a = tmp.a * Q->a - tmp.b * Q->b - tmp.c * Q->c - tmp.d * Q->d;
+		this.b = tmp.a * Q->b + tmp.b * Q->a + tmp.c * Q->d - tmp.d * Q->c;
+		this.c = tmp.a * Q->c - tmp.b * Q->d + tmp.c * Q->a + tmp.d * Q->b;
+		this.d = tmp.a * Q->d + tmp.b * Q->c - tmp.c * Q->b + tmp.d * Q->a;
 	}
 
 	public double norm2()
 	{
-		return Math.sqrt(this.data[0] * this.data[0] + this.data[1] * this.data[1]
-				+ this.data[2] * this .data[2] + this.data[3] * this.data[3]);
+		return Math.sqrt(this.a * this.a + this.b * this.b
+				+ this.c * this .c + this.d * this.d);
 	}
 
 	public void conjugate()
 	{
-		this.data[1] = -this.data[1];
-		this.data[2] = -this.data[2];
-		this.data[3] = -this.data[3];
+		this.b = -this.b;
+		this.c = -this.c;
+		this.d = -this.d;
 	}
 
 	/**
@@ -125,17 +128,17 @@ public struct Hkl.Quaternion
 	 */
 	public void to_matrix(out Matrix m) requires (Math.fabs(this.norm2() - 1.0) < EPSILON)
 	{
-		m.m11 = this.data[0]*this.data[0] + this.data[1]*this.data[1] - this.data[2]*this.data[2] - this.data[3]*this.data[3];
-		m.m12 = 2 * (this.data[1]*this.data[2] - this.data[0]*this.data[3]);
-		m.m13 = 2 * (this.data[0]*this.data[2] + this.data[1]*this.data[3]);
+		m.m11 = this.a*this.a + this.b*this.b - this.c*this.c - this.d*this.d;
+		m.m12 = 2 * (this.b*this.c - this.a*this.d);
+		m.m13 = 2 * (this.a*this.c + this.b*this.d);
 
-		m.m21 = 2 * (this.data[0]*this.data[3] + this.data[1]*this.data[2]);
-		m.m22 = this.data[0]*this.data[0] - this.data[1]*this.data[1] + this.data[2]*this.data[2] - this.data[3]*this.data[3];
-		m.m23 = 2 * (this.data[2]*this.data[3] - this.data[0]*this.data[1]);
+		m.m21 = 2 * (this.a*this.d + this.b*this.c);
+		m.m22 = this.a*this.a - this.b*this.b + this.c*this.c - this.d*this.d;
+		m.m23 = 2 * (this.c*this.d - this.a*this.b);
 
-		m.m31 = 2 * (this.data[1]*this.data[3] - this.data[0]*this.data[2]);
-		m.m32 = 2 * (this.data[0]*this.data[1] + this.data[2]*this.data[3]);
-		m.m33 = this.data[0]*this.data[0] - this.data[1]*this.data[1] - this.data[2]*this.data[2] + this.data[3]*this.data[3];
+		m.m31 = 2 * (this.b*this.d - this.a*this.c);
+		m.m32 = 2 * (this.a*this.b + this.c*this.d);
+		m.m33 = this.a*this.a - this.b*this.b - this.c*this.c + this.d*this.d;
 	}
 
 	/**
@@ -149,7 +152,7 @@ public struct Hkl.Quaternion
 		double sin_angle_2;
 
 		// compute the angle
-		cos_angle_2 = this.data[0];
+		cos_angle_2 = this.a;
 		angle_2 = Math.acos(cos_angle_2);
 		angle = 2 * angle_2;
 		// we want an angle between -pi, pi
@@ -160,12 +163,12 @@ public struct Hkl.Quaternion
 		sin_angle_2 = Math.sin(angle_2);
 		if (Math.fabs(sin_angle_2) > EPSILON) {
 			// compute the axe using the vector part of the unitary quaterninon
-			v.data[0] = this.data[1] / sin_angle_2;
-			v.data[1] = this.data[2] / sin_angle_2;
-			v.data[2] = this.data[3] / sin_angle_2;
+			v.x = this.b / sin_angle_2;
+			v.y = this.c / sin_angle_2;
+			v.z = this.d / sin_angle_2;
 		} else {
 			angle = 0.0;
-			v.data[0] = v.data[1] = v.data[2] = 0.0;
+			v.x = v.y = v.z = 0.0;
 		}
 	}
 }

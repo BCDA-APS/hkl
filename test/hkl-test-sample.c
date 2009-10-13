@@ -153,12 +153,12 @@ HKL_TEST_SUITE_FUNC(affine)
 	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
 
 	sample = hkl_sample_new("test");
-	sample->lattice.a->value = 1;
-	sample->lattice.b->value = 5;
-	sample->lattice.c->value = 4;
-	sample->lattice.alpha->value = 92 * HKL_DEGTORAD;
-	sample->lattice.beta->value = 81 * HKL_DEGTORAD;
-	sample->lattice.gamma->value = 90 * HKL_DEGTORAD;
+	sample->lattice->a->value = 1;
+	sample->lattice->b->value = 5;
+	sample->lattice->c->value = 4;
+	sample->lattice->alpha->value = 92 * HKL_DEGTORAD;
+	sample->lattice->beta->value = 81 * HKL_DEGTORAD;
+	sample->lattice->gamma->value = 90 * HKL_DEGTORAD;
 
 	SET_ANGLES(geom, 30, 0, 90, 60);
 	ref = hkl_sample_add_reflection(sample, geom, &det, 1, 0, 0);
@@ -177,12 +177,12 @@ HKL_TEST_SUITE_FUNC(affine)
 
 	hkl_sample_affine(sample);
 
-	a = sample->lattice.a->value;
-	b = sample->lattice.b->value;
-	c = sample->lattice.c->value;
-	alpha = sample->lattice.alpha->value;
-	beta = sample->lattice.beta->value;
-	gamma = sample->lattice.gamma->value;
+	a = sample->lattice->a->value;
+	b = sample->lattice->b->value;
+	c = sample->lattice->c->value;
+	alpha = sample->lattice->alpha->value;
+	beta = sample->lattice->beta->value;
+	gamma = sample->lattice->gamma->value;
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &sample->U));
 	HKL_ASSERT_DOUBLES_EQUAL(1.54, a, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(1.54, b, HKL_EPSILON);

@@ -29,6 +29,11 @@ public struct Hkl.Source
 		this.set(wave_length, x, y, z);
 	}
 
+	public double get_wavelength()
+	{
+		return wave_length;
+	}
+
 	public void set(double wave_length, double x, double y, double z)
 	{
 		double norm = Math.sqrt(x*x + y*y + z*z);

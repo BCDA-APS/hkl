@@ -65,7 +65,7 @@ static int test_engine(struct hkl_test *test,
 			// pseudo -> geometry
 			hkl_pseudo_axis_engine_init(engine, geometry, &det, sample);
 			//hkl_pseudo_axis_engine_fprintf(stderr, engine);
-			res = hkl_pseudo_axis_engine_setter(engine, geometry, &det, sample);
+			res = hkl_pseudo_axis_engine_set(engine, geometry, &det, sample);
 
 			// geometry -> pseudo
 			if (res == HKL_SUCCESS) {
@@ -81,7 +81,7 @@ static int test_engine(struct hkl_test *test,
 						((HklParameter *)engine->pseudoAxes[k])->value = 0.;
 
 					hkl_geometry_init_geometry(engine->geometry, engine->engines->geometries->geometries[j]);
-					hkl_pseudo_axis_engine_getter(engine, engine->geometry, &det, sample);
+					hkl_pseudo_axis_engine_get(engine, engine->geometry, &det, sample);
 
 					for(k=0; k<len; ++k) {
 						HKL_ASSERT_DOUBLES_EQUAL(values[k],
@@ -122,6 +122,7 @@ HKL_TEST_SUITE_FUNC(set)
 	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
 	test_engines(test, engines, geometry, sample);
 
+/*
 	// test all E6C HKL engines
 	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN6C);
 	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN6C, parameters, 0);
@@ -136,6 +137,7 @@ HKL_TEST_SUITE_FUNC(set)
 	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
 	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
 	test_engines(test, engines, geometry, sample);
+*/
 
 	return HKL_TEST_PASS;
 }

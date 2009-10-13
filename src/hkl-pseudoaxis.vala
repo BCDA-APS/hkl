@@ -22,12 +22,12 @@
 
 public class Hkl.PseudoAxis : Hkl.Parameter
 {
-	public weak PseudoAxisEngine engine;
+	public PseudoAxisEngine? engine;
 
-	public PseudoAxis(string name, PseudoAxisEngine engine)
+	public PseudoAxis(Parameter parameter)
 	{
-		this.name = name;
-		this.engine = engine;
+		base.copy(parameter);
+		this.engine = null;
 	}
 
 	[CCode (instance_pos=-1)]
@@ -41,11 +41,31 @@ public class Hkl.PseudoAxis : Hkl.Parameter
 public abstract class Hkl.PseudoAxisEngineMode
 {
 	public string name;
-	public abstract bool init(Geometry geometry, Detector detector, Sample sample);
 	public abstract bool get(Geometry geometry, Detector detector, Sample sample);
 	public abstract bool set(Geometry geometry, Detector detector, Sample sample);
 	public Parameter[] parameters;
 	public string[] axes_names;
+	public Geometry geometry_init;
+	public Detector detector_init;
+	public Sample sample_init;
+
+	public PseudoAxisEngineMode(string name, string[] axes_names, Parameter[] parameters)
+		{
+			this.name = name;
+			this.axes_names = axes_names;
+			this.parameters = parameters;
+		}
+
+	public virtual bool init(Geometry geometry, Detector detector, Sample sample)
+		{
+			geometry.update();
+			this.geometry_init = new Geometry.copy(geometry);
+			this.detector_init = detector;
+			this.sample_init = sample;
+
+			return true;
+		}
+
 }
 
 public class Hkl.PseudoAxisEngine
@@ -60,13 +80,18 @@ public class Hkl.PseudoAxisEngine
 	public PseudoAxis[] pseudoAxes;
 	public PseudoAxisEngineList engines;
 
-	public PseudoAxisEngine(string name, string[] names)
+	public PseudoAxisEngine(string name)
 	{
 		this.name = name;
-		this.pseudoAxes = new PseudoAxis[names.length];
-		for(int i=0; i<names.length;++i)
-			this.pseudoAxes[i] = new PseudoAxis(names[i], this);
 	}
+
+	public void add_pseudoAxis(PseudoAxis pseudoAxis)
+		{
+			int len = this.pseudoAxes.length;
+			this.pseudoAxes.resize(len + 1);
+			this.pseudoAxes[len] = pseudoAxis;
+			pseudoAxis.engine = this;
+		}
 
 	public void add_mode(owned PseudoAxisEngineMode mode)
 	{
@@ -88,6 +113,30 @@ public class Hkl.PseudoAxisEngine
 	{
 		this.mode = this.modes[idx];
 	}
+
+	public bool init(Geometry geometry, Detector detector, Sample sample)
+		{
+			return this.mode.init(geometry, detector, sample);
+		}
+
+	public bool get(Geometry geometry, Detector detector, Sample sample)
+		{
+			return this.mode.get(geometry, detector, sample);
+		}
+
+	public bool set(Geometry geometry, Detector detector, Sample sample)
+		{
+			bool res;
+
+			res = this.mode.set(geometry, detector, sample);
+			if(!res){
+				this.engines.geometries.multiply();
+				this.engines.geometries.multiply_from_range();
+				this.engines.geometries.sort(geometry);
+			}
+
+			return res;
+		}
 
 	public void prepare_internal(Geometry geometry, Detector detector, Sample sample)
 	{

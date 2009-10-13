@@ -34,13 +34,6 @@ public struct Hkl.Unit {
 	public weak string name;
 	public weak string repr;
 
-	public Unit(UnitType type, string name, string repr)
-	{
-		this.type = type;
-		this.name = name;
-		this.repr = repr;
-	}
-
 	public double factor(Hkl.Unit unit)
 	{
 		double factor = 1.0;

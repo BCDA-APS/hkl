@@ -9,7 +9,7 @@ public static Hkl.Lattice default = {
 }; 
 */
 
-public struct Hkl.Lattice
+public class Hkl.Lattice
 {
 	public Parameter a;
 	public Parameter b;
@@ -21,7 +21,7 @@ public struct Hkl.Lattice
 	/* private */
 
 	bool check_lattice_param(double a, double b, double c,
-			double alpha, double beta, double gamma)
+							 double alpha, double beta, double gamma)
 	{
 		double D = 1.0 - Math.cos(alpha)*Math.cos(alpha)
 			- Math.cos(beta)*Math.cos(beta)
@@ -38,23 +38,23 @@ public struct Hkl.Lattice
 	{
 		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)){
 			this.a     = new Parameter("a", 0.0, a, a+10.0,
-						   false, false,
-						   hkl_unit_length_nm, hkl_unit_length_nm);
+									   false, false,
+									   hkl_unit_length_nm, hkl_unit_length_nm);
 			this.b     = new Parameter("b", 0.0, b, b+10.0,
-						   false, false,
-						   hkl_unit_length_nm, hkl_unit_length_nm);
+									   false, false,
+									   hkl_unit_length_nm, hkl_unit_length_nm);
 			this.c     = new Parameter("c", 0.0, c, c+10.0,
-						   false, false,
-						   hkl_unit_length_nm, hkl_unit_length_nm);
+									   false, false,
+									   hkl_unit_length_nm, hkl_unit_length_nm);
 			this.alpha = new Parameter("alpha", -Math.PI, alpha, Math.PI,
-						   false, false,
-						   hkl_unit_angle_rad, hkl_unit_angle_deg);
+									   false, false,
+									   hkl_unit_angle_rad, hkl_unit_angle_deg);
 			this.beta  = new Parameter("beta", -Math.PI, beta, Math.PI,
-						   false, false,
-						   hkl_unit_angle_rad, hkl_unit_angle_deg);
+									   false, false,
+									   hkl_unit_angle_rad, hkl_unit_angle_deg);
 			this.gamma = new Parameter("gamma", -Math.PI, gamma, Math.PI,
-						   false, false,
-						   hkl_unit_angle_rad, hkl_unit_angle_deg);
+									   false, false,
+									   hkl_unit_angle_rad, hkl_unit_angle_deg);
 		}
 	}
 
@@ -80,8 +80,18 @@ public struct Hkl.Lattice
 					   hkl_unit_angle_rad, hkl_unit_angle_deg);
 	}
 
+	public Lattice.copy(Lattice lattice)
+		{
+			this.a = new Parameter.copy(lattice.a);
+			this.b = new Parameter.copy(lattice.b);
+			this.c = new Parameter.copy(lattice.c);
+			this.alpha = new Parameter.copy(lattice.alpha);
+			this.beta = new Parameter.copy(lattice.beta);
+			this.gamma = new Parameter.copy(lattice.gamma);
+		}
+
 	public bool set(double a, double b, double c,
-			double alpha, double beta, double gamma) requires (this.check_lattice_param(a, b, c, alpha, beta, gamma))
+					double alpha, double beta, double gamma) requires (this.check_lattice_param(a, b, c, alpha, beta, gamma))
 	{
 		this.a.value = a;
 		this.b.value = b;
@@ -89,6 +99,7 @@ public struct Hkl.Lattice
 		this.alpha.value = alpha;
 		this.beta.value = beta;
 		this.gamma.value = gamma;
+
 		return true;
 	}
 
@@ -132,7 +143,7 @@ public struct Hkl.Lattice
 		return true;
 	}
 
-	public bool compute_reciprocal(out Lattice reciprocal)
+	public bool reciprocal(ref Lattice reciprocal)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);
@@ -159,14 +170,14 @@ public struct Hkl.Lattice
 		double s_beta2 = D / s_gamma_s_alpha;
 		double s_beta3 = D / s_alpha_s_beta;
 
-		reciprocal.a.value = TAU * s_alpha / (this.a.value * D);
-		reciprocal.b.value = TAU * s_beta / (this.b.value * D);
-		reciprocal.c.value = TAU * s_gamma / (this.c.value * D);
-		reciprocal.alpha.value = Math.atan2(s_beta1, c_beta1);
-		reciprocal.beta.value = Math.atan2(s_beta2, c_beta2);
-		reciprocal.gamma.value = Math.atan2(s_beta3, c_beta3);
+		reciprocal = new Lattice(TAU * s_alpha / (this.a.value * D),
+								 TAU * s_beta / (this.b.value * D),
+								 TAU * s_gamma / (this.c.value * D),
+								 Math.atan2(s_beta1, c_beta1),
+								 Math.atan2(s_beta2, c_beta2),
+								 Math.atan2(s_beta3, c_beta3));
 
-		return true;
+		return false;
 	}
 
 	/* optimize the assignation */

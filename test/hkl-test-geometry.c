@@ -99,10 +99,10 @@ HKL_TEST_SUITE_FUNC(update)
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_axis_get_changed(axis1));
 	
 	hkl_geometry_update(g);
-	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), g->holders[0]->q.data[0], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), g->holders[0]->q.data[1], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(.0, g->holders[0]->q.data[2], HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(.0, g->holders[0]->q.data[3], HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), g->holders[0]->q.a, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1./sqrt(2), g->holders[0]->q.b, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(.0, g->holders[0]->q.c, HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(.0, g->holders[0]->q.d, HKL_EPSILON);
 	// now axis1 is clean
 	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_axis_get_changed(axis1));
 
@@ -185,9 +185,9 @@ HKL_TEST_SUITE_FUNC(list)
 
 	hkl_geometry_set_values_v(g, values, 3);
 	hkl_geometry_list_sort(list, g);
-	HKL_ASSERT_DOUBLES_EQUAL(0., hkl_axis_get_value(&list->geometries[0]->axes[0]), HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(10*HKL_DEGTORAD, hkl_axis_get_value(&list->geometries[1]->axes[0]), HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(30*HKL_DEGTORAD, hkl_axis_get_value(&list->geometries[2]->axes[0]), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0., hkl_axis_get_value(list->geometries[0]->axes[0]), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10*HKL_DEGTORAD, hkl_axis_get_value(list->geometries[1]->axes[0]), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(30*HKL_DEGTORAD, hkl_axis_get_value(list->geometries[2]->axes[0]), HKL_EPSILON);
 
 	return HKL_TEST_PASS;
 }

@@ -23,14 +23,14 @@ public class Hkl.Parameter {
 	public string name;
 	public Interval range;
 	public double value;
-	public Hkl.Unit? unit;
-	public Hkl.Unit? punit;
+	public weak Unit? unit;
+	public weak Unit? punit;
 	public bool not_to_fit;
 	public bool changed;
 
 	public Parameter(string name, double min, double value, double max,
-			 bool not_to_fit, bool changed,
-			 Hkl.Unit? unit, Hkl.Unit? punit)
+					 bool not_to_fit, bool changed,
+					 Unit? unit, Unit? punit)
 	{
 		this.name = name;
 		this.range.min = min;
@@ -47,10 +47,10 @@ public class Hkl.Parameter {
 		this.name = parameter.name;
 		this.range = parameter.range;
 		this.value = parameter.value;
-		this.unit = parameter.unit;
-		this.punit = parameter.punit;
 		this.not_to_fit = parameter.not_to_fit;
 		this.changed = parameter.changed;
+		this.unit = parameter.unit;
+		this.punit = parameter.punit;
 	}
 
 	public double get_value()

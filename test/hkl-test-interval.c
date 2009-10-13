@@ -40,24 +40,24 @@ HKL_TEST_SUITE_FUNC(cmp)
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(plus_interval)
+HKL_TEST_SUITE_FUNC(add_interval)
 {
 	HklInterval i_ref = {-2, 8};
 	HklInterval i1 = {-1, 4};
 	HklInterval i2 = {-1, 4};
 
-	hkl_interval_plus_interval(&i1, &i2);
+	hkl_interval_add_interval(&i1, &i2);
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(plus_double)
+HKL_TEST_SUITE_FUNC(add_double)
 {
 	HklInterval i_ref = {-1, 9};
 	HklInterval i1 = {-2, 8};
 
-	hkl_interval_plus_double(&i1, 1);
+	hkl_interval_add_double(&i1, 1);
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_interval_cmp(&i_ref, &i1));
 
 	return HKL_TEST_PASS;
@@ -328,8 +328,8 @@ HKL_TEST_SUITE_FUNC(length)
 HKL_TEST_SUITE_BEGIN
 
 HKL_TEST( cmp );
-HKL_TEST( plus_interval );
-HKL_TEST( plus_double );
+HKL_TEST( add_interval );
+HKL_TEST( add_double );
 HKL_TEST( times_interval );
 HKL_TEST( times_double );
 HKL_TEST( divides_double );
