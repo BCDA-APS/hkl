@@ -132,7 +132,7 @@ public class Hkl.Geometry
 			this.name = "E4CV";
 			this.source.set(1.54, 1.0, 0.0, 0.0);
 
-			weak Holder h = this.add_holder();
+			Holder h = this.add_holder();
 			h.add_rotation_axis("omega", 0.0, -1.0, 0.0);
 			h.add_rotation_axis("chi", 1.0, 0.0, 0.0);
 			h.add_rotation_axis("phi", 0.0, -1.0, 0.0);
@@ -213,7 +213,7 @@ public class Hkl.Geometry
 			this.update();
 		}
 
-	public unowned Holder add_holder()
+	public unowned Holder? add_holder()
 		{
 			int length = this.holders.length;
 			this.holders.resize(length + 1);

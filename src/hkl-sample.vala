@@ -28,15 +28,14 @@ public class Hkl.Sample {
 	public Matrix UB;
 	public Reflection[] reflections;
 
-	public struct Reflection {
+	public class Reflection {
 		public Geometry geometry;
 		public Detector detector;
 		public Vector hkl;
 		public Vector _hkl;
 		public bool flag;
 
-		public Reflection(Geometry g, Detector det,
-						  double h, double k, double l)
+		public Reflection(Geometry g, Detector det, double h, double k, double l)
 		{
 			Vector ki;
 
@@ -45,6 +44,7 @@ public class Hkl.Sample {
 			this.geometry = new Geometry.copy(g);
 			this.detector = det;
 			this.hkl.set(h, k, l);
+			this.flag = true;
 
 			// compute the _hkl using only the axes of the geometry
 			weak Holder holder_d = g.holders[det.idx];
@@ -67,9 +67,10 @@ public class Hkl.Sample {
 			this.detector = src.detector;
 			this.hkl = src.hkl;
 			this._hkl = src._hkl;
+			this.flag = src.flag;
 		}
 
-		public void set_hkl(double h, double k, double l) requires (Math.fabs(h) + Math.fabs(k) + Math.fabs(l) < EPSILON)
+		public void set_hkl(double h, double k, double l) requires (Math.fabs(h) + Math.fabs(k) + Math.fabs(l) > EPSILON)
 		{
 			this.hkl.set(h, k, l);
 		}
@@ -87,19 +88,19 @@ public class Hkl.Sample {
 	{
 		Matrix B;
 
-		if (!this.lattice.get_B(out B))
-			return false;
+		if (this.lattice.get_B(out B))
+			return true;
 
 		this.UB = this.U;
 		this.UB.times_matrix(B);
 
-		return true;
+		return false;
 	}
 
 	static double mono_crystal_fitness(Gsl.Vector x, void *params)
 	{
 		Sample *sample = params;
-		double *x_data = x.ptr(0);
+		double *x_data = x.data;
 
 		double euler_x = x_data[0];
 		double euler_y = x_data[1];
@@ -111,7 +112,7 @@ public class Hkl.Sample {
 		sample->lattice.beta.value = x_data[7];
 		sample->lattice.gamma.value = x_data[8];
 		sample->U.from_euler(euler_x, euler_y, euler_z);
-		if (!sample->compute_UB())
+		if (sample->compute_UB())
 			return double.NAN;
 
 		double fitness = 0.0;
@@ -121,6 +122,7 @@ public class Hkl.Sample {
 			UBh.minus_vector(reflection._hkl);
 			fitness += UBh.norm2();
 		}
+		stdout.printf(" %f", fitness);
 		return fitness;
 	}
 
@@ -147,7 +149,7 @@ public class Hkl.Sample {
 		this.reflections = new Reflection[src.reflections.length];
 		i=0;
 		foreach(weak Reflection reflection in src.reflections){
-			this.reflections[i++] = Reflection.copy(reflection);
+			this.reflections[i++] = new Reflection.copy(reflection);
 		}
 	}
 
@@ -187,11 +189,11 @@ public class Hkl.Sample {
 					       double h, double k, double l) requires (
 						       Math.fabs(h) >= EPSILON
 						       || Math.fabs(k) >= EPSILON
-						       || Math.fabs(l) < EPSILON)
+						       || Math.fabs(l) >= EPSILON)
 	{
 		int len = this.reflections.length;
 		this.reflections.resize(len + 1);
-		this.reflections[len] = Reflection(g, det, h, k, l);
+		this.reflections[len] = new Reflection(g, det, h, k, l);
 		return this.reflections[len];
 	}
 
@@ -200,10 +202,11 @@ public class Hkl.Sample {
 		return this.reflections[idx];
 	}
 
-	public bool del_reflection(uint idx)
+	public bool del_reflection(int idx)
 	{
-		return true;
-		//return this.reflections.del(idx);
+		this.reflections.move(idx+1, idx, this.reflections.length - idx - 1);
+		this.reflections.resize(this.reflections.length - 1);
+		return false;
 	}
 
 	public bool compute_UB_busing_levy(uint idx1, uint idx2)
@@ -275,10 +278,11 @@ public class Hkl.Sample {
 		do {
 			++iter;
 			status = s.iterate();
+			stdout.printf(" %d %l", status, iter);
 			if (status != 0)
 				break;
 			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.0);
-		} while (status == Gsl.Status.CONTINUE && iter < 10000U);
+		} while (status == Gsl.Status.CONTINUE && iter < 1000000U);
 		Gsl.Error.set_error_handler(null);
 
 		return s.size;

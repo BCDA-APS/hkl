@@ -38,45 +38,45 @@ public class Hkl.Lattice
 	{
 		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)){
 			this.a     = new Parameter("a", 0.0, a, a+10.0,
-									   false, false,
-									   hkl_unit_length_nm, hkl_unit_length_nm);
+						   false, true,
+						   hkl_unit_length_nm, hkl_unit_length_nm);
 			this.b     = new Parameter("b", 0.0, b, b+10.0,
-									   false, false,
-									   hkl_unit_length_nm, hkl_unit_length_nm);
+						   false, true,
+						   hkl_unit_length_nm, hkl_unit_length_nm);
 			this.c     = new Parameter("c", 0.0, c, c+10.0,
-									   false, false,
-									   hkl_unit_length_nm, hkl_unit_length_nm);
+						   false, true,
+						   hkl_unit_length_nm, hkl_unit_length_nm);
 			this.alpha = new Parameter("alpha", -Math.PI, alpha, Math.PI,
-									   false, false,
-									   hkl_unit_angle_rad, hkl_unit_angle_deg);
+						   false, true,
+						   hkl_unit_angle_rad, hkl_unit_angle_deg);
 			this.beta  = new Parameter("beta", -Math.PI, beta, Math.PI,
-									   false, false,
-									   hkl_unit_angle_rad, hkl_unit_angle_deg);
+						   false, true,
+						   hkl_unit_angle_rad, hkl_unit_angle_deg);
 			this.gamma = new Parameter("gamma", -Math.PI, gamma, Math.PI,
-									   false, false,
-									   hkl_unit_angle_rad, hkl_unit_angle_deg);
+						   false, true,
+						   hkl_unit_angle_rad, hkl_unit_angle_deg);
 		}
 	}
 
 	public Lattice.default()
 	{
 		this.a     = new Parameter("a", 0.0, 1.54, 11.54,
-					   false, false,
+					   false, true,
 					   hkl_unit_length_nm, hkl_unit_length_nm);
 		this.b     = new Parameter("b", 0.0, 1.54, 11.54,
-					   false, false,
+					   false, true,
 					   hkl_unit_length_nm, hkl_unit_length_nm);
 		this.c     = new Parameter("c", 0.0, 1.54, 11.54,
-					   false, false,
+					   false, true,
 					   hkl_unit_length_nm, hkl_unit_length_nm);
 		this.alpha = new Parameter("alpha", -Math.PI, 90*DEGTORAD, Math.PI,
-					   false, false,
+					   false, true,
 					   hkl_unit_angle_rad, hkl_unit_angle_deg);
 		this.beta  = new Parameter("beta", -Math.PI, 90*DEGTORAD, Math.PI,
-					   false, false,
+					   false, true,
 					   hkl_unit_angle_rad, hkl_unit_angle_deg);
 		this.gamma = new Parameter("gamma", -Math.PI, 90*DEGTORAD, Math.PI,
-					   false, false,
+					   false, true,
 					   hkl_unit_angle_rad, hkl_unit_angle_deg);
 	}
 
@@ -105,7 +105,7 @@ public class Hkl.Lattice
 
 	/* 
 	 * Get the B matrix from the l parameters return true if everything
-	 * goes fine. false if a problem occure.
+	 * goes fine. true if a problem occure.
 	 */
 	public bool get_B(out Matrix B)
 	{
@@ -118,7 +118,7 @@ public class Hkl.Lattice
 		if (D > 0.0)
 			D = Math.sqrt(D);
 		else
-			return false;
+			return true;
 
 		double s_alpha = Math.sin(this.alpha.value);
 		double s_beta = Math.sin(this.beta.value);
@@ -140,10 +140,10 @@ public class Hkl.Lattice
 		B.m32 = 0.0;
 		B.m33 = b22;
 
-		return true;
+		return false;
 	}
 
-	public bool reciprocal(ref Lattice reciprocal)
+	public bool reciprocal(Lattice reciprocal)
 	{
 		double c_alpha = Math.cos(this.alpha.value);
 		double c_beta = Math.cos(this.beta.value);
@@ -153,7 +153,7 @@ public class Hkl.Lattice
 		if (D > 0.0)
 			D = Math.sqrt(D);
 		else
-			return false;
+			return true;
 
 		double s_alpha = Math.sin(this.alpha.value);
 		double s_beta = Math.sin(this.beta.value);
@@ -170,12 +170,12 @@ public class Hkl.Lattice
 		double s_beta2 = D / s_gamma_s_alpha;
 		double s_beta3 = D / s_alpha_s_beta;
 
-		reciprocal = new Lattice(TAU * s_alpha / (this.a.value * D),
-								 TAU * s_beta / (this.b.value * D),
-								 TAU * s_gamma / (this.c.value * D),
-								 Math.atan2(s_beta1, c_beta1),
-								 Math.atan2(s_beta2, c_beta2),
-								 Math.atan2(s_beta3, c_beta3));
+		reciprocal.set(TAU * s_alpha / (this.a.value * D),
+					   TAU * s_beta / (this.b.value * D),
+					   TAU * s_gamma / (this.c.value * D),
+					   Math.atan2(s_beta1, c_beta1),
+					   Math.atan2(s_beta2, c_beta2),
+					   Math.atan2(s_beta3, c_beta3));
 
 		return false;
 	}

@@ -43,6 +43,7 @@ HKL_TEST_SUITE_FUNC(new)
 	HKL_ASSERT_DOUBLES_EQUAL(90*HKL_DEGTORAD, lattice->alpha->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90*HKL_DEGTORAD, lattice->beta->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90*HKL_DEGTORAD, lattice->gamma->value, HKL_EPSILON);
+
 	hkl_lattice_unref(lattice);
 
 	return HKL_TEST_PASS;
@@ -54,7 +55,7 @@ HKL_TEST_SUITE_FUNC( new_copy )
 	HklLattice *copy;
 
 	lattice = hkl_lattice_new(1.54, 1.54, 1.54,
-			90*HKL_DEGTORAD, 90*HKL_DEGTORAD, 90*HKL_DEGTORAD);
+				  90*HKL_DEGTORAD, 90*HKL_DEGTORAD, 90*HKL_DEGTORAD);
 
 	// copy constructor
 	copy = hkl_lattice_new_copy(lattice);
@@ -179,9 +180,9 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 HKL_TEST_SUITE_FUNC( get_B )
 {
 	static HklMatrix B_ref = {
-		HKL_TAU / 1.54,              0,              0,
-		0, HKL_TAU / 1.54,              0,
-		0,              0, HKL_TAU / 1.54
+		HKL_TAU / 1.54, 0, 0,
+		0, HKL_TAU / 1.54, 0,
+		0, 0, HKL_TAU / 1.54
 	};
 	HklLattice *lattice;
 	HklMatrix B;
@@ -190,7 +191,7 @@ HKL_TEST_SUITE_FUNC( get_B )
 	lattice = hkl_lattice_new(1.54, 1.54, 1.54, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD);
 
 	hkl_lattice_get_B(lattice, &B);
-	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&B_ref, &B));
+	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&B_ref, &B));
 
 	hkl_lattice_unref(lattice);
 

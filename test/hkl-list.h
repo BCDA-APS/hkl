@@ -23,7 +23,7 @@
 #define __HKL_LIST_H__
 
 #include <stdlib.h>
-#include <hkl/hkl-macros.h>
+#include <hkl-macros.h>
 
 HKL_BEGIN_DECLS
 
