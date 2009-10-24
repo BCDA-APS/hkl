@@ -5,27 +5,41 @@
 import UnitTest, os, Build, Options
 
 # the following two variables are used by the target "waf dist"
-VERSION='4.0.0'
+VERSION_FULL='4.0.0'
 APPNAME='hkl'
-
-# these variables are mandatory ('/' are converted automatically)
-srcdir = '.'
-blddir = 'build'
 
 def set_options(opt):
 	opt.tool_options('compiler_cc vala misc')
 	opt.add_option('--soleil', action='store_true', default=False, help='Build for the Soleil site')
 
 def configure(conf):
-	conf.check_tool('compiler_cc vala')
-	conf.check_cfg(package='gsl', atleast_version='1.12', mandatory=1, args='--cflags --libs')
-	conf.check_cfg(package='gobject-2.0', uselib_store='GOBJECT', atleast_version='2.12.0', mandatory=1, args='--cflags --libs')
-	conf.env['HKL_VERSION'] = VERSION.split('-')[0]
+	conf.check_tool('compiler_cc')
+	conf.check_tool('misc')
+	if Options.options.soleil:
+		conf.env['LIB_GSL'] = ['GSL', 'GSLcblas', 'm']
+		conf.env['LIBPATH_GSL'] = os.environ['SOLEIL_ROOT'] + '/sw-support/GSL/lib'
+		conf.env['CPPPATH_GSL'] = os.environ['SOLEIL_ROOT'] + '/sw-support/GSL/include'
+	else:
+		conf.check_cfg(atleast_pkgconfig_version='0.0.0')
+		conf.check_cfg(package='gsl', args='--cflags --libs')
+	conf.env['VERSION'] = VERSION_FULL.split('-')[0]
 
 def build(bld):
 	bld.add_subdirs('src test')
 
-def shutdown():
+	#install the headers
+	bld.install_files('${PREFIX}/include/hkl.h', 'include/hkl.h')
+	bld.install_files('${PREFIX}/include/hkl', 'include/hkl/*.h')
+
+	#create the pkg-config file hkl.pc.in -> hkl.pc
+	bld.new_task_gen(
+			features = 'subst',
+			source = 'hkl.pc.in',
+			target = 'hkl.pc',
+			dict = bld.env)
+	bld.install_files('${PREFIX}/lib/pkgconfig', 'hkl.pc')
+
+def check(context):
 	# Unit tests are run when "check" target is used
 	ut = UnitTest.unit_test()
 	ut.change_to_testfile_dir = True
