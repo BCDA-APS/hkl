@@ -14,8 +14,9 @@ AM_SILENT_RULES
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
-AC_PROG_CC
+AC_PROG_CC_C99
 AC_PROG_CPP
+AM_PROG_VALAC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -23,7 +24,8 @@ LT_INIT
 
 # Checks for libraries.
 AM_PROG_CC_C_O
-AX_PATH_GSL
+AM_PATH_GSL
+AM_PATH_GLIB_2_0
 
 # Checks for header files.
 AC_CHECK_HEADERS([float.h stdlib.h string.h sys/time.h])
@@ -38,7 +40,6 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([floor gettimeofday memmove memset sqrt strdup])
 
 AC_CONFIG_FILES([Makefile
-		 include/Makefile
 		 src/Makefile
 		 test/Makefile
 		 hkl.pc])

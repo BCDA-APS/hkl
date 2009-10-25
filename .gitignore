@@ -16,3 +16,16 @@ config.h.in
 config
 configure
 m4
+stamp-h1
+*.o
+*.lo
+src/*.c
+src/*.h
+.deps
+.libs
+*.la
+config.h
+libtool
+config.status
+*.stamp
+hkl.pc

@@ -1,43 +1,35 @@
 ## Process this file with automake to produce Makefile.in
 
+AM_VALAFLAGS = --pkg=gsl --header=hkl.h
+
+include_HEADERS=hkl.h
+
 lib_LTLIBRARIES = \
 	libhkl.la
 
 libhkl_la_LDFLAGS = -version-info 4:0:0
-libhkl_la_LIBS = $(GSL_LIBS)
+libhkl_la_LIBS = $(GSL_LIBS) $(GLIB_LIBS)
 libhkl_la_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/include/hkl \
-	$(GSL_CFLAGS)
+	$(GSL_CFLAGS) \
+	$(GLIB_CFLAGS)
+
 
 libhkl_la_SOURCES = \
-	hkl-axis.c \
-	hkl-detector.c \
-	hkl-geometry.c \
-	hkl-geometry-factory.c \
-	hkl-interval.c \
-	hkl-lattice.c \
-	hkl-matrix.c \
-	hkl-parameter.c \
-	hkl-pseudoaxis.c \
-	hkl-pseudoaxis-auto.c \
-	hkl-pseudoaxis-common.c \
-	hkl-pseudoaxis-common-eulerians.c \
-	hkl-pseudoaxis-common-hkl.c \
-	hkl-pseudoaxis-common-psi.c \
-	hkl-pseudoaxis-common-q.c \
-	hkl-pseudoaxis-e4cv-hkl.c \
-	hkl-pseudoaxis-e4cv-psi.c \
-	hkl-pseudoaxis-e6c-hkl.c \
-	hkl-pseudoaxis-e6c-psi.c \
-	hkl-pseudoaxis-factory.c \
-	hkl-pseudoaxis-k4cv-hkl.c \
-	hkl-pseudoaxis-k4cv-psi.c \
-	hkl-pseudoaxis-k6c-hkl.c \
-	hkl-pseudoaxis-k6c-psi.c \
-	hkl-quaternion.c \
-	hkl-sample.c \
-	hkl-source.c \
-	hkl-unit.c \
-	hkl-vector.c \
-	usage.c
+	hkl-constants.vala \
+	hkl-axis.vala \
+	hkl-detector.vala \
+	hkl-geometry.vala \
+	hkl-interval.vala \
+	hkl-lattice.vala \
+	hkl-matrix.vala \
+	hkl-parameter.vala \
+	hkl-pseudoaxis.vala \
+	hkl-pseudoaxis-auto.vala \
+	hkl-pseudoaxis-auto-e4cv.vala \
+	hkl-quaternion.vala \
+	hkl-sample.vala \
+	hkl-source.vala \
+	hkl-unit.vala \
+	hkl-vector.vala

@@ -19,7 +19,7 @@
  *
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
-public struct Hkl.Detector
+public class Hkl.Detector
 {
 	public uint idx;
 

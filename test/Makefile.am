@@ -23,11 +23,13 @@ hkl-test-parameter.c \
 hkl-test-pseudoaxis-k6c.c \
 main.c
 
-test_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS)
-test_CPPFLAGS = -I$(top_srcdir)/include
+test_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS) $(GLIB_LIBS)
+test_CFLAGS = $(GSL_CFLAGS) $(GLIB_CFLAGS)
+test_CPPFLAGS = -I$(top_srcdir)/src
 
 bench_SOURCES = \
 	bench.c
 
-bench_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS)
-bench_CPPFLAGS = -I$(top_srcdir)/include
+bench_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS) $(GLIB_LIBS)
+bench_CFLAGS = $(GSL_CFLAGS) $(GLIB_CFLAGS)
+bench_CPPFLAGS = -I$(top_srcdir)/src
