@@ -29,6 +29,9 @@ AM_PATH_GSL
 # Checks for packages
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.22.0 gobject-2.0 >= 2.22.0])
 
+# check for gtk-doc
+GTK_DOC_CHECK(1.9)
+
 # Checks for header files.
 AC_CHECK_HEADERS([float.h stdlib.h string.h sys/time.h])
 
@@ -44,5 +47,6 @@ AC_CHECK_FUNCS([floor gettimeofday memmove memset sqrt strdup])
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 test/Makefile
+		 Documentation/Makefile
 		 hkl.pc])
 AC_OUTPUT
