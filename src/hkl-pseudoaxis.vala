@@ -48,7 +48,7 @@ public abstract class Hkl.PseudoAxisEngineMode
 	public Geometry geometry_init;
 	public Detector detector_init;
 	public Sample sample_init;
-	public weak PseudoAxisEngine engine;
+	public unowned PseudoAxisEngine engine;
 
 	public PseudoAxisEngineMode(string name, string[] axes_names, Parameter[] parameters)
 		{

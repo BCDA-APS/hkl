@@ -67,7 +67,7 @@ static int RUBh_minus_Q_func(Gsl.Vector x, void *params, Gsl.Vector f)
 
 public class Hkl.PseudoAxisEngineModeHkl : Hkl.PseudoAxisEngineMode
 {
-	public PseudoAxisEngineHkl *hkl;
+	public unowned PseudoAxisEngineHkl hkl;
 
 	PseudoAxisEngineModeHkl(string name, string[] axes_names, Parameter[]? parameters)
 	{
@@ -96,10 +96,10 @@ public class Hkl.PseudoAxisEngineModeHkl : Hkl.PseudoAxisEngineMode
 
 		RUB.solve(out hkl, Q);
 
-		this.hkl = &this.engine;
-		this.hkl->h.set_value(hkl.x);
-		this.hkl->k.set_value(hkl.y);
-		this.hkl->l.set_value(hkl.z);
+		this.hkl = this.engine as PseudoAxisEngineHkl;
+		this.hkl.h.set_value(hkl.x);
+		this.hkl.k.set_value(hkl.y);
+		this.hkl.l.set_value(hkl.z);
 
 		return false;
 	}
@@ -110,7 +110,7 @@ public class Hkl.PseudoAxisEngineModeHkl : Hkl.PseudoAxisEngineMode
 		
 		Gsl.MultirootFunction f = {RUBh_minus_Q_func, 3, this};
 
-		return this.engine.solve_function(f);
+		return this.hkl.solve_function(f);
 	}
 }
 
@@ -184,7 +184,7 @@ public class Hkl.PseudoAxisEngineModeHklDoubleDiffraction : Hkl.PseudoAxisEngine
 	{
 		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {double_diffraction_func, 4, this};
-		return this.engine.solve_function(f);
+		return this.hkl.solve_function(f);
 	}
 }
 
@@ -194,9 +194,9 @@ public class Hkl.PseudoAxisEngineModeHklDoubleDiffraction : Hkl.PseudoAxisEngine
 
 public class Hkl.PseudoAxisEngineHkl : Hkl.PseudoAxisEngineAuto
 {
-	public Hkl.PseudoAxis h;
-	public Hkl.PseudoAxis k;
-	public Hkl.PseudoAxis l;
+	public PseudoAxis h;
+	public PseudoAxis k;
+	public PseudoAxis l;
 
 	public PseudoAxisEngineHkl()
 	{
@@ -243,7 +243,7 @@ public class Hkl.PseudoAxisEngineModeHklE4CVBissector : Hkl.PseudoAxisEngineMode
 	{
 		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {bissector_func, 4, this};
-		return this.engine.solve_function(f);
+		return this.hkl.solve_function(f);
 	}
 }
 
