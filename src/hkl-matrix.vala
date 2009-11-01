@@ -30,6 +30,23 @@ public struct Hkl.Matrix {
 	public double m32;
 	public double m33;
 
+	public Matrix(double m11, double m12, double m13,
+		      double m21, double m22, double m23,
+		      double m31, double m32, double m33)
+	{
+		this.set(m11, m12, m13, m21, m22, m23, m31, m32, m33);
+	}
+
+	public Matrix.from_two_vectors(Vector v1, Vector v2)
+	{
+		this.set_from_two_vectors(v1, v2);
+	}
+
+	public Matrix.from_eulers(double ex, double ey, double ez)
+	{
+		this.set_from_eulers(ex, ey, ez);
+	}
+
 	public void set(double m11, double m12, double m13,
 			double m21, double m22, double m23,
 			double m31, double m32, double m33)
@@ -43,6 +60,46 @@ public struct Hkl.Matrix {
 		this.m31 = m31;
 		this.m32 = m32;
 		this.m33 = m33;
+	}
+	public void set_from_two_vectors(Vector v1, Vector v2)
+	{
+		Vector x, y, z;
+
+		x = v1;
+		x.normalize();
+
+		z = v1;
+		z.vectorial_product(v2);
+		z.normalize();
+
+		y = z;
+		y.vectorial_product(x);
+
+		this.m11 = x.x; this.m12 = y.x; this.m13 = z.x;
+		this.m21 = x.y; this.m22 = y.y; this.m23 = z.y;
+		this.m31 = x.z; this.m32 = y.z; this.m33 = z.z;
+	}
+
+	public void set_from_eulers(double euler_x, double euler_y, double euler_z)
+	{
+		double A = Math.cos(euler_x);
+		double B = Math.sin(euler_x);
+		double C = Math.cos(euler_y);
+		double D = Math.sin(euler_y);
+		double E = Math.cos(euler_z);
+		double F = Math.sin(euler_z);
+		double AD = A *D;
+		double BD = B *D;
+
+		this.m11 = C*E;
+		this.m12 =-C*F;
+		this.m13 = D;
+		this.m21 = BD *E + A *F;
+		this.m22 =-BD *F + A *E;
+		this.m23 =-B *C;
+		this.m31 =-AD *E + B *F;
+		this.m32 = AD *F + B *E;
+		this.m33 = A *C;
 	}
 
 	[CCode (instance_pos=-1)]
@@ -71,46 +128,7 @@ public struct Hkl.Matrix {
 			return false;
 	}
 
-	public void from_two_vector(Vector v1, Vector v2)
-	{
-		Vector x, y, z;
 
-		x = v1;
-		x.normalize();
-
-		z = v1;
-		z.vectorial_product(v2);
-		z.normalize();
-
-		y = z;
-		y.vectorial_product(x);
-
-		this.m11 = x.x; this.m12 = y.x; this.m13 = z.x;
-		this.m21 = x.y; this.m22 = y.y; this.m23 = z.y;
-		this.m31 = x.z; this.m32 = y.z; this.m33 = z.z;
-	}
-
-	public void from_euler(double euler_x, double euler_y, double euler_z)
-	{
-		double A = Math.cos(euler_x);
-		double B = Math.sin(euler_x);
-		double C = Math.cos(euler_y);
-		double D = Math.sin(euler_y);
-		double E = Math.cos(euler_z);
-		double F = Math.sin(euler_z);
-		double AD = A *D;
-		double BD = B *D;
-
-		this.m11 = C*E;
-		this.m12 =-C*F;
-		this.m13 = D;
-		this.m21 = BD *E + A *F;
-		this.m22 =-BD *F + A *E;
-		this.m23 =-B *C;
-		this.m31 =-AD *E + B *F;
-		this.m32 = AD *F + B *E;
-		this.m33 = A *C;
-	}
 
 	public void to_euler(out double euler_x, out double euler_y, out double euler_z)
 	{

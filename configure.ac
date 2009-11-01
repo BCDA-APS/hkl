@@ -25,7 +25,9 @@ LT_INIT
 # Checks for libraries.
 AM_PROG_CC_C_O
 AM_PATH_GSL
-AM_PATH_GLIB_2_0
+
+# Checks for packages
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.22.0 gobject-2.0 >= 2.22.0])
 
 # Checks for header files.
 AC_CHECK_HEADERS([float.h stdlib.h string.h sys/time.h])

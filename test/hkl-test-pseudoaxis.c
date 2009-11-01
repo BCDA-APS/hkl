@@ -32,7 +32,7 @@ static int test_engine(struct hkl_test *test,
 		       HklPseudoAxisEngine *engine,
 		       HklGeometry *geometry, HklSample *sample)
 {
-	HklDetector det = {1};
+	HklDetector *det = hkl_detector_new(1);
 	size_t i, j, k, f_idx;
 	double values[HKL_LIST_LEN(engine->pseudoAxes)];
 	int miss = 0;
@@ -60,12 +60,12 @@ static int test_engine(struct hkl_test *test,
 
 			// randomize the parameters
 			for(j=0; j<HKL_LIST_LEN(engine->mode->parameters); ++j)
-				hkl_parameter_randomize(&engine->mode->parameters[j]);
+				hkl_parameter_randomize(engine->mode->parameters[j]);
 
 			// pseudo -> geometry
-			hkl_pseudo_axis_engine_init(engine, geometry, &det, sample);
+			hkl_pseudo_axis_engine_init(engine, geometry, det, sample);
 			//hkl_pseudo_axis_engine_fprintf(stderr, engine);
-			res = hkl_pseudo_axis_engine_set(engine, geometry, &det, sample);
+			res = hkl_pseudo_axis_engine_set(engine, geometry, det, sample);
 
 			// geometry -> pseudo
 			if (res == HKL_SUCCESS) {
@@ -81,7 +81,7 @@ static int test_engine(struct hkl_test *test,
 						((HklParameter *)engine->pseudoAxes[k])->value = 0.;
 
 					hkl_geometry_init_geometry(engine->geometry, engine->engines->geometries->geometries[j]);
-					hkl_pseudo_axis_engine_get(engine, engine->geometry, &det, sample);
+					hkl_pseudo_axis_engine_get(engine, engine->geometry, det, sample);
 
 					for(k=0; k<len; ++k) {
 						HKL_ASSERT_DOUBLES_EQUAL(values[k],
@@ -98,12 +98,14 @@ static int test_engine(struct hkl_test *test,
 	}
 	fprintf(stderr, "\n");
 
+	hkl_detector_unref(det);
+
 	return HKL_TEST_PASS;
 }
 
-static test_engines(struct hkl_test *test,
-		    HklPseudoAxisEngineList *engines,
-		    HklGeometry *geometry, HklSample *sample)
+static void test_engines(struct hkl_test *test,
+			 HklPseudoAxisEngineList *engines,
+			 HklGeometry *geometry, HklSample *sample)
 {
 	size_t i;
 	for(i=0; i<HKL_LIST_LEN(engines->engines); ++i)

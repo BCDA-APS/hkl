@@ -28,6 +28,11 @@ public class Hkl.Detector
 		this.idx = idx;
 	}
 
+	public Detector.copy(Detector src)
+	{
+		this.idx = src.idx;
+	}
+
 	public void compute_kf(Geometry g, out Vector kf) requires (this.idx < g.holders.length)
 	{
 		g.update();

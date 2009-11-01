@@ -64,7 +64,7 @@ public class Hkl.Sample {
 		public Reflection.copy(Reflection src)
 		{
 			this.geometry = new Geometry.copy(src.geometry);
-			this.detector = src.detector;
+			this.detector = new Detector.copy(src.detector);
 			this.hkl = src.hkl;
 			this._hkl = src._hkl;
 			this.flag = src.flag;
@@ -97,7 +97,7 @@ public class Hkl.Sample {
 		return false;
 	}
 
-	static double mono_crystal_fitness(Gsl.Vector x, void *params)
+	static double mono_crystal_fitness([Immutable] Gsl.Vector x, void *params)
 	{
 		Sample *sample = params;
 		double *x_data = x.data;
@@ -111,7 +111,8 @@ public class Hkl.Sample {
 		sample->lattice.alpha.value = x_data[6];
 		sample->lattice.beta.value = x_data[7];
 		sample->lattice.gamma.value = x_data[8];
-		sample->U.from_euler(euler_x, euler_y, euler_z);
+		sample->U.set_from_eulers(euler_x, euler_y, euler_z);
+
 		if (sample->compute_UB())
 			return double.NAN;
 
@@ -120,9 +121,8 @@ public class Hkl.Sample {
 			Vector UBh = reflection.hkl;
 			sample->UB.times_vector(ref UBh);
 			UBh.minus_vector(reflection._hkl);
-			fitness += UBh.norm2();
+			fitness += UBh.x * UBh.x + UBh.y * UBh.y + UBh.z * UBh.z;
 		}
-		stdout.printf(" %f", fitness);
 		return fitness;
 	}
 
@@ -170,9 +170,9 @@ public class Hkl.Sample {
 	}
 
 	/* TODO test */
-	public bool set_U_from_euler(double x, double y, double z)
+	public bool set_U_from_eulers(double x, double y, double z)
 	{
-		this.U.from_euler(x, y, z);
+		this.U.set_from_eulers(x, y, z);
 		this.compute_UB();
 
 		return true;
@@ -227,11 +227,11 @@ public class Hkl.Sample {
 				this.lattice.get_B(out B);
 				B.times_vector(ref h1c);
 				B.times_vector(ref h2c);
-				Tc.from_two_vector(h1c, h2c);
+				Tc.set_from_two_vectors(h1c, h2c);
 				Tc.transpose();
 
 				// compute U
-				this.U.from_two_vector(r1._hkl, r2._hkl);
+				this.U.set_from_two_vectors(r1._hkl, r2._hkl);
 				this.U.times_matrix(Tc);
 			} else
 				return true;
@@ -278,11 +278,10 @@ public class Hkl.Sample {
 		do {
 			++iter;
 			status = s.iterate();
-			stdout.printf(" %d %l", status, iter);
 			if (status != 0)
 				break;
 			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.0);
-		} while (status == Gsl.Status.CONTINUE && iter < 1000000U);
+		} while (status == Gsl.Status.CONTINUE && iter < 10000U);
 		Gsl.Error.set_error_handler(null);
 
 		return s.size;

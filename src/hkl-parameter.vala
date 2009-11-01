@@ -29,8 +29,8 @@ public class Hkl.Parameter {
 	public bool changed;
 
 	public Parameter(string name, double min, double value, double max,
-					 bool not_to_fit, bool changed,
-					 Unit? unit, Unit? punit)
+			 bool not_to_fit, bool changed,
+			 Unit? unit, Unit? punit)
 	{
 		this.name = name;
 		this.range.min = min;

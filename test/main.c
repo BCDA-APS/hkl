@@ -20,6 +20,7 @@
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
 #include <stdio.h>
+#include <glib-object.h>
 
 #include "hkl-test.h"
 
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
 	hkl_tests_init(&tests, 0);
 
 	HKL_TEST_SUITE( vector );
-	//HKL_TEST_SUITE( smatrix );
+	HKL_TEST_SUITE( matrix );
 	HKL_TEST_SUITE( quaternion );
 	//HKL_TEST_SUITE( interval );
 	HKL_TEST_SUITE( source );
@@ -44,8 +45,8 @@ int main(int argc, char **argv)
 	HKL_TEST_SUITE( parameter );
 	HKL_TEST_SUITE( lattice );
 	HKL_TEST_SUITE( sample );
-	HKL_TEST_SUITE( pseudoaxis );
-	HKL_TEST_SUITE( pseudoaxis_E4CV );
+	//HKL_TEST_SUITE( pseudoaxis );
+	HKL_TEST_SUITE( pseudoaxis_e4cv );
 	//HKL_TEST_SUITE( pseudoaxis_E6C );
 	//HKL_TEST_SUITE( pseudoaxis_K4CV );
 	//HKL_TEST_SUITE( pseudoaxis_K6C );

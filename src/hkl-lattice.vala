@@ -20,8 +20,8 @@ public class Hkl.Lattice
 
 	/* private */
 
-	bool check_lattice_param(double a, double b, double c,
-							 double alpha, double beta, double gamma)
+	bool lattice_parameters_are_valid(double a, double b, double c,
+					  double alpha, double beta, double gamma)
 	{
 		double D = 1.0 - Math.cos(alpha)*Math.cos(alpha)
 			- Math.cos(beta)*Math.cos(beta)
@@ -36,7 +36,7 @@ public class Hkl.Lattice
 
 	public Lattice(double a, double b, double c, double alpha, double beta, double gamma)
 	{
-		if(this.check_lattice_param(a, b, c, alpha, beta, gamma)){
+		if(this.lattice_parameters_are_valid(a, b, c, alpha, beta, gamma)){
 			this.a     = new Parameter("a", 0.0, a, a+10.0,
 						   false, true,
 						   hkl_unit_length_nm, hkl_unit_length_nm);
@@ -91,7 +91,7 @@ public class Hkl.Lattice
 		}
 
 	public bool set(double a, double b, double c,
-					double alpha, double beta, double gamma) requires (this.check_lattice_param(a, b, c, alpha, beta, gamma))
+			double alpha, double beta, double gamma) requires (this.lattice_parameters_are_valid(a, b, c, alpha, beta, gamma))
 	{
 		this.a.value = a;
 		this.b.value = b;

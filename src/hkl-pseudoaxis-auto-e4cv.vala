@@ -67,7 +67,7 @@ static int RUBh_minus_Q_func(Gsl.Vector x, void *params, Gsl.Vector f)
 
 public class Hkl.PseudoAxisEngineModeHkl : Hkl.PseudoAxisEngineMode
 {
-	public PseudoAxisEngineHkl engine;
+	public PseudoAxisEngineHkl *hkl;
 
 	PseudoAxisEngineModeHkl(string name, string[] axes_names, Parameter[]? parameters)
 	{
@@ -96,9 +96,10 @@ public class Hkl.PseudoAxisEngineModeHkl : Hkl.PseudoAxisEngineMode
 
 		RUB.solve(out hkl, Q);
 
-		this.engine.h.set_value(hkl.x);
-		this.engine.k.set_value(hkl.y);
-		this.engine.l.set_value(hkl.z);
+		this.hkl = &this.engine;
+		this.hkl->h.set_value(hkl.x);
+		this.hkl->k.set_value(hkl.y);
+		this.hkl->l.set_value(hkl.z);
 
 		return false;
 	}
@@ -290,6 +291,8 @@ public class Hkl.PseudoAxisEngineHklE4CV : Hkl.PseudoAxisEngineHkl
 {
 	public PseudoAxisEngineHklE4CV()
 	{
+		base();
+
 		this.add_mode(new PseudoAxisEngineModeHklE4CVBissector());
 		this.add_mode(new PseudoAxisEngineModeHklE4CVConstantOmega());
 		this.add_mode(new PseudoAxisEngineModeHklE4CVConstantChi());

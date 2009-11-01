@@ -21,6 +21,7 @@
  */
 #include <stdio.h>
 #include <sys/time.h>
+#include <glib-object.h>
 
 #include <hkl.h>
 
@@ -43,7 +44,7 @@ static void hkl_test_bench()
 	HklPseudoAxisEngineList *engines;
 	HklPseudoAxisEngine *engine;
 	HklGeometry *geom;
-	HklDetector det = {1};
+	HklDetector *det = hkl_detector_new(1);
 	HklSample *sample;
 	size_t i, j;
 	double *H, *K, *L, h, k, l;
@@ -51,9 +52,9 @@ static void hkl_test_bench()
 	struct timeval debut, fin, dt;
 	double parameters[] = {50 * HKL_DEGTORAD};
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 1);
 	sample = hkl_sample_new("test");
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
 
 	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "hkl");
 
@@ -76,7 +77,7 @@ static void hkl_test_bench()
 		gettimeofday(&debut, NULL);
 		for(i=0; i<n; ++i){
 			SET_AXES(geom, 0, 0, 0, 0, 10, 10);
-			res = hkl_pseudo_axis_engine_mode_set(engine->mode, geom, &det, sample);
+			res = hkl_pseudo_axis_engine_mode_set(engine->mode, geom, det, sample);
 		}
 		gettimeofday(&fin, NULL);
 		timersub(&fin, &debut, &dt);
@@ -86,20 +87,20 @@ static void hkl_test_bench()
 
 }
 
-hkl_test_bench_eulerians()
+void hkl_test_bench_eulerians()
 {
 	HklPseudoAxisEngineList *engines;
 	HklPseudoAxisEngine *engine;
 	HklGeometry *geom;
-	HklDetector det = {1};
+	HklDetector *det = hkl_detector_new(1);
 	HklSample *sample;
 	size_t i, f_idx;
 	double *Omega, *Chi, *Phi;
 	double parameters[] = {50 * HKL_DEGTORAD};
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 1);
 	sample = hkl_sample_new("test");
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
 
 	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "eulerians");
 
@@ -121,7 +122,7 @@ hkl_test_bench_eulerians()
 		*Phi = phi = 0;
 
 		// pseudo -> geometry
-		res = hkl_pseudo_axis_engine_mode_set(engine->mode, geom, &det, sample);
+		res = hkl_pseudo_axis_engine_mode_set(engine->mode, geom, det, sample);
 		//hkl_pseudo_axis_engine_fprintf(stdout, engine);
 
 		// geometry -> pseudo
@@ -130,7 +131,7 @@ hkl_test_bench_eulerians()
 				*Omega = *Chi = *Phi = 0;
 
 				hkl_geometry_init_geometry(engine->geometry, engines->geometries->geometries[i]);
-				hkl_pseudo_axis_engine_mode_get(engine->mode, engine->geometry, &det, sample);
+				hkl_pseudo_axis_engine_mode_get(engine->mode, engine->geometry, det, sample);
 				//hkl_pseudo_axis_engine_fprintf(stdout, engine);
 			}
 		}

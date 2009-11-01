@@ -48,6 +48,7 @@ public abstract class Hkl.PseudoAxisEngineMode
 	public Geometry geometry_init;
 	public Detector detector_init;
 	public Sample sample_init;
+	public weak PseudoAxisEngine engine;
 
 	public PseudoAxisEngineMode(string name, string[] axes_names, Parameter[] parameters)
 		{
@@ -65,7 +66,6 @@ public abstract class Hkl.PseudoAxisEngineMode
 
 			return true;
 		}
-
 }
 
 public class Hkl.PseudoAxisEngine
@@ -87,14 +87,15 @@ public class Hkl.PseudoAxisEngine
 
 	public void add_pseudoAxis(PseudoAxis pseudoAxis)
 		{
+			pseudoAxis.engine = this;
 			int len = this.pseudoAxes.length;
 			this.pseudoAxes.resize(len + 1);
 			this.pseudoAxes[len] = pseudoAxis;
-			pseudoAxis.engine = this;
 		}
 
 	public void add_mode(owned PseudoAxisEngineMode mode)
 	{
+		mode.engine = this;
 		int len = this.modes.length;
 		this.modes.resize(len + 1);
 		this.modes[len] = mode;
@@ -228,8 +229,16 @@ public class Hkl.PseudoAxisEngineList
 public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.GeometryType type)
 {
 	Hkl.PseudoAxisEngineList list = new Hkl.PseudoAxisEngineList();
-/*
+
 	switch(type){
+	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
+		list.add(new Hkl.PseudoAxisEngineHklE4CV());
+		//list.add(hkl_pseudo_axis_engine_e4cv_psi_new());
+		//list.add(hkl_pseudo_axis_engine_q_new());
+		break;
+	}
+/*
+	Switc(type){
 	case Hkl.GeometryType.TWOC_VERTICAL:
 		break;
 	case Hkl.GeometryType.EULERIAN4C_VERTICAL:

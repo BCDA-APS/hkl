@@ -1,4 +1,4 @@
-TESTS = $(check_PROGRAMS)
+TESTS = test
 
 check_PROGRAMS = test bench
 
@@ -12,15 +12,12 @@ hkl-test-pseudoaxis-e4cv.c \
 hkl-test-sample.c \
 hkl-test.c \
 hkl-test-lattice.c \
-hkl-test-pseudoaxis-e6c.c \
 hkl-test-source.c \
 hkl-test-detector.c \
-hkl-test-matrix.c \
-hkl-test-pseudoaxis-k4cv.c \
 hkl-test-vector.c \
+hkl-test-matrix.c \
 hkl-test-geometry.c \
 hkl-test-parameter.c \
-hkl-test-pseudoaxis-k6c.c \
 main.c
 
 test_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS) $(GLIB_LIBS)
