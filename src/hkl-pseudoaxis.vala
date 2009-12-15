@@ -48,24 +48,23 @@ public abstract class Hkl.PseudoAxisEngineMode
 	public Geometry geometry_init;
 	public Detector detector_init;
 	public Sample sample_init;
-	public unowned PseudoAxisEngine engine;
 
 	public PseudoAxisEngineMode(string name, string[] axes_names, Parameter[] parameters)
-		{
-			this.name = name;
-			this.axes_names = axes_names;
-			this.parameters = parameters;
-		}
+	{
+		this.name = name;
+		this.axes_names = axes_names;
+		this.parameters = parameters;
+	}
 
 	public virtual bool init(Geometry geometry, Detector detector, Sample sample)
-		{
-			geometry.update();
-			this.geometry_init = new Geometry.copy(geometry);
-			this.detector_init = detector;
-			this.sample_init = sample;
+	{
+		geometry.update();
+		this.geometry_init = new Geometry.copy(geometry);
+		this.detector_init = detector;
+		this.sample_init = sample;
 
-			return true;
-		}
+		return true;
+	}
 }
 
 public class Hkl.PseudoAxisEngine
@@ -95,7 +94,6 @@ public class Hkl.PseudoAxisEngine
 
 	public void add_mode(owned PseudoAxisEngineMode mode)
 	{
-		mode.engine = this;
 		int len = this.modes.length;
 		this.modes.resize(len + 1);
 		this.modes[len] = mode;
@@ -175,11 +173,17 @@ public class Hkl.PseudoAxisEngineList
 	public PseudoAxisEngine[] engines;
 	public GeometryList geometries;
 
+	public PseudoAxisEngineList()
+	{
+		this.geometries = new GeometryList();
+	}
+
 	public void add(PseudoAxisEngine engine)
 	{
-		int len = engines.length;
-		engines.resize(len + 1);
-		engines[len] = engine;
+		engine.engines = this;
+		int len = this.engines.length;
+		this.engines.resize(len + 1);
+		this.engines[len] = engine;
 	}
 
 	public weak PseudoAxisEngine? get_by_name(string name)
