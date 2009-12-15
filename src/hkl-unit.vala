@@ -34,10 +34,13 @@ public struct Hkl.Unit {
 	public weak string name;
 	public weak string repr;
 
-	public double factor(Hkl.Unit unit)
+	public double factor(Hkl.Unit ?unit)
 	{
 		double factor = 1.0;
 
+		if (unit == null)
+			return factor;
+		
 		switch(this.type){
 			case Hkl.UnitType.ANGLE_DEG:
 				switch(unit.type){
