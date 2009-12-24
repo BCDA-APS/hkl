@@ -3,6 +3,8 @@ TESTS = test bench
 check_PROGRAMS = test bench
 
 test_SOURCES = \
+hkl-list.h \
+hkl-macros.h \
 hkl-test.c \
 hkl-test.h \
 hkl-test-axis.c \

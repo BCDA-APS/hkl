@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.64)
+AC_PREREQ(2.65)
 AC_INIT([hkl],[4.0.0],[picca@synchrotron-soleil.fr])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
@@ -24,13 +24,10 @@ LT_INIT
 
 # Checks for libraries.
 AM_PROG_CC_C_O
-AM_PATH_GSL
+AX_PATH_GSL
 
 # Checks for packages
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.22.0 gobject-2.0 >= 2.22.0])
-
-# check for gtk-doc
-GTK_DOC_CHECK(1.9)
 
 # Checks for header files.
 AC_CHECK_HEADERS([float.h stdlib.h string.h sys/time.h])
@@ -47,6 +44,5 @@ AC_CHECK_FUNCS([floor gettimeofday memmove memset sqrt strdup])
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 test/Makefile
-		 Documentation/Makefile
 		 hkl.pc])
 AC_OUTPUT
