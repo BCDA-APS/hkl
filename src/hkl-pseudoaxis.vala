@@ -252,7 +252,7 @@ public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.Geometry
 		list.add(new Hkl.PseudoAxisEngineAutoQE4CV());
 		break;
 	case Hkl.GeometryType.KAPPA4C_VERTICAL:
-		//self->geometries->multiply = hkl_geometry_list_multiply_k4c_real;
+		list.geometries = new Hkl.GeometryListKappa4C();
 		list.add(new Hkl.PseudoAxisEngineHklK4CV());
 		list.add(new Hkl.PseudoAxisEngineAutoEuleriansK4CV());
 		list.add(new Hkl.PseudoAxisEngineAutoPsiK4CV());
@@ -264,28 +264,13 @@ public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.Geometry
 		list.add(new Hkl.PseudoAxisEngineAutoQ2E6C());
 		break;
 	case Hkl.GeometryType.KAPPA6C:
-		//self->geometries->multiply = hkl_geometry_list_multiply_k6c_real;
+		list.geometries = new Hkl.GeometryListKappa6C();
 		list.add(new Hkl.PseudoAxisEngineHklK6C());
 		list.add(new Hkl.PseudoAxisEngineAutoEuleriansK4CV());
 		list.add(new Hkl.PseudoAxisEngineAutoPsiK6C());
 		list.add(new Hkl.PseudoAxisEngineAutoQ2K6C());
 		break;
 	}
-/*
-	Switc(type){
-	case Hkl.GeometryType.EULERIAN6C:
-		list.add(hkl_pseudo_axis_engine_e6c_hkl_new());
-		list.add(hkl_pseudo_axis_engine_e6c_psi_new());
-		list.add(hkl_pseudo_axis_engine_q2_new());
-		break;
-	case Hkl.GeometryType.KAPPA6C:
-		//self->geometries->multiply = hkl_geometry_list_multiply_k6c_real;
-		list.add(hkl_pseudo_axis_engine_k6c_hkl_new());
-		list.add(hkl_pseudo_axis_engine_eulerians_new());
-		list.add(hkl_pseudo_axis_engine_k6c_psi_new());
-		list.add(hkl_pseudo_axis_engine_q2_new());
-		break;
-	}
-*/
+
 	return list;
 }
