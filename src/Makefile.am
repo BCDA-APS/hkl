@@ -27,7 +27,14 @@ libhkl_la_SOURCES = \
 	hkl-parameter.vala \
 	hkl-pseudoaxis.vala \
 	hkl-pseudoaxis-auto.vala \
+	hkl-pseudoaxis-auto-eulerians.vala \
+	hkl-pseudoaxis-auto-hkl.vala \
+	hkl-pseudoaxis-auto-psi.vala \
+	hkl-pseudoaxis-auto-q.vala \
 	hkl-pseudoaxis-auto-e4cv.vala \
+	hkl-pseudoaxis-auto-k4cv.vala \
+	hkl-pseudoaxis-auto-e6c.vala \
+	hkl-pseudoaxis-auto-k6c.vala \
 	hkl-quaternion.vala \
 	hkl-sample.vala \
 	hkl-source.vala \

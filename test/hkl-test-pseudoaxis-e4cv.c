@@ -344,6 +344,72 @@ HKL_TEST_SUITE_FUNC(q)
 }
 */
 
+HKL_TEST_SUITE_FUNC(hkl_psi_constant_vertical)
+{
+	HklPseudoAxisEngineList *engines;
+	HklPseudoAxisEngine *engine;
+	HklGeometry *geom;
+	HklDetector *detector;
+	HklSample *sample;
+	size_t i, f_idx;
+	double *H, *K, *L;
+	double h, k, l;
+	double *h_ref, *k_ref, *l_ref, *psi_ref;
+	int res;
+	double *parameters = NULL;
+
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 0);
+	sample = hkl_sample_new("test");
+
+	detector = hkl_detector_new(1);
+
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
+	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "hkl");
+
+	H = &(((HklParameter *)engine->pseudoAxes[0])->value);
+	K = &(((HklParameter *)engine->pseudoAxes[1])->value);
+	L = &(((HklParameter *)engine->pseudoAxes[2])->value);
+
+
+	hkl_pseudo_axis_engine_select_mode(engine, 5);
+	h_ref = &engine->mode->parameters[0]->value;
+	k_ref = &engine->mode->parameters[1]->value;
+	l_ref = &engine->mode->parameters[2]->value;
+	psi_ref = &engine->mode->parameters[3]->value;
+
+	// the init part
+	SET_AXES(geom, 30., 0., 0., 60.);
+	*h_ref = 1;
+	*k_ref = 1;
+	*l_ref = 0;
+	hkl_pseudo_axis_engine_init(engine, geom, detector, sample);
+
+	*H = h = 1;
+	*K = k = 0;
+	*L = l = 1;
+	res = hkl_pseudo_axis_engine_set(engine, geom, detector, sample);
+			
+	// geometry -> pseudo
+	if(res == HKL_SUCCESS){
+		//hkl_pseudo_axis_engine_fprintf(stdout, engine);
+		for(i=0; i<HKL_LIST_LEN(engines->geometries->geometries); ++i){
+			*H = *K = *L = 0;
+					
+			hkl_geometry_init_geometry(engine->geometry, engines->geometries->geometries[i]);
+			hkl_pseudo_axis_engine_get(engine, engine->geometry, detector, sample);
+			HKL_ASSERT_DOUBLES_EQUAL(h, *H, HKL_EPSILON);
+			HKL_ASSERT_DOUBLES_EQUAL(k, *K, HKL_EPSILON);
+			HKL_ASSERT_DOUBLES_EQUAL(l, *L, HKL_EPSILON);
+		}
+	}
+
+	hkl_pseudo_axis_engine_list_unref(engines);
+	hkl_sample_unref(sample);
+	hkl_geometry_unref(geom);
+
+	return HKL_TEST_PASS;
+}
+
 HKL_TEST_SUITE_BEGIN
 
 HKL_TEST( new );
@@ -352,5 +418,6 @@ HKL_TEST( degenerated );
 //HKL_TEST( psi_getter );
 //HKL_TEST( psi_setter );
 //HKL_TEST( q );
+HKL_TEST( hkl_psi_constant_vertical );
 
 HKL_TEST_SUITE_END

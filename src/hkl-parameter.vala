@@ -105,6 +105,15 @@ public class Hkl.Parameter {
 		}
 	}
 
+	public bool is_valid()
+	{
+		if(this.value < this.range.min
+		   || this.value > this.range.max)
+			return false;
+		else
+			return true;
+	}
+
 	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{

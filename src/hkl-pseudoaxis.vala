@@ -49,11 +49,10 @@ public abstract class Hkl.PseudoAxisEngineMode
 	public Detector detector_init;
 	public Sample sample_init;
 
-	public PseudoAxisEngineMode(string name, string[] axes_names, Parameter[] parameters)
+	public PseudoAxisEngineMode(string name, string[] axes_names)
 	{
 		this.name = name;
 		this.axes_names = axes_names;
-		this.parameters = parameters;
 	}
 
 	public virtual bool init(Geometry geometry, Detector detector, Sample sample)
@@ -65,16 +64,24 @@ public abstract class Hkl.PseudoAxisEngineMode
 
 		return true;
 	}
+
+	public unowned Parameter add_parameter(owned Parameter parameter)
+	{
+		int len = this.parameters.length;
+		this.parameters.resize(len + 1);
+		this.parameters[len] = parameter;
+		return parameter;
+	}
 }
 
 public class Hkl.PseudoAxisEngine
 {
-	public weak string name;
+	public string name;
 	public Geometry geometry;
-	public Detector detector;
-	public weak Sample sample;
+	public unowned Detector detector;
+	public unowned Sample sample;
 	public PseudoAxisEngineMode[] modes;
-	public weak PseudoAxisEngineMode mode;
+	public unowned PseudoAxisEngineMode mode;
 	public Axis[] axes;
 	public PseudoAxis[] pseudoAxes;
 	public PseudoAxisEngineList engines;
@@ -84,13 +91,14 @@ public class Hkl.PseudoAxisEngine
 		this.name = name;
 	}
 
-	public void add_pseudoAxis(PseudoAxis pseudoAxis)
-		{
-			pseudoAxis.engine = this;
-			int len = this.pseudoAxes.length;
-			this.pseudoAxes.resize(len + 1);
-			this.pseudoAxes[len] = pseudoAxis;
-		}
+	public unowned PseudoAxis add_pseudoAxis(owned PseudoAxis pseudoAxis)
+	{
+		pseudoAxis.engine = this;
+		int len = this.pseudoAxes.length;
+		this.pseudoAxes.resize(len + 1);
+		this.pseudoAxes[len] = pseudoAxis;
+		return pseudoAxis;
+	}
 
 	public void add_mode(owned PseudoAxisEngineMode mode)
 	{
@@ -132,6 +140,7 @@ public class Hkl.PseudoAxisEngine
 				this.engines.geometries.multiply();
 				this.engines.geometries.multiply_from_range();
 				this.engines.geometries.sort(geometry);
+				this.engines.geometries.remove_invalid();
 			}
 
 			return res;
@@ -155,8 +164,10 @@ public class Hkl.PseudoAxisEngine
 		f.printf("\nPseudoAxesEngine : \"%s\"", this.name);
 		if(this.mode != null){
 			f.printf(" %s", this.mode.name);
-			foreach(weak Parameter parameter in this.mode.parameters)
-				f.printf(" \"%s\" = %g", parameter.name, parameter.value);
+			foreach(weak Parameter parameter in this.mode.parameters){
+				f.printf("\n     ");
+				parameter.fprintf(f);
+			}
 		}
 		foreach(weak PseudoAxis pseudoAxis in this.pseudoAxes){
 			f.printf("\n     ");
@@ -237,26 +248,31 @@ public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.Geometry
 	switch(type){
 	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
 		list.add(new Hkl.PseudoAxisEngineHklE4CV());
-		//list.add(hkl_pseudo_axis_engine_e4cv_psi_new());
-		//list.add(hkl_pseudo_axis_engine_q_new());
+		list.add(new Hkl.PseudoAxisEngineAutoPsiE4CV());
+		list.add(new Hkl.PseudoAxisEngineAutoQE4CV());
+		break;
+	case Hkl.GeometryType.KAPPA4C_VERTICAL:
+		//self->geometries->multiply = hkl_geometry_list_multiply_k4c_real;
+		list.add(new Hkl.PseudoAxisEngineHklK4CV());
+		list.add(new Hkl.PseudoAxisEngineAutoEuleriansK4CV());
+		list.add(new Hkl.PseudoAxisEngineAutoPsiK4CV());
+		list.add(new Hkl.PseudoAxisEngineAutoQK4CV());
+		break;
+	case Hkl.GeometryType.EULERIAN6C:
+		list.add(new Hkl.PseudoAxisEngineHklE6C());
+		list.add(new Hkl.PseudoAxisEngineAutoPsiE6C());
+		list.add(new Hkl.PseudoAxisEngineAutoQ2E6C());
+		break;
+	case Hkl.GeometryType.KAPPA6C:
+		//self->geometries->multiply = hkl_geometry_list_multiply_k6c_real;
+		list.add(new Hkl.PseudoAxisEngineHklK6C());
+		list.add(new Hkl.PseudoAxisEngineAutoEuleriansK4CV());
+		list.add(new Hkl.PseudoAxisEngineAutoPsiK6C());
+		list.add(new Hkl.PseudoAxisEngineAutoQ2K6C());
 		break;
 	}
 /*
 	Switc(type){
-	case Hkl.GeometryType.TWOC_VERTICAL:
-		break;
-	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
-		list.add(hkl_pseudo_axis_engine_e4cv_hkl_new());
-		list.add(hkl_pseudo_axis_engine_e4cv_psi_new());
-		list.add(hkl_pseudo_axis_engine_q_new());
-		break;
-	case Hkl.GeometryType.KAPPA4C_VERTICAL:
-		//self->geometries->multiply = hkl_geometry_list_multiply_k4c_real;
-		list.add(hkl_pseudo_axis_engine_k4cv_hkl_new());
-		list.add(hkl_pseudo_axis_engine_eulerians_new());
-		list.add(hkl_pseudo_axis_engine_k4cv_psi_new());
-		list.add(hkl_pseudo_axis_engine_q_new());
-		break;
 	case Hkl.GeometryType.EULERIAN6C:
 		list.add(hkl_pseudo_axis_engine_e6c_hkl_new());
 		list.add(hkl_pseudo_axis_engine_e6c_psi_new());

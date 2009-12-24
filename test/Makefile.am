@@ -1,17 +1,20 @@
-TESTS = test
+TESTS = test bench
 
 check_PROGRAMS = test bench
 
 test_SOURCES = \
+hkl-test.c \
 hkl-test.h \
-hkl-test-pseudoaxis.c \
-hkl-test-quaternion.c \
 hkl-test-axis.c \
 hkl-test-interval.c \
-hkl-test-pseudoaxis-e4cv.c \
-hkl-test-sample.c \
-hkl-test.c \
 hkl-test-lattice.c \
+hkl-test-pseudoaxis.c \
+hkl-test-pseudoaxis-e4cv.c \
+hkl-test-pseudoaxis-k4cv.c \
+hkl-test-pseudoaxis-e6c.c \
+hkl-test-pseudoaxis-k6c.c \
+hkl-test-quaternion.c \
+hkl-test-sample.c \
 hkl-test-source.c \
 hkl-test-detector.c \
 hkl-test-vector.c \

@@ -52,9 +52,9 @@ static void hkl_test_bench()
 	struct timeval debut, fin, dt;
 	double parameters[] = {50 * HKL_DEGTORAD};
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 1);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
 	sample = hkl_sample_new("test");
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
 
 	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "hkl");
 
@@ -98,9 +98,9 @@ void hkl_test_bench_eulerians()
 	double *Omega, *Chi, *Phi;
 	double parameters[] = {50 * HKL_DEGTORAD};
 
-	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, parameters, 1);
+	geom = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
 	sample = hkl_sample_new("test");
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
+	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
 
 	engine = hkl_pseudo_axis_engine_list_get_by_name(engines, "eulerians");
 

@@ -45,11 +45,11 @@ int main(int argc, char **argv)
 	HKL_TEST_SUITE( parameter );
 	HKL_TEST_SUITE( lattice );
 	HKL_TEST_SUITE( sample );
-	//HKL_TEST_SUITE( pseudoaxis );
+	HKL_TEST_SUITE( pseudoaxis );
 	HKL_TEST_SUITE( pseudoaxis_e4cv );
-	//HKL_TEST_SUITE( pseudoaxis_E6C );
-	//HKL_TEST_SUITE( pseudoaxis_K4CV );
-	//HKL_TEST_SUITE( pseudoaxis_K6C );
+	HKL_TEST_SUITE( pseudoaxis_E6C );
+	HKL_TEST_SUITE( pseudoaxis_K4CV );
+	HKL_TEST_SUITE( pseudoaxis_K6C );
 
 	res = hkl_tests_run(&tests);
 	hkl_tests_release(&tests);
