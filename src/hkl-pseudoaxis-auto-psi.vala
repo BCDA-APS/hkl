@@ -193,7 +193,6 @@ public class Hkl.PseudoAxisEngineModePsi : Hkl.PseudoAxisEngineMode
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {psi_func, 4, this.engine};
 		return this.engine.solve_function(f);
 	}

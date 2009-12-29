@@ -78,8 +78,6 @@ int hkl_tests_run(struct hkl_tests * tests)
 		if (!hkl_test_run(test)) {
 			fprintf(stderr, "\n%s:%d: FAIL %s\n", test->file, test->line, test->name);
 			exit(-1);
-			res = -1;
-			break;
 		} else
 			fprintf(stdout, ".");
 	}

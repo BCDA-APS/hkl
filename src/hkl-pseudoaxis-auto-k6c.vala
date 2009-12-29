@@ -90,7 +90,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaBissectorHorizontal : Hkl.PseudoAxi
 		Gsl.MultirootFunction f1 = {bissector_h_f1_func, 5, this.engine};
 		Gsl.MultirootFunction f2 = {bissector_h_f2_func, 5, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 
@@ -163,7 +162,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaConstantKphiHorizontal : Hkl.Pseudo
 		Gsl.MultirootFunction f1 = {constant_kphi_h_f1_func, 4, this.engine};
 		Gsl.MultirootFunction f2 = {constant_kphi_h_f2_func, 4, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 
@@ -247,7 +245,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaConstantPhiHorizontal : Hkl.PseudoA
 		Gsl.MultirootFunction f1 = {constant_phi_h_f1_func, 5, this.engine};
 		Gsl.MultirootFunction f2 = {constant_phi_h_f2_func, 5, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 
@@ -296,7 +293,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaDoubleDiffractionHorizontal : Hkl.P
 		bool status = false;
 		Gsl.MultirootFunction f1 = {double_diffraction_h_func, 5, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 
 		return status;

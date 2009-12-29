@@ -53,7 +53,6 @@ public class Hkl.PseudoAxisEngineModeHklE6CBissectorHorizontal : Hkl.PseudoAxisE
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {bissector_horizontal_func, 5, this.engine};
 		return this.engine.solve_function(f);
 	}
@@ -88,7 +87,6 @@ public class Hkl.PseudoAxisEngineModeHklE6CBissectorVertical : Hkl.PseudoAxisEng
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {bissector_vertical_func, 4, this.engine};
 		return this.engine.solve_function(f);
 	}

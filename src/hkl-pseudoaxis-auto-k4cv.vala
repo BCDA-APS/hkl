@@ -84,7 +84,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaBissector : Hkl.PseudoAxisEngineMod
 		Gsl.MultirootFunction f1 = {bissector_f1_func, 4, this.engine};
 		Gsl.MultirootFunction f2 = {bissector_f2_func, 4, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 
@@ -164,7 +163,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaConstantOmega : Hkl.PseudoAxisEngin
 		Gsl.MultirootFunction f1 = {constant_omega_f1_func, 4, this.engine};
 		Gsl.MultirootFunction f2 = {constant_omega_f2_func, 4, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 
@@ -242,7 +240,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaConstantChi : Hkl.PseudoAxisEngineM
 		Gsl.MultirootFunction f1 = {constant_chi_f1_func, 4, this.engine};
 		Gsl.MultirootFunction f2 = {constant_chi_f2_func, 4, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 
@@ -322,7 +319,6 @@ public class Hkl.PseudoAxisEngineModeHklKappaConstantPhi : Hkl.PseudoAxisEngineM
 		Gsl.MultirootFunction f1 = {constant_phi_f1_func, 4, this.engine};
 		Gsl.MultirootFunction f2 = {constant_phi_f2_func, 4, this.engine};
 
-		this.engine.prepare_internal(geometry, detector, sample);
 		status |= this.engine.solve_function(f1);
 		status |= this.engine.solve_function(f2);
 

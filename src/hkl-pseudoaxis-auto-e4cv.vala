@@ -49,7 +49,6 @@ public class Hkl.PseudoAxisEngineModeHklE4CVBissector : Hkl.PseudoAxisEngineMode
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {bissector_func, 4, this.engine};
 		return this.engine.solve_function(f);
 	}

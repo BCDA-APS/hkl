@@ -87,7 +87,6 @@ class Hkl.PseudoAxisEngineModeQ : Hkl.PseudoAxisEngineMode
 
 	public override bool set(Geometry geometry,Detector detector,Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {q_func, 1, this.engine};
 		return this.engine.solve_function(f);
 	}
@@ -187,7 +186,6 @@ class Hkl.PseudoAxisEngineModeQ2 : Hkl.PseudoAxisEngineMode
 
 	public override bool set(Geometry geometry,Detector detector,Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {q2_func, 2, this.engine};
 		return this.engine.solve_function(f);
 	}

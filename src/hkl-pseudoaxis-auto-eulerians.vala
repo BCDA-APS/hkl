@@ -72,8 +72,6 @@ class Hkl.PseudoAxisEngineModeEulerians : Hkl.PseudoAxisEngineMode
 		double alpha = 50.0 * Hkl.DEGTORAD;
 		Gsl.Vector angles = new Gsl.Vector(3);
 
-		this.engine.prepare_internal(geometry, detector, sample);
-
 		if (Math.fabs(this.engine.chi.value) <= alpha * 2){
 			double p = Math.asin(Math.tan(this.engine.chi.value/2.0)/Math.tan(alpha));
 

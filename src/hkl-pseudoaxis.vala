@@ -78,7 +78,7 @@ public class Hkl.PseudoAxisEngine
 {
 	public string name;
 	public Geometry geometry;
-	public unowned Detector detector;
+	public Detector detector;
 	public unowned Sample sample;
 	public PseudoAxisEngineMode[] modes;
 	public unowned PseudoAxisEngineMode mode;
@@ -119,43 +119,50 @@ public class Hkl.PseudoAxisEngine
 	public void select_mode(int idx) requires (idx < this.modes.length)
 	{
 		this.mode = this.modes[idx];
+		this.prepare_internal(this.geometry, this.detector, this.sample);
 	}
 
-	public bool init(Geometry geometry, Detector detector, Sample sample)
-		{
-			return this.mode.init(geometry, detector, sample);
+	public bool init()
+	{
+		return this.mode.init(this.engines.geometry,
+				      this.engines.detector,
+				      this.engines.sample);
+	}
+
+	public bool get()
+	{
+		return this.mode.get(this.engines.geometry,
+				     this.engines.detector,
+				     this.engines.sample);
+	}
+
+	public bool set()
+	{
+		bool res;
+
+		this.engines.geometries.clear();
+		res = this.mode.set(this.geometry,
+				    this.detector,
+				    this.sample);
+		if(!res){
+			this.engines.geometries.multiply();
+			this.engines.geometries.multiply_from_range();
+			this.engines.geometries.sort(this.engines.geometry);
+			this.engines.geometries.remove_invalid();
 		}
 
-	public bool get(Geometry geometry, Detector detector, Sample sample)
-		{
-			return this.mode.get(geometry, detector, sample);
-		}
-
-	public bool set(Geometry geometry, Detector detector, Sample sample)
-		{
-			bool res;
-
-			res = this.mode.set(geometry, detector, sample);
-			if(!res){
-				this.engines.geometries.multiply();
-				this.engines.geometries.multiply_from_range();
-				this.engines.geometries.sort(geometry);
-				this.engines.geometries.remove_invalid();
-			}
-
-			return res;
-		}
+		return res;
+	}
 
 	public void prepare_internal(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.geometry = new Geometry.copy(geometry);
-		this.detector = detector;
-		this.sample = sample;
+		this.geometry = new Geometry.copy(this.engines.geometry);
+		this.detector = new Detector.copy(this.engines.detector);
+		this.sample = this.engines.sample;
 		this.axes.resize(this.mode.axes_names.length);
 		int i=0;
 		foreach(weak string name in this.mode.axes_names)
 			this.axes[i++] = this.geometry.get_axis_by_name(name);
-		this.engines.geometries.clear();
 	}
 
 	[CCode (instance_pos=-1)]
@@ -183,6 +190,9 @@ public class Hkl.PseudoAxisEngineList
 {
 	public PseudoAxisEngine[] engines;
 	public GeometryList geometries;
+	public Geometry geometry;
+	public Detector detector;
+	public Sample sample;
 
 	public PseudoAxisEngineList()
 	{
@@ -222,12 +232,22 @@ public class Hkl.PseudoAxisEngineList
 		this.engines.resize(0);
 	}
 
-	public bool getter(Geometry geometry, Detector detector, Sample sample)
+	public void init(Geometry geometry, Detector detector, Sample sample)
+	{
+		this.geometry = geometry;
+		this.detector = detector;
+		this.sample = sample;
+
+		foreach(weak PseudoAxisEngine engine in this.engines)
+			engine.prepare_internal(this.geometry, this.detector, this.sample);
+	}
+
+	public bool getter()
 	{
 		bool res = true;
 
 		foreach(weak PseudoAxisEngine engine in this.engines)
-			if(!engine.mode.get(geometry, detector, sample))
+			if(!engine.mode.get(this.geometry, this.detector, this.sample))
 				res = false;
 
 		return res;

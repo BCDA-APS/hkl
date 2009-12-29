@@ -19,18 +19,27 @@
  *
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
+
+public enum Hkl.DetectorType
+{
+	0D,
+}
+
 public class Hkl.Detector
 {
 	public uint idx;
+	public unowned Holder? holder;
 
 	public Detector(uint idx)
 	{
 		this.idx = idx;
+		this.holder = null;
 	}
 
 	public Detector.copy(Detector src)
 	{
 		this.idx = src.idx;
+		this.holder = src.holder;
 	}
 
 	public void compute_kf(Geometry g, out Vector kf) requires (this.idx < g.holders.length)
@@ -41,4 +50,25 @@ public class Hkl.Detector
 		kf = Vector(TAU / g.source.wave_length, 0.0, 0.0);
 		kf.rotated_quaternion(holder.q);
 	}
+
+	public void attach_to_holder(Holder? holder)
+	{
+		this.holder = holder;
+	}
+}
+
+public static Hkl.Detector hkl_detector_factory_new(Hkl.DetectorType type)
+{
+	Hkl.Detector detector;
+
+	switch(type) {
+	case Hkl.DetectorType.0D:
+		detector = new Hkl.Detector(0);
+		break;
+	default:
+		detector = new Hkl.Detector(0);
+		break;
+	}
+
+	return detector;
 }

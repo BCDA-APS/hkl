@@ -107,8 +107,6 @@ public class Hkl.PseudoAxisEngineModeHkl : Hkl.PseudoAxisEngineMode
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
-		
 		Gsl.MultirootFunction f = {RUBh_minus_Q_func, 3, this.engine};
 
 		return this.engine.solve_function(f);
@@ -187,7 +185,6 @@ public class Hkl.PseudoAxisEngineModeHklDoubleDiffraction : Hkl.PseudoAxisEngine
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {double_diffraction_func, 4, this.engine};
 		return this.engine.solve_function(f);
 	}
@@ -341,7 +338,6 @@ public class Hkl.PseudoAxisEngineModeHklConstantPsi : Hkl.PseudoAxisEngineModeHk
 
 	public override bool set(Geometry geometry, Detector detector, Sample sample)
 	{
-		this.engine.prepare_internal(geometry, detector, sample);
 		Gsl.MultirootFunction f = {constant_psi_func, 4, this.engine};
 		return this.engine.solve_function(f);
 	}
