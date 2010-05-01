@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
@@ -23,11 +23,11 @@
 #define __HKL_LIST_H__
 
 #include <stdlib.h>
-#include <hkl-macros.h>
+#include <hkl/hkl-macros.h>
 
 HKL_BEGIN_DECLS
 
-#define HKL_LIST_LEN(array) array ## _length1
+#define HKL_LIST_LEN(array) array ## _len
 
 #define HKL_LIST(type, name) type *name; size_t HKL_LIST_LEN(name)
 

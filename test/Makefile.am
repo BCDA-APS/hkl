@@ -1,12 +1,21 @@
-TESTS = test bench
+TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = test bench
+
+AM_CPPFLAGS = -std=c89 -ansi -pedantic -D_BSD_SOURCE \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/hkl
+
+AM_LDFLAGS = $(top_builddir)/hkl/libhkl.la $(GSL_LIBS)
 
 test_SOURCES = \
 hkl-list.h \
 hkl-macros.h \
 hkl-test.c \
 hkl-test.h \
+hkl-test-error.c \
+hkl-test-pseudoaxis.c \
+hkl-test-quaternion.c \
 hkl-test-axis.c \
 hkl-test-interval.c \
 hkl-test-lattice.c \
@@ -25,13 +34,12 @@ hkl-test-geometry.c \
 hkl-test-parameter.c \
 main.c
 
-test_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS) $(GLIB_LIBS)
-test_CFLAGS = $(GSL_CFLAGS) $(GLIB_CFLAGS)
-test_CPPFLAGS = -I$(top_srcdir)/src
-
 bench_SOURCES = \
 	bench.c
 
-bench_LDADD = $(top_builddir)/src/libhkl.la $(GSL_LIBS) $(GLIB_LIBS)
-bench_CFLAGS = $(GSL_CFLAGS) $(GLIB_CFLAGS)
-bench_CPPFLAGS = -I$(top_srcdir)/src
+# Support for GNU Flymake, in Emacs.
+check-syntax: AM_CFLAGS += -fsyntax-only -pipe
+check-syntax:
+	test -z "$(CHK_SOURCES)" || $(COMPILE) $(CHK_SOURCES)
+
+.PHONY: check-syntax

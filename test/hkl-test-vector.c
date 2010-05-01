@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
@@ -172,7 +172,7 @@ HKL_TEST_SUITE_FUNC(rotated_around_vector)
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(times_smatrix)
+HKL_TEST_SUITE_FUNC(times_matrix)
 {
 	HklMatrix m = {
 		1.0, 3.0,-2.0,
@@ -214,7 +214,7 @@ HKL_TEST( vectorial_product );
 HKL_TEST( angle );
 HKL_TEST( oriented_angle );
 HKL_TEST( rotated_around_vector );
-HKL_TEST( times_smatrix );
+HKL_TEST( times_matrix );
 HKL_TEST( project_on_plan );
 
 HKL_TEST_SUITE_END

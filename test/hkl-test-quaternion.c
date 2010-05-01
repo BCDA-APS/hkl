@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
@@ -47,40 +47,40 @@ HKL_TEST_SUITE_FUNC(cmp)
 	HklQuaternion q = {1., 2., 3., 4.};
 	HklQuaternion q1 = {1., 1., 3., 4.};
 
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref, &q));
-	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref, &q1));
-
-	// test the assignation
-	q1 = q_ref;
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref, &q));
 	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref, &q1));
+
+	/* test the assignation */
+	q1 = q_ref;
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref, &q1));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(from_vector)
+HKL_TEST_SUITE_FUNC(init_from_vector)
 {
 	HklQuaternion q_ref = {0, 1, -1, .5};
 	HklVector v = {1., -1., .5};
 	HklQuaternion q;
 
 	hkl_quaternion_init_from_vector(&q, &v);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref, &q));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref, &q));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(from_angle_and_axe)
+HKL_TEST_SUITE_FUNC(init_from_angle_and_axe)
 {
 	HklQuaternion q_ref1 = {1, 0, 0, 0};
 	HklQuaternion q_ref2 = {sqrt(2.)/2., sqrt(2./9.), -sqrt(2./9.), sqrt(1./18.)};
 	HklVector v_ref2 = {1., -1., .5};
 	HklQuaternion q;
 
-	hkl_quaternion_init_from_angle_and_axis(&q, 0, &v_ref2);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref1, &q));
+	hkl_quaternion_init_from_angle_and_axe(&q, 0, &v_ref2);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref1, &q));
 
-	hkl_quaternion_init_from_angle_and_axis(&q, 90. * HKL_DEGTORAD, &v_ref2);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref2, &q));
+	hkl_quaternion_init_from_angle_and_axe(&q, 90. * HKL_DEGTORAD, &v_ref2);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref2, &q));
 
 	return HKL_TEST_PASS;
 }
@@ -91,7 +91,7 @@ HKL_TEST_SUITE_FUNC(times_quaternion)
 	HklQuaternion q = {1., 2., 3., 4.};
 
 	hkl_quaternion_times_quaternion(&q, &q);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref, &q));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref, &q));
 
 	return HKL_TEST_PASS;
 }
@@ -111,12 +111,12 @@ HKL_TEST_SUITE_FUNC(conjugate)
 	HklQuaternion q = {1., 2., 3., 4.};
 
 	hkl_quaternion_conjugate(&q);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_quaternion_cmp(&q_ref, &q));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_quaternion_cmp(&q_ref, &q));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(to_smatrix)
+HKL_TEST_SUITE_FUNC(to_matrix)
 {
 	HklQuaternion q_ref = {1./sqrt(2), 0, 0, 1./sqrt(2)};
 	HklMatrix m_ref = {0,-1, 0,
@@ -125,7 +125,7 @@ HKL_TEST_SUITE_FUNC(to_smatrix)
 	HklMatrix m;
 
 	hkl_quaternion_to_matrix(&q_ref, &m);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m_ref, &m));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &m));
 
 	return HKL_TEST_PASS;
 }
@@ -143,15 +143,15 @@ HKL_TEST_SUITE_FUNC(to_angle_and_axe)
 	HklQuaternion q;
 
 
-	// test the q = (1, 0, 0, 0) solution axe == (0, 0, 0) and angle = 0.
+	/* test the q = (1, 0, 0, 0) solution axe == (0, 0, 0) and angle = 0. */
 	hkl_quaternion_to_angle_and_axe(&q_I, &angle, &v);
 	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&v_null, &v));
 	HKL_ASSERT_DOUBLES_EQUAL(0., angle, HKL_EPSILON);
 
-	// test other cases
+	/* test other cases */
 	for(i=-180; i<180; i++) {
 		angle_ref = i *  HKL_DEGTORAD;
-		hkl_quaternion_init_from_angle_and_axis(&q, angle_ref, &v_ref);
+		hkl_quaternion_init_from_angle_and_axe(&q, angle_ref, &v_ref);
 		hkl_quaternion_to_angle_and_axe(&q, &angle, &v);
 
 		if (!hkl_vector_cmp(&v_ref, &v))
@@ -167,12 +167,12 @@ HKL_TEST_SUITE_BEGIN
 
 	HKL_TEST( assignment );
 	HKL_TEST( cmp );
-	HKL_TEST( from_vector );
-	HKL_TEST( from_angle_and_axe );
+	HKL_TEST( init_from_vector );
+	HKL_TEST( init_from_angle_and_axe );
 	HKL_TEST( times_quaternion );
 	HKL_TEST( norm2 );
 	HKL_TEST( conjugate );
-	HKL_TEST( to_smatrix );
+	HKL_TEST( to_matrix );
 	HKL_TEST( to_angle_and_axe );
 
 HKL_TEST_SUITE_END

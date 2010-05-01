@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
@@ -32,7 +32,12 @@ HKL_TEST_SUITE_FUNC(new)
 {
 	HklLattice *lattice;
 
-	// but can create this one
+	/* can not set this lattice */
+	lattice = hkl_lattice_new(1.54, 1.54, 1.54,
+			90*HKL_DEGTORAD, 10*HKL_DEGTORAD, 120*HKL_DEGTORAD);
+	HKL_ASSERT_POINTER_EQUAL(NULL, lattice);
+
+	/* but can create this one */
 	lattice = hkl_lattice_new(1.54, 1.54, 1.54,
 				  90*HKL_DEGTORAD, 90*HKL_DEGTORAD, 90*HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(0, !lattice);
@@ -55,9 +60,9 @@ HKL_TEST_SUITE_FUNC( new_copy )
 	HklLattice *copy;
 
 	lattice = hkl_lattice_new(1.54, 1.54, 1.54,
-				  90*HKL_DEGTORAD, 90*HKL_DEGTORAD, 90*HKL_DEGTORAD);
+			90*HKL_DEGTORAD, 90*HKL_DEGTORAD, 90*HKL_DEGTORAD);
 
-	// copy constructor
+	/* copy constructor */
 	copy = hkl_lattice_new_copy(lattice);
 
 	HKL_ASSERT_DOUBLES_EQUAL(1.54, copy->a->value, HKL_EPSILON);
@@ -77,10 +82,10 @@ HKL_TEST_SUITE_FUNC(set)
 {
 	HklLattice *lattice;
 
-	// can not set this lattice
+	/* can not set this lattice */
 	lattice = hkl_lattice_new_default();
 
-	// but can create this one
+	/* but can create this one */
 	hkl_lattice_set(lattice, 1.54, 1.54, 1.54,
 			90*HKL_DEGTORAD, 91*HKL_DEGTORAD, 92*HKL_DEGTORAD);
 
@@ -103,7 +108,7 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 	lattice = hkl_lattice_new_default();
 	reciprocal = hkl_lattice_new_default();
 
-	// cubic
+	/* cubic */
 	hkl_lattice_set(lattice, 1.54, 1.54, 1.54,
 			90*HKL_DEGTORAD, 90*HKL_DEGTORAD, 90*HKL_DEGTORAD);
 
@@ -116,7 +121,7 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->beta->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->gamma->value, HKL_EPSILON);
 
-	//orthorombic
+	/* orthorombic */
 	hkl_lattice_set(lattice, 1., 3., 4., 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(HKL_SUCCESS, hkl_lattice_reciprocal(lattice, reciprocal));
 
@@ -127,7 +132,7 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->beta->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->gamma->value, HKL_EPSILON);
 
-	// hexagonal1
+	/* hexagonal1 */
 	hkl_lattice_set(lattice, 1., 2., 1., 90 * HKL_DEGTORAD, 120 * HKL_DEGTORAD, 90 * HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(HKL_SUCCESS, hkl_lattice_reciprocal(lattice, reciprocal));
 
@@ -138,7 +143,7 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 	HKL_ASSERT_DOUBLES_EQUAL(60. * HKL_DEGTORAD, reciprocal->beta->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->gamma->value, HKL_EPSILON);
 
-	// hexagonal2
+	/* hexagonal2 */
 	hkl_lattice_set(lattice, 2., 1., 1., 120 * HKL_DEGTORAD, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(HKL_SUCCESS, hkl_lattice_reciprocal(lattice, reciprocal));
 
@@ -149,7 +154,7 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->beta->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(90. * HKL_DEGTORAD, reciprocal->gamma->value, HKL_EPSILON);
 
-	// triclinic1
+	/* triclinic1 */
 	hkl_lattice_set(lattice, 9.32, 8.24, 13.78, 91.23 * HKL_DEGTORAD, 93.64 * HKL_DEGTORAD, 122.21 * HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(HKL_SUCCESS, hkl_lattice_reciprocal(lattice, reciprocal));
 
@@ -160,7 +165,7 @@ HKL_TEST_SUITE_FUNC( reciprocal )
 	HKL_ASSERT_DOUBLES_EQUAL(1.482101482, reciprocal->beta->value, HKL_EPSILON);
 	HKL_ASSERT_DOUBLES_EQUAL(1.0055896011, reciprocal->gamma->value, HKL_EPSILON);
 
-	// triclinic2
+	/* triclinic2 */
 	hkl_lattice_set(lattice, 18.423, 18.417, 18.457, 89.99 * HKL_DEGTORAD, 89.963 * HKL_DEGTORAD, 119.99 * HKL_DEGTORAD);
 	HKL_ASSERT_EQUAL(HKL_SUCCESS, hkl_lattice_reciprocal(lattice, reciprocal));
 
@@ -187,13 +192,38 @@ HKL_TEST_SUITE_FUNC( get_B )
 	HklLattice *lattice;
 	HklMatrix B;
 
-	// cubic
+	/* cubic */
 	lattice = hkl_lattice_new(1.54, 1.54, 1.54, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD);
 
 	hkl_lattice_get_B(lattice, &B);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&B_ref, &B));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&B_ref, &B));
 
-	hkl_lattice_unref(lattice);
+	hkl_lattice_free(lattice);
+
+	return HKL_TEST_PASS;
+}
+
+HKL_TEST_SUITE_FUNC( get_1_B )
+{
+	static HklMatrix I_ref = {{{1, 0, 0},
+				   {0, 1, 0},
+				   {0, 0, 1}}};
+	HklLattice *lattice;
+	HklMatrix I;
+	HklMatrix B_1;
+
+	/* cubic */
+	lattice = hkl_lattice_new(1.54, 1.54, 1.54,
+				  90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD, 90 * HKL_DEGTORAD);
+
+	hkl_lattice_get_B(lattice, &I);
+	hkl_lattice_get_1_B(lattice, &B_1);
+
+	/* B times B^-1 = Identity */
+	hkl_matrix_times_matrix(&I, &B_1);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&I_ref, &I));
+
+	hkl_lattice_free(lattice);
 
 	return HKL_TEST_PASS;
 }
@@ -205,5 +235,6 @@ HKL_TEST( new_copy );
 HKL_TEST( set );
 HKL_TEST( reciprocal );
 HKL_TEST( get_B );
+HKL_TEST( get_1_B );
 
 HKL_TEST_SUITE_END

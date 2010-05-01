@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
@@ -56,8 +56,8 @@ HKL_TEST_SUITE_FUNC(cmp)
 			3.0, 4.0, 5.0,
 			6.0, 7.0, 8.0};
 
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m1, &m1));
-	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m1, &m2));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m1, &m1));
+	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m1, &m2));
 
 	return HKL_TEST_PASS;
 }
@@ -70,25 +70,25 @@ HKL_TEST_SUITE_FUNC(assignement)
 	HklMatrix m;
 
 	m = m1;
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m1, &m));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m1, &m));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(set_from_eulers)
+HKL_TEST_SUITE_FUNC(init_from_euler)
 {
 	HklMatrix m_ref = {1./2.             ,             -1./2., sqrt(2)/2.,
 			   sqrt(2.)/4.+1./2. , -sqrt(2.)/4.+1./2.,     -1./2.,
 			   -sqrt(2.)/4.+1./2.,  sqrt(2.)/4.+1./2.,      1./2.};
 	HklMatrix m;
 
-	hkl_matrix_set_from_eulers(&m, 45.*HKL_DEGTORAD, 45.*HKL_DEGTORAD, 45.*HKL_DEGTORAD);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m_ref, &m));
+	hkl_matrix_init_from_euler(&m, 45.*HKL_DEGTORAD, 45.*HKL_DEGTORAD, 45.*HKL_DEGTORAD);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &m));
 
 	return HKL_TEST_PASS;
 }
 
-HKL_TEST_SUITE_FUNC(set_from_two_vectors)
+HKL_TEST_SUITE_FUNC(init_from_two_vector)
 {
 	HklVector v1 = {0.0, 1.0, 2.0};
 	HklVector v2 = {1.0, 2.0, 3.0};
@@ -98,8 +98,8 @@ HKL_TEST_SUITE_FUNC(set_from_two_vectors)
 	};
 	HklMatrix m;
 
-	hkl_matrix_set_from_two_vectors(&m, &v1, &v2);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m_ref, &m));
+	hkl_matrix_init_from_two_vector(&m, &v1, &v2);
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &m));
 
 	return HKL_TEST_PASS;
 }
@@ -115,7 +115,7 @@ HKL_TEST_SUITE_FUNC(times_vector)
 	HklVector v_ref = {1, 35, 1};
 
 	hkl_matrix_times_vector(&m, &v);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_vector_cmp(&v_ref, &v));
+	HKL_ASSERT_EQUAL(0, hkl_vector_cmp(&v_ref, &v));
 
 	return HKL_TEST_PASS;
 }
@@ -135,7 +135,7 @@ HKL_TEST_SUITE_FUNC(times_matrix)
 	};
 
 	hkl_matrix_times_matrix(&m, &m);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m_ref, &m));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &m));
 
 	return HKL_TEST_PASS;
 }
@@ -155,7 +155,7 @@ HKL_TEST_SUITE_FUNC(transpose)
 	};
 
 	hkl_matrix_transpose(&m);
-	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_matrix_cmp(&m_ref, &m));
+	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_matrix_cmp(&m_ref, &m));
 
 	return HKL_TEST_PASS;
 }
@@ -165,8 +165,8 @@ HKL_TEST_SUITE_BEGIN
 	HKL_TEST(init);
 	HKL_TEST(cmp);
 	HKL_TEST(assignement);
-	HKL_TEST(set_from_eulers);
-	HKL_TEST(set_from_two_vectors);
+	HKL_TEST(init_from_euler);
+	HKL_TEST(init_from_two_vector);
 	HKL_TEST(times_vector);
 	HKL_TEST(times_matrix);
 	HKL_TEST(transpose);

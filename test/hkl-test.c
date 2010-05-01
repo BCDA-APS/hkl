@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
+#include <alloca.h>
 #include <hkl.h>
 
 #include "hkl-test.h"
@@ -26,8 +27,7 @@
 void hkl_tests_grow(struct hkl_tests * tests, size_t extra)
 {
 	if (tests->len + extra <= tests->len)
-		exit(-1);
-		//die("you want to use way too much memory");
+		die("you want to use way too much memory");
 	if (!tests->alloc)
 		tests->tests = NULL;
 	ALLOC_GROW(tests->tests, tests->len + extra, tests->alloc);
@@ -71,16 +71,36 @@ int hkl_test_run(struct hkl_test * test)
 int hkl_tests_run(struct hkl_tests * tests)
 {
 	size_t i;
+	int *results = alloca(tests->len * sizeof(*results));
 	int res = 0;
 
 	for(i=0; i<tests->len; i++) {
-		struct hkl_test *test = &tests->tests[i];
-		if (!hkl_test_run(test)) {
+		size_t j;
+		struct hkl_test *test;
+
+		test = &tests->tests[i];
+		results[i] = hkl_test_run(test);
+
+		/* pretty print of the test */
+		fprintf(stderr, "[");
+		for(j=0; j<=i; ++j)
+			if(results[j])
+				fprintf(stderr, ".");
+			else
+				fprintf(stderr, "X");
+
+		/* fill with spaces the rest */
+		for(j=i+1; j<tests->len; ++j)
+			fprintf(stderr, " ");
+		fprintf(stderr, "]\r");
+		fflush(stderr);
+
+		if (!results[i]) {
 			fprintf(stderr, "\n%s:%d: FAIL %s\n", test->file, test->line, test->name);
-			exit(-1);
-		} else
-			fprintf(stdout, ".");
+			res = -1;
+			break;
+		}	
 	}
-	printf("\n");
+	fprintf(stderr, "\n");
 	return res;
 }

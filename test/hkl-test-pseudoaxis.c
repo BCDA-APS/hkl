@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
  * Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
  */
+#include <alloca.h>
 #include <hkl.h>
 
 #include "hkl-test.h"
@@ -28,28 +29,31 @@
 #endif
 #define HKL_TEST_SUITE_NAME pseudoaxis
 
+#define with_log 0
+#define N 2
+
 static int test_engine(struct hkl_test *test,
 		       HklPseudoAxisEngine *engine, HklGeometry *geometry,
 		       HklDetector *detector, HklSample *sample)
 {
 	size_t i, j, k, f_idx;
-	double values[HKL_LIST_LEN(engine->pseudoAxes)];
+	double *values = alloca(HKL_LIST_LEN(engine->pseudoAxes) * sizeof(*values));
 	int miss = 0;
 
-	// randomize the geometry
+	/* randomize the geometry */
 	hkl_geometry_randomize(geometry);
 	
 	for(f_idx=0; f_idx<HKL_LIST_LEN(engine->modes); ++f_idx) {
 		hkl_pseudo_axis_engine_select_mode(engine, f_idx);
-		// for now unactive the eulerians check
+		/* for now unactive the eulerians check */
 		if(!strcmp(engine->mode->name, "eulerians"))
 			continue;
 		miss = 0;
-		for(i=0;i<100;++i) {
+		for(i=0;i<N;++i) {
 			int res;
 			size_t len = HKL_LIST_LEN(engine->pseudoAxes);
 
-			// randomize the pseudoAxes values
+			/* randomize the pseudoAxes values */
 			for(j=0; j<len; ++j) {
 				HklParameter *parameter = (HklParameter *)(engine->pseudoAxes[j]);
 				hkl_parameter_randomize(parameter);
@@ -57,45 +61,53 @@ static int test_engine(struct hkl_test *test,
 				values[j] = parameter->value;
 			}
 
-			// randomize the parameters
+			/* randomize the parameters */
 			for(j=0; j<HKL_LIST_LEN(engine->mode->parameters); ++j)
-				hkl_parameter_randomize(engine->mode->parameters[j]);
+				hkl_parameter_randomize(&engine->mode->parameters[j]);
 
-			// pseudo -> geometry
-			hkl_pseudo_axis_engine_init(engine);
-			//hkl_pseudo_axis_engine_fprintf(stderr, engine);
-			res = hkl_pseudo_axis_engine_set(engine);
+			/* pseudo -> geometry */
+			hkl_pseudo_axis_engine_initialize(engine, NULL);
+			/* hkl_pseudo_axis_engine_fprintf(stderr, engine); */
+			res = hkl_pseudo_axis_engine_set(engine, NULL);
 
-			// geometry -> pseudo
+			/* geometry -> pseudo */
 			if (res == HKL_SUCCESS) {
-				size_t g_len = HKL_LIST_LEN(engine->engines->geometries->geometries);
-				// check all finded geometries
-				//hkl_pseudo_axis_engine_fprintf(stderr, engine);
+				size_t g_len = hkl_geometry_list_len(engine->engines->geometries);
+				/* check all finded geometries */
+				/* hkl_pseudo_axis_engine_fprintf(stderr, engine); */
 
 				for(j=0; j<g_len; ++j) {
-					// first modify the pseudoAxes values
-					// to be sure that the result is the
-					// computed result.
+					/* first modify the pseudoAxes values */
+					/* to be sure that the result is the */
+					/* computed result. */
 					for(k=0; k<len; ++k)
 						((HklParameter *)engine->pseudoAxes[k])->value = 0.;
 
-					hkl_geometry_init_geometry(geometry, engine->engines->geometries->geometries[j]);
-					hkl_pseudo_axis_engine_get(engine);
+					hkl_geometry_init_geometry(geometry,
+								   engine->engines->geometries->items[j]->geometry);
+					hkl_pseudo_axis_engine_get(engine, NULL);
 
 					for(k=0; k<len; ++k) {
 						HKL_ASSERT_DOUBLES_EQUAL(values[k],
 									 ((HklParameter *)engine->pseudoAxes[k])->value,
-								HKL_EPSILON);
+									 HKL_EPSILON);
 					}
 				}
 			} else
 				miss++;
 		}
+
+#if with_log
 		fprintf(stderr, "\n\"%s\" \"%s\" missed : %d",
-				engine->geometry->name,
-				engine->mode->name, miss);
+			engine->geometry->name,
+			engine->mode->name, miss);
+#endif
+
 	}
+	
+#if with_log
 	fprintf(stderr, "\n");
+#endif
 
 	return HKL_TEST_PASS;
 }
@@ -103,59 +115,70 @@ static int test_engine(struct hkl_test *test,
 #define test_engines(test, engines) do{					\
 		size_t i;						\
 		for(i=0; i<HKL_LIST_LEN(engines->engines); ++i){	\
-			int res = test_engine(test,			\
-					      engines->engines[i],	\
-					      engines->geometry,	\
-					      engines->detector,	\
-					      engines->sample);		\
-			if (res == HKL_TEST_FAIL)			\
-				return res;				\
+			if (!test_engine(test, engines->engines[i],	\
+					 engines->geometry,		\
+					 engines->detector,		\
+					 engines->sample))		\
+				return HKL_TEST_FAIL;			\
 		}							\
-	} while(0)
+	}while(0)
 
 HKL_TEST_SUITE_FUNC(set)
 {
+	const HklGeometryConfig *config;
 	HklGeometry *geometry = NULL;
 	HklDetector *detector = hkl_detector_factory_new(HKL_DETECTOR_TYPE_0D);
-	HklSample *sample = hkl_sample_new("test");
+	HklSample *sample = hkl_sample_new("test", HKL_SAMPLE_TYPE_MONOCRYSTAL);
 	HklPseudoAxisEngineList *engines;
-	double parameters[] = {50 * HKL_DEGTORAD};
 
-	// attach to the second holder
+	/* attach to the second holder */
 	detector->idx = 1;
 
-	// test all E4CV engines
-	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL, NULL, 0);
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
+	/* test all E4CV engines */
+	config = hkl_geometry_factory_get_config_from_type(HKL_GEOMETRY_TYPE_EULERIAN4C_VERTICAL);
+	geometry = hkl_geometry_factory_new(config);
+	engines = hkl_pseudo_axis_engine_list_factory(config);
 	hkl_pseudo_axis_engine_list_init(engines, geometry, detector, sample);
 	test_engines(test, engines);
 	hkl_geometry_unref(geometry);
 	hkl_pseudo_axis_engine_list_unref(engines);
 
-	// test all E6C HKL engines
-	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_EULERIAN6C, NULL, 0);
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_EULERIAN6C);
+	/* test all E6C HKL engines */
+	config = hkl_geometry_factory_get_config_from_type(HKL_GEOMETRY_TYPE_EULERIAN6C);
+	geometry = hkl_geometry_factory_new(config);
+	engines = hkl_pseudo_axis_engine_list_factory(config);
 	hkl_pseudo_axis_engine_list_init(engines, geometry, detector, sample);
 	test_engines(test, engines);
 	hkl_geometry_unref(geometry);
 	hkl_pseudo_axis_engine_list_unref(engines);
 
-	// test all K4CV HKL engines
-	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA4C_VERTICAL, parameters, 1);
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA4C_VERTICAL);
+	/* test all K4CV HKL engines */
+	config = hkl_geometry_factory_get_config_from_type(HKL_GEOMETRY_TYPE_KAPPA4C_VERTICAL);
+	geometry = hkl_geometry_factory_new(config, 50 * HKL_DEGTORAD);
+	engines = hkl_pseudo_axis_engine_list_factory(config);
 	hkl_pseudo_axis_engine_list_init(engines, geometry, detector, sample);
 	test_engines(test, engines);
 	hkl_geometry_unref(geometry);
 	hkl_pseudo_axis_engine_list_unref(engines);
 
-	// test all K6C engines
-	geometry = hkl_geometry_factory_new(HKL_GEOMETRY_TYPE_KAPPA6C, parameters, 1);
-	engines = hkl_pseudo_axis_engine_list_factory(HKL_GEOMETRY_TYPE_KAPPA6C);
+	/* test all K6C engines */
+	config = hkl_geometry_factory_get_config_from_type(HKL_GEOMETRY_TYPE_KAPPA6C);
+	geometry = hkl_geometry_factory_new(config, 50 * HKL_DEGTORAD);
+	engines = hkl_pseudo_axis_engine_list_factory(config);
+	hkl_pseudo_axis_engine_list_init(engines, geometry, detector, sample);
+	test_engines(test, engines);
+	hkl_geometry_free(geometry);
+	hkl_pseudo_axis_engine_list_free(engines);
+
+	/* test all ZAXIS engines */
+	config = hkl_geometry_factory_get_config_from_type(HKL_GEOMETRY_TYPE_ZAXIS);
+	geometry = hkl_geometry_factory_new(config);
+	engines = hkl_pseudo_axis_engine_list_factory(config);
 	hkl_pseudo_axis_engine_list_init(engines, geometry, detector, sample);
 	test_engines(test, engines);
 	hkl_geometry_unref(geometry);
 	hkl_pseudo_axis_engine_list_unref(engines);
-
+	
 	hkl_detector_unref(detector);
 	hkl_sample_unref(sample);
 

@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the hkl library.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2003-2009 Synchrotron SOLEIL
+ * Copyright (C) 2003-2010 Synchrotron SOLEIL
  *                         L'Orme des Merisiers Saint-Aubin
  *                         BP 48 91192 GIF-sur-YVETTE CEDEX
  *
@@ -95,7 +95,7 @@ HKL_TEST_SUITE_FUNC(update)
 
 	axis1 = hkl_geometry_get_axis_by_name(g, "B");
 	hkl_axis_set_value(axis1, M_PI_2);
-	// now axis1 is dirty
+	/* now axis1 is dirty */
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_axis_get_changed(axis1));
 	
 	hkl_geometry_update(g);
@@ -113,7 +113,6 @@ HKL_TEST_SUITE_FUNC(set_values)
 {
 	HklGeometry *g;
 	HklHolder *holder;
-	double values[] = {1., 1., 1.};
 
 	g = hkl_geometry_new();
 	holder = hkl_geometry_add_holder(g);
@@ -121,10 +120,12 @@ HKL_TEST_SUITE_FUNC(set_values)
 	hkl_holder_add_rotation_axis(holder, "B", 1., 0., 0.);
 	hkl_holder_add_rotation_axis(holder, "C", 1., 0., 0.);
 
-	hkl_geometry_set_values_v(g, values, 3);
-	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(g->axes[0]), HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(g->axes[1]), HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(g->axes[2]), HKL_EPSILON);
+	hkl_geometry_set_values_v(g, 3, 1., 1., 1.);
+	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(&g->axes[0]), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(&g->axes[1]), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(1., hkl_axis_get_value(&g->axes[2]), HKL_EPSILON);
+
+	hkl_geometry_free(g);
 
 	return HKL_TEST_PASS;
 }
@@ -145,8 +146,8 @@ HKL_TEST_SUITE_FUNC(distance)
 
 	g2 = hkl_geometry_new_copy(g1);
 
-	hkl_geometry_set_values_v(g1, values_1, 3);
-	hkl_geometry_set_values_v(g2, values_2, 3);
+	hkl_geometry_set_values_v(g1, 3, 0., 0., 0.);
+	hkl_geometry_set_values_v(g2, 3, 1., 1., 1.);
 	HKL_ASSERT_DOUBLES_EQUAL(3, hkl_geometry_distance(g1, g2), HKL_EPSILON);
 
 	return HKL_TEST_PASS;
@@ -165,10 +166,10 @@ HKL_TEST_SUITE_FUNC(is_valid)
 	hkl_holder_add_rotation_axis(holder, "B", 1., 0., 0.);
 	hkl_holder_add_rotation_axis(holder, "C", 1., 0., 0.);
 
-	hkl_geometry_set_values_v(geom, values_1, 3);
+	hkl_geometry_set_values_v(geom, 3, 0., 0., 0.);
 	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_geometry_is_valid(geom));
 
-	hkl_geometry_set_values_v(geom, values_2, 3);
+	hkl_geometry_set_values_v(geom, 3, -180., 0., 0.);
 	HKL_ASSERT_EQUAL(HKL_FALSE, hkl_geometry_is_valid(geom));
 
 	hkl_geometry_unref(geom);
@@ -193,25 +194,35 @@ HKL_TEST_SUITE_FUNC(list)
 
 	list = hkl_geometry_list_new();
 
-	hkl_geometry_set_values_v(g, values, 3);
+	hkl_geometry_set_values_v(g, 3, 0., 0., 0.);
 	hkl_geometry_list_add(list, g);
-	HKL_ASSERT_EQUAL(1, HKL_LIST_LEN(list->geometries));
+	HKL_ASSERT_EQUAL(1, HKL_LIST_LEN(list->items));
 
-	// can not add two times the same geometry
+	/* can not add two times the same geometry */
 	hkl_geometry_list_add(list, g);
-	HKL_ASSERT_EQUAL(1, HKL_LIST_LEN(list->geometries));
+	HKL_ASSERT_EQUAL(1, HKL_LIST_LEN(list->items));
 
-	hkl_geometry_set_values_v(g, values_1, 3);
+	hkl_geometry_set_values_v(g, 3, 30*HKL_DEGTORAD, 0., 0.);
 	hkl_geometry_list_add(list, g);
-	hkl_geometry_set_values_v(g, values_2, 3);
+	hkl_geometry_set_values_v(g, 3, 10*HKL_DEGTORAD, 0., 0.);
 	hkl_geometry_list_add(list, g);
-	HKL_ASSERT_EQUAL(3, HKL_LIST_LEN(list->geometries));
+	HKL_ASSERT_EQUAL(3, HKL_LIST_LEN(list->items));
 
-	hkl_geometry_set_values_v(g, values, 3);
+	hkl_geometry_set_values_v(g, 3, 0., 0., 0.);
 	hkl_geometry_list_sort(list, g);
-	HKL_ASSERT_DOUBLES_EQUAL(0., hkl_axis_get_value(list->geometries[0]->axes[0]), HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(10*HKL_DEGTORAD, hkl_axis_get_value(list->geometries[1]->axes[0]), HKL_EPSILON);
-	HKL_ASSERT_DOUBLES_EQUAL(30*HKL_DEGTORAD, hkl_axis_get_value(list->geometries[2]->axes[0]), HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(0.,
+				 hkl_axis_get_value(&list->items[0]->geometry->axes[0]),
+				 HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(10*HKL_DEGTORAD,
+				 hkl_axis_get_value(&list->items[1]->geometry->axes[0]),
+				 HKL_EPSILON);
+	HKL_ASSERT_DOUBLES_EQUAL(30*HKL_DEGTORAD,
+				 hkl_axis_get_value(&list->items[2]->geometry->axes[0]),
+				 HKL_EPSILON);
+
+
+	hkl_geometry_unref(g);
+	hkl_geometry_list_unref(list);
 
 	return HKL_TEST_PASS;
 }
@@ -240,10 +251,61 @@ HKL_TEST_SUITE_FUNC( list_multiply_from_range )
 
 	list = hkl_geometry_list_new();
 
-	hkl_geometry_set_values_v(g, values, 3);
+	hkl_geometry_set_values_v(g, 3, 185. * HKL_DEGTORAD, -185. * HKL_DEGTORAD, 190. * HKL_DEGTORAD);
 	hkl_geometry_list_add(list, g);
 
 	hkl_geometry_list_multiply_from_range(list);
+
+	return HKL_TEST_PASS;
+}
+
+HKL_TEST_SUITE_FUNC( list_remove_invalid )
+{
+	HklGeometry *g;
+	HklGeometryList *list;
+	HklHolder *holder;
+	HklAxis *axisA, *axisB, *axisC;
+
+	g = hkl_geometry_new();
+	holder = hkl_geometry_add_holder(g);
+	hkl_holder_add_rotation_axis(holder, "A", 1., 0., 0.);
+	hkl_holder_add_rotation_axis(holder, "B", 1., 0., 0.);
+	hkl_holder_add_rotation_axis(holder, "C", 1., 0., 0.);
+
+	axisA = hkl_geometry_get_axis_by_name(g, "A");
+	axisB = hkl_geometry_get_axis_by_name(g, "B");
+	axisC = hkl_geometry_get_axis_by_name(g, "C");
+
+	hkl_axis_set_range_unit(axisA, -190., 180.);
+	hkl_axis_set_range_unit(axisB, -190., 180.);
+	hkl_axis_set_range_unit(axisC, -190., 180.);
+
+	list = hkl_geometry_list_new();
+
+	hkl_geometry_set_values_v(g, 3,
+				  185. * HKL_DEGTORAD,
+				  -185.* HKL_DEGTORAD,
+				  185. * HKL_DEGTORAD);
+	hkl_geometry_list_add(list, g);
+
+	hkl_geometry_set_values_v(g, 3,
+				  -190. * HKL_DEGTORAD,
+				  -190.* HKL_DEGTORAD,
+				  -190.* HKL_DEGTORAD);
+	hkl_geometry_list_add(list, g);
+
+	hkl_geometry_set_values_v(g, 3,
+				  180. * HKL_DEGTORAD,
+				  180.* HKL_DEGTORAD,
+				  180.* HKL_DEGTORAD);
+	hkl_geometry_list_add(list, g);
+
+	HKL_ASSERT_EQUAL(3, HKL_LIST_LEN(list->items));
+	hkl_geometry_list_remove_invalid(list);
+	HKL_ASSERT_EQUAL(2, HKL_LIST_LEN(list->items));
+
+	hkl_geometry_free(g);
+	hkl_geometry_list_free(list);
 
 	return HKL_TEST_PASS;
 }
@@ -259,5 +321,6 @@ HKL_TEST( is_valid );
 
 HKL_TEST( list );
 HKL_TEST( list_multiply_from_range );
+HKL_TEST( list_remove_invalid );
 
 HKL_TEST_SUITE_END
