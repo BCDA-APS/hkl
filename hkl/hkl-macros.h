@@ -35,35 +35,12 @@
 # define HKL_END_DECLS
 #endif
 
-/* add the win32 portability part */
-#if _MSC_VER && _MSC_VER <= 1200
-# include <float.h>
-# define INFINITY DBL_MAX
-# define M_PI     3.14159265358979323846264338328
-# define M_PI_2   1.57079632679489661923132169164
-#endif
-
 /* common part */
 #define HKL_MAJOR 2
 #define HKL_MINOR 3
 #define HKL_PATCH 0
 
 #define HKL_VERSION (HKL_MAJOR * 10000 + HKL_MINOR * 100 + HKL_PATCH)
-
-#define HKL_TRUE 1
-#define HKL_FALSE 0
-
-#define HKL_SUCCESS 0
-#define HKL_FAIL -1
-
-#define HKL_TINY 1e-7
-#define HKL_EPSILON 1e-6
-#define HKL_DEGTORAD (M_PI/180.)
-#define HKL_RADTODEG (180./M_PI)
-
-/* tau = 2pi or 1 */
-#define HKL_TAU (2. * M_PI)
-/* #define HKL_TAU 1 */
 
 /* specific part for the eulerian -> kappa conversion */
 #define HKL_EULERIAN_KAPPA_SOLUTION 1
@@ -110,6 +87,15 @@
 #  define __attribute__(x)
 # endif
 #endif
+
+/* vala definitions */
+#define _free _unref
+#define hkl_geometry_free hkl_geometry_unref
+#define hkl_geometry_list_free hkl_geometry_list_unref
+#define hkl_sample_free hkl_sample_unref
+#define hkl_detector_free hkl_detector_unref
+#define hkl_pseudo_axis_engine_list_free hkl_pseudo_axis_engine_list_unref
+#define hkl_lattice_free hkl_lattice_unref
 
 HKL_BEGIN_DECLS
 

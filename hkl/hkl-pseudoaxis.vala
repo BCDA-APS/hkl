@@ -41,8 +41,8 @@ public class Hkl.PseudoAxis : Hkl.Parameter
 public abstract class Hkl.PseudoAxisEngineMode
 {
 	public string name;
-	public abstract bool get(Geometry geometry, Detector detector, Sample sample);
-	public abstract bool set(Geometry geometry, Detector detector, Sample sample);
+	public abstract bool get(Geometry geometry, Detector detector, Sample sample) throws Error;
+	public abstract bool set(Geometry geometry, Detector detector, Sample sample) throws Error;
 	public Parameter[] parameters;
 	public string[] axes_names;
 	public Geometry geometry_init;
@@ -55,7 +55,7 @@ public abstract class Hkl.PseudoAxisEngineMode
 		this.axes_names = axes_names;
 	}
 
-	public virtual bool init(Geometry geometry, Detector detector, Sample sample)
+	public virtual bool initialize(Geometry geometry, Detector detector, Sample sample) throws Error
 	{
 		geometry.update();
 		this.geometry_init = new Geometry.copy(geometry);
@@ -122,21 +122,21 @@ public class Hkl.PseudoAxisEngine
 		this.prepare_internal(this.geometry, this.detector, this.sample);
 	}
 
-	public bool init()
+	public bool initialize() throws Error
 	{
-		return this.mode.init(this.engines.geometry,
-				      this.engines.detector,
-				      this.engines.sample);
+		return this.mode.initialize(this.engines.geometry,
+					    this.engines.detector,
+					    this.engines.sample);
 	}
 
-	public bool get()
+	public bool get() throws Error
 	{
 		return this.mode.get(this.engines.geometry,
 				     this.engines.detector,
 				     this.engines.sample);
 	}
 
-	public bool set()
+	public bool set() throws Error
 	{
 		bool res;
 
@@ -180,7 +180,7 @@ public class Hkl.PseudoAxisEngine
 			f.printf("\n     ");
 			pseudoAxis.fprintf(f);
 		}
-		if(this.engines.geometries.geometries.length > 0)
+		if(this.engines.geometries.items.length > 0)
 			this.engines.geometries.fprintf(f);
 		f.printf("\n");
 	}
@@ -207,7 +207,7 @@ public class Hkl.PseudoAxisEngineList
 		this.engines[len] = engine;
 	}
 
-	public weak PseudoAxisEngine? get_by_name(string name)
+	public unowned PseudoAxisEngine? get_by_name(string name)
 	{
 		foreach(weak PseudoAxisEngine engine in this.engines){
 			if(engine.name == name)
@@ -216,7 +216,7 @@ public class Hkl.PseudoAxisEngineList
 		return null;
 	}
 
-	public weak PseudoAxis? get_pseudo_axis_by_name(string name)
+	public unowned PseudoAxis? get_pseudo_axis_by_name(string name)
 	{
 		foreach(weak PseudoAxisEngine engine in this.engines){
 			foreach(weak PseudoAxis pseudoaxis in engine.pseudoAxes){
@@ -242,14 +242,16 @@ public class Hkl.PseudoAxisEngineList
 			engine.prepare_internal(this.geometry, this.detector, this.sample);
 	}
 
-	public bool getter()
+	public bool get()
 	{
 		bool res = true;
 
 		foreach(weak PseudoAxisEngine engine in this.engines)
-			if(!engine.mode.get(this.geometry, this.detector, this.sample))
+			try{
+				engine.mode.get(this.geometry, this.detector, this.sample);
+			}catch (Error err) {
 				res = false;
-
+			}
 		return res;
 	}
 
@@ -261,11 +263,11 @@ public class Hkl.PseudoAxisEngineList
 	}
 }
 
-public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.GeometryType type)
+public Hkl.PseudoAxisEngineList hkl_pseudo_axis_engine_list_factory(Hkl.GeometryConfig config)
 {
 	Hkl.PseudoAxisEngineList list = new Hkl.PseudoAxisEngineList();
 
-	switch(type){
+	switch(config.type){
 	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
 		list.add(new Hkl.PseudoAxisEngineHklE4CV());
 		list.add(new Hkl.PseudoAxisEngineAutoPsiE4CV());

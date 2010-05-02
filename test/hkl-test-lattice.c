@@ -205,9 +205,9 @@ HKL_TEST_SUITE_FUNC( get_B )
 
 HKL_TEST_SUITE_FUNC( get_1_B )
 {
-	static HklMatrix I_ref = {{{1, 0, 0},
-				   {0, 1, 0},
-				   {0, 0, 1}}};
+	static HklMatrix I_ref = {1, 0, 0,
+				  0, 1, 0,
+				  0, 0, 1};
 	HklLattice *lattice;
 	HklMatrix I;
 	HklMatrix B_1;

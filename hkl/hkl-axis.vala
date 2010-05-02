@@ -26,7 +26,7 @@ public class Hkl.Axis : Hkl.Parameter {
 	void update()
 	{
 		if(this.changed)
-			this.q = Quaternion.from_angle_and_axis(this.value, this.axis_v);		
+			this.q = Quaternion.from_angle_and_axe(this.value, this.axis_v);		
 	}
 	
 	/*
@@ -84,8 +84,8 @@ public class Hkl.Axis : Hkl.Parameter {
 	public Axis(string name, Vector axis_v)
 	{
 		base(name, -Math.PI, 0.0, Math.PI,
-			 false, true,
-			 hkl_unit_angle_rad, hkl_unit_angle_deg);
+		     true, true,
+		     hkl_unit_angle_rad, hkl_unit_angle_deg);
 		this.axis_v = axis_v;
 		this.q = Quaternion(1.0, 0.0, 0.0, 0.0);
 	}

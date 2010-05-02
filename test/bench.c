@@ -24,6 +24,8 @@
 #include <glib-object.h>
 
 #include <hkl.h>
+#include "hkl/hkl-list.h"
+#include "hkl/hkl-macros.h"
 
 #define SET_AXES(geometry, mu, komega, kappa, kphi, gamma, delta) do{\
 	hkl_geometry_set_values_v(geometry, 6,\

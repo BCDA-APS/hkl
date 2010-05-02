@@ -301,8 +301,6 @@ HKL_TEST_SUITE_FUNC(psi_setter)
 
 	hkl_pseudo_axis_engine_initialize(engine, NULL);
 
-	hkl_pseudo_axis_engine_init(engine);
-
 	for(f_idx=0; f_idx<HKL_LIST_LEN(engine->modes); ++f_idx){
 		double psi;
 		int res;
@@ -370,8 +368,6 @@ HKL_TEST_SUITE_FUNC(q)
 	SET_AXES(geom, 30., 0., 0., 60.);
 
 	hkl_pseudo_axis_engine_initialize(engine, NULL);
-
-	hkl_pseudo_axis_engine_init(engine);
 
 	for(f_idx=0; f_idx<HKL_LIST_LEN(engine->modes); ++f_idx){
 		double q;

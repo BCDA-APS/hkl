@@ -2,11 +2,15 @@ TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = test bench
 
-AM_CPPFLAGS = -std=c89 -ansi -pedantic -D_BSD_SOURCE \
+AM_CFLAGS = -D_BSD_SOURCE \
 	-I$(top_srcdir) \
-	-I$(top_srcdir)/hkl
+	-I$(top_srcdir)/hkl \
+	$(GSL_CFLAGS) \
+	$(GLIB_CFLAGS)
 
-AM_LDFLAGS = $(top_builddir)/hkl/libhkl.la $(GSL_LIBS)
+AM_LDFLAGS = $(top_builddir)/hkl/libhkl.la \
+	$(GSL_LIBS) \
+	$(GLIB_LIBS)
 
 test_SOURCES = \
 hkl-list.h \
@@ -14,8 +18,6 @@ hkl-macros.h \
 hkl-test.c \
 hkl-test.h \
 hkl-test-error.c \
-hkl-test-pseudoaxis.c \
-hkl-test-quaternion.c \
 hkl-test-axis.c \
 hkl-test-interval.c \
 hkl-test-lattice.c \

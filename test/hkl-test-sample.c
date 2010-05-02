@@ -132,7 +132,7 @@ HKL_TEST_SUITE_FUNC(del_reflection)
 HKL_TEST_SUITE_FUNC( set_UB )
 {
 	HklSample *sample;
-	static HklMatrix UB = {HKL_TAU/1.54,           0.,           0.},
+	static HklMatrix UB = {HKL_TAU/1.54,           0.,           0.,
 				          0.,           0., HKL_TAU/1.54,
 				          0.,-HKL_TAU/1.54,           0.};
 	static HklMatrix U = {1., 0., 0.,

@@ -291,13 +291,13 @@ public class Hkl.PseudoAxisEngineModeHklConstantPsi : Hkl.PseudoAxisEngineModeHk
 							    hkl_unit_angle_rad, hkl_unit_angle_deg));
 	}
 
-	public override bool init(Geometry geometry, Detector detector, Sample sample)
+	public override bool initialize(Geometry geometry, Detector detector, Sample sample) throws GLib.Error
 	{
 		Vector hkl = {1, 0, 0};
 		Vector ki, kf, Q, n;
 		bool status = true;
 
-		status = base.init(geometry, detector, sample);
+		status = base.initialize(geometry, detector, sample);
 		if(status == false)
 			return status;
 

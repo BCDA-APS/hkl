@@ -1,20 +1,24 @@
 ## Process this file with automake to produce Makefile.in
 
-AM_VALAFLAGS = --pkg=gsl --header=hkl.h
+AM_VALAFLAGS = --pkg=gsl --header=hkl.h -g
 
 AM_LDFLAGS = -no-undefined -version-info 4:0:0
 AM_LIBS = $(GSL_LIBS) $(GLIB_LIBS)
-AM_CFLAGS = -Wmissing-declarations -std=c89 -ansi -pedantic \
+AM_CFLAGS = -Wmissing-declarations \
 	-I$(top_srcdir) \
 	$(GSL_CFLAGS) \
 	$(GLIB_CFLAGS)
 
-include_HEADERS=hkl.h
+include_HEADERS=hkl.h hkl-error.h
+
+nodist_EXTRA=hkl-list.h hkl-macros.h
 
 lib_LTLIBRARIES = \
 	libhkl.la
 
 libhkl_la_SOURCES = \
+	hkl-error.c \
+	usage.c \
 	hkl-constants.vala \
 	hkl-axis.vala \
 	hkl-detector.vala \

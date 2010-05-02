@@ -25,21 +25,37 @@ public class Hkl.Parameter {
 	public double value;
 	public weak Unit? unit;
 	public weak Unit? punit;
-	public bool not_to_fit;
+	public bool fit;
 	public bool changed;
 
 	public Parameter(string name, double min, double value, double max,
-			 bool not_to_fit, bool changed,
+			 bool fit, bool changed,
 			 Unit? unit, Unit? punit)
 	{
 		this.name = name;
 		this.range.min = min;
 		this.value = value;
 		this.range.max = max;
-		this.not_to_fit = not_to_fit;
+		this.fit = fit;
 		this.changed = changed;
 		this.unit = unit;
 		this.punit = punit;
+	}
+
+	public bool init(string name, double min, double value, double max,
+			 bool fit, bool changed,
+			 Unit? unit, Unit? punit)
+	{
+		this.name = name;
+		this.range.min = min;
+		this.value = value;
+		this.range.max = max;
+		this.fit = fit;
+		this.changed = changed;
+		this.unit = unit;
+		this.punit = punit;
+
+		return true;
 	}
 
 	public Parameter.copy(Parameter parameter)
@@ -47,7 +63,7 @@ public class Hkl.Parameter {
 		this.name = parameter.name;
 		this.range = parameter.range;
 		this.value = parameter.value;
-		this.not_to_fit = parameter.not_to_fit;
+		this.fit = parameter.fit;
 		this.changed = parameter.changed;
 		this.unit = parameter.unit;
 		this.punit = parameter.punit;
@@ -99,7 +115,7 @@ public class Hkl.Parameter {
 
 	public virtual void randomize()
 	{
-		if (!this.not_to_fit){
+		if (this.fit){
 			this.value = Random.double_range(this.range.min, this.range.max);
 			this.changed = true;
 		}

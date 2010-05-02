@@ -45,7 +45,7 @@ public class Hkl.Holder {
 			this.q.times_quaternion(this.geometry.axes[idx].q);
 	}
 
-	public weak Axis? add_rotation_axis(string name,
+	public unowned Axis? add_rotation_axis(string name,
 										double x, double y, double z)
 	{
 		Vector axis_v = Vector(x, y, z);
@@ -65,37 +65,66 @@ public class Hkl.Holder {
 	}
 }
 
+public struct Hkl.GeometryConfig
+{
+	public string name;
+	public Hkl.GeometryType type;
+}
+
+[CCode (array_null_terminated = true, array_length = false)]
+static const Hkl.GeometryConfig hkl_geometry_factory_configs[] =
+{
+	{"TwoC", Hkl.GeometryType.TWOC_VERTICAL},
+	{"E4CV", Hkl.GeometryType.EULERIAN4C_VERTICAL},
+ 	{"K4CV", Hkl.GeometryType.KAPPA4C_VERTICAL},
+	{"E6C", Hkl.GeometryType.EULERIAN6C},
+	{"K6C", Hkl.GeometryType.KAPPA6C},
+	{"ZAXIS", Hkl.GeometryType.ZAXIS},
+	{null}
+};
+
 public enum Hkl.GeometryType
 {
 	TWOC_VERTICAL,
-		EULERIAN4C_VERTICAL,
-		KAPPA4C_VERTICAL,
-		EULERIAN6C,
-		KAPPA6C
-		}
+	EULERIAN4C_VERTICAL,
+	KAPPA4C_VERTICAL,
+	EULERIAN6C,
+	KAPPA6C,
+	ZAXIS
+}
 
-public Hkl.Geometry hkl_geometry_factory_new(Hkl.GeometryType type, double[] parameters)
+public Hkl.GeometryConfig? hkl_geometry_factory_get_config_from_type(Hkl.GeometryType type)
+{
+	foreach(weak Hkl.GeometryConfig config in hkl_geometry_factory_configs){
+		if (config.type == type)
+				  return config;
+	}
+	return null;
+}
+
+public Hkl.Geometry hkl_geometry_factory_new(Hkl.GeometryConfig config, ...)
 {
 	Hkl.Geometry geom;
+	var l = va_list();
 
-	switch(type) {
+	switch(config.type) {
 	case Hkl.GeometryType.TWOC_VERTICAL:
-		geom = new Hkl.Geometry.TwoCV();
+		geom = new Hkl.Geometry.TwoCV(config);
 		break;
 	case Hkl.GeometryType.EULERIAN4C_VERTICAL:
-		geom = new Hkl.Geometry.E4CV();
+		geom = new Hkl.Geometry.E4CV(config);
 		break;
 	case Hkl.GeometryType.KAPPA4C_VERTICAL:
-		geom = new Hkl.Geometry.K4CV(parameters[0]);
+		geom = new Hkl.Geometry.K4CV(config, l.arg());
 		break;
 	case Hkl.GeometryType.EULERIAN6C:
-		geom = new Hkl.Geometry.E6C();
+		geom = new Hkl.Geometry.E6C(config);
 		break;
 	case Hkl.GeometryType.KAPPA6C:
-		geom = new Hkl.Geometry.K6C(parameters[0]);
+		geom = new Hkl.Geometry.K6C(config, l.arg());
 		break;
 	default:
-		geom = new Hkl.Geometry.E4CV();
+		geom = new Hkl.Geometry.E4CV(config);
 		break;
 	}
 
@@ -105,7 +134,7 @@ public Hkl.Geometry hkl_geometry_factory_new(Hkl.GeometryType type, double[] par
 
 public class Hkl.Geometry
 {
-	public string name;
+	public GeometryConfig config;
 	public Source source;
 	public Axis[] axes;
 	public Holder[] holders;
@@ -115,9 +144,9 @@ public class Hkl.Geometry
 		this.source.set(SOURCE_DEFAULT_WAVE_LENGTH, 1.0, 0.0, 0.0);
 	}
 
-	public Geometry.TwoCV()
+	public Geometry.TwoCV(Hkl.GeometryConfig config)
 	{
-		this.name = "TwoCV";
+		this.config = config;
 		this.source.set(1.054, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -127,9 +156,9 @@ public class Hkl.Geometry
 		h.add_rotation_axis("tth", 0.0, -1.0, 0.0);
 	}
 
-	public Geometry.E4CV()
+	public Geometry.E4CV(Hkl.GeometryConfig config)
 	{
-		this.name = "E4CV";
+		this.config = config;
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		Holder h = this.add_holder();
@@ -141,9 +170,9 @@ public class Hkl.Geometry
 		h.add_rotation_axis("tth", 0.0, -1.0, 0.0);
 	}
 
-	public Geometry.K4CV(double alpha)
+	public Geometry.K4CV(Hkl.GeometryConfig config, double alpha)
 	{
-		this.name = "K4CV";
+		this.config = config;
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -155,9 +184,9 @@ public class Hkl.Geometry
 		h.add_rotation_axis("tth", 0.0, -1.0, 0.0);
 	}
 
-	public Geometry.E6C()
+	public Geometry.E6C(Hkl.GeometryConfig config)
 	{
-		this.name = "E6C";
+		this.config.name = "E6C";
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -171,9 +200,9 @@ public class Hkl.Geometry
 		h.add_rotation_axis("delta", 0.0, -1.0, 0.0);
 	}
 
-	public Geometry.K6C(double alpha)
+	public Geometry.K6C(Hkl.GeometryConfig config, double alpha)
 	{
-		this.name = "K6C";
+		this.config = config;
 		this.source.set(1.54, 1.0, 0.0, 0.0);
 
 		weak Holder h = this.add_holder();
@@ -189,7 +218,7 @@ public class Hkl.Geometry
 
 	public Geometry.copy(Geometry src)
 	{
-		this.name = src.name;
+		this.config = src.config;
 		this.source = src.source;
 		this.axes = new Axis[src.axes.length];
 		this.holders = new Holder[src.holders.length];
@@ -240,7 +269,7 @@ public class Hkl.Geometry
 		}
 	}
 
-	public weak Axis? get_axis_by_name(string name)
+	public unowned Axis? get_axis_by_name(string name)
 	{
 		foreach(weak Axis axis in this.axes)
 			if (axis.name == name)
@@ -255,12 +284,12 @@ public class Hkl.Geometry
 		this.update();
 	}
 
-	public bool set_values_v(double[] values) requires (values.length == this.axes.length)
+	public bool set_values_v(size_t len, ...) requires (len == this.axes.length)
 	{
-		uint idx=0;
+		var l = va_list();
 
 		foreach(weak Axis axis in this.axes)
-			axis.set_value(values[idx++]);
+			axis.set_value(l.arg());
 		this.update();
 		return true;
 	}
@@ -354,9 +383,14 @@ public class Hkl.Geometry
 
 }
 
+public class Hkl.GeometryListItem
+{
+	public Hkl.Geometry geometry;
+}
+
 public class Hkl.GeometryList
 {
-	public Geometry[] geometries;
+	public GeometryListItem[] items;
 	public delegate void Multiply();
 	
 	virtual void _multiply(Hkl.Geometry geometry)
@@ -365,34 +399,34 @@ public class Hkl.GeometryList
 
 	public void multiply()
 	{
-		foreach(Geometry geometry in this.geometries)
-			this._multiply(geometry);
+		foreach(GeometryListItem item in this.items)
+			this._multiply(item.geometry);
 	}
 
 	// look for a owne transfer to optimize the code.
 	public void add(Geometry geometry)
 	{
 		bool ok = true;
-		foreach(weak Geometry geom in this.geometries)
-			if(geometry.distance_orthodromic(geom) < EPSILON){
+		foreach(weak GeometryListItem item in this.items)
+			if(geometry.distance_orthodromic(item.geometry) < EPSILON){
 				ok = false;
 				break;
 			}
 		if(ok){
-			int len = this.geometries.length;
-			this.geometries.resize(len + 1);
-			this.geometries[len] = new Geometry.copy(geometry);
+			int len = this.items.length;
+			this.items.resize(len + 1);
+			this.items[len].geometry = new Geometry.copy(geometry);
 		}
 	}
 
 	public void clear()
 	{
-		this.geometries.resize(0);
+		this.items.resize(0);
 	}
 
 	public void sort(Geometry geometry)
 	{
-		int len = this.geometries.length;
+		int len = this.items.length;
 		double[] distances = new double[len];
 		int[] idx = new int[len];
 		int i, x;
@@ -400,7 +434,7 @@ public class Hkl.GeometryList
 
 		// compute the distances once for all
 		for(i=0; i<len; ++i){
-			distances[i] = geometry.distance(this.geometries[i]);
+			distances[i] = geometry.distance(this.items[i].geometry);
 			idx[i] = i;
 		}
 
@@ -418,10 +452,10 @@ public class Hkl.GeometryList
 		}
 
 		// reorder the geometries.
-		Geometry[] geometries = new Geometry[len];
+		GeometryListItem[] items = new GeometryListItem[len];
 		for(i=0; i<len; ++i)
-			geometries[i] = this.geometries[idx[i]];
-		this.geometries = geometries;
+			items[i] = this.items[idx[i]];
+		this.items = items;
 	}
 
 	void perm_r(Hkl.Geometry reference, Hkl.Geometry geometry, bool[] perm, uint axis_idx)
@@ -454,11 +488,11 @@ public class Hkl.GeometryList
 
 	public void multiply_from_range()
 	{
-		foreach(weak Geometry reference in this.geometries){
+		foreach(weak GeometryListItem item in this.items){
 			Hkl.Geometry geometry;
 
-			geometry = new Hkl.Geometry.copy(reference);
-			bool[] perm = new bool[geometry.axes.length];
+			geometry = new Hkl.Geometry.copy(item.geometry);
+			bool[] perm = new bool[item.geometry.axes.length];
 
 			// find axes to permute and the first solution of thoses axes;
 			uint i=0u;
@@ -468,21 +502,26 @@ public class Hkl.GeometryList
 					axis.set_value_smallest_in_range();
 			}
 
-			this.perm_r(reference, geometry, perm, 0);
+			this.perm_r(item.geometry, geometry, perm, 0);
 		}
+	}
+
+	public int len()
+	{
+		return this.items.length;
 	}
 
 	[CCode (instance_pos=-1)]
 	public void fprintf(FileStream f)
 	{
-		if(this.geometries.length > 0){
-			foreach(weak Axis axis in this.geometries[0].axes)
+		if(this.items.length > 0){
+			foreach(weak Axis axis in this.items[0].geometry.axes)
 				axis.fprintf(f);
 
 			int i=0;
-			foreach(weak Geometry geometry in this.geometries){
+			foreach(weak GeometryListItem item in this.items){
 				f.printf("\n%d :", i++);
-				foreach(weak Axis axis in geometry.axes){
+				foreach(weak Axis axis in item.geometry.axes){
 					double value = axis.get_value_unit();
 					if (axis.punit != null)
 						f.printf(" % 9.6g %s", value, axis.punit.repr);
@@ -490,7 +529,7 @@ public class Hkl.GeometryList
 						f.printf(" % 9.6g", value);
 				}
 				f.printf("\n   ");
-				foreach(weak Axis axis in geometry.axes){
+				foreach(weak Axis axis in item.geometry.axes){
 					double value = Gsl.Trig.angle_restrict_symm(axis.value) * axis.unit.factor(axis.punit);
 					if (axis.punit != null)
 						f.printf(" % 9.6g %s", value, axis.punit.repr);
@@ -506,9 +545,9 @@ public class Hkl.GeometryList
 	{
 		int i;
 
-		for(i=0; i<this.geometries.length; ++i){
-			if(!this.geometries[i].is_valid()){
-				this.geometries.move(i+1, i, this.geometries.length-i);
+		for(i=0; i<this.items.length; ++i){
+			if(!this.items[i].geometry.is_valid()){
+				this.items.move(i+1, i, this.items.length-i);
 			}
 		}
 	}

@@ -87,7 +87,7 @@ HKL_TEST_SUITE_FUNC(degenerated)
 
 		hkl_pseudo_axis_engine_select_mode(engine, f_idx);
 		if (f_idx>0)
-			engine->mode->parameters[0].value = 1.;
+			engine->mode->parameters[0]->value = 1.;
 
 		/* studdy this degenerated case */
 		*H = h = 0;
@@ -155,7 +155,7 @@ HKL_TEST_SUITE_FUNC(eulerians)
 
 		hkl_pseudo_axis_engine_select_mode(engine, f_idx);
 		if (f_idx>0)
-			engine->mode->parameters[0].value = 1.;
+			engine->mode->parameters[0]->value = 1.;
 
 		/* studdy this degenerated case */
 		*Omega = omega = 0;

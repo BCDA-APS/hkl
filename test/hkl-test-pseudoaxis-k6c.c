@@ -79,7 +79,7 @@ HKL_TEST_SUITE_FUNC(degenerated)
 
 		hkl_pseudo_axis_engine_select_mode(engine, f_idx);
 		if (HKL_LIST_LEN(engine->mode->parameters))
-			engine->mode->parameters[0].value = 1.;
+			engine->mode->parameters[0]->value = 1.;
 
 		/* studdy this degenerated case */
 		*H = h = 0;
@@ -148,7 +148,7 @@ HKL_TEST_SUITE_FUNC(eulerians)
 
 		hkl_pseudo_axis_engine_select_mode(engine, f_idx);
 		if (f_idx>0)
-			engine->mode->parameters[0].value = 1.;
+			engine->mode->parameters[0]->value = 1.;
 
 		/* studdy this degenerated case */
 		*Omega = omega = 0;
@@ -232,9 +232,9 @@ HKL_TEST_SUITE_FUNC(manip)
 	*H = 0;
 	*K = 0;
 	*L = 1. - 0.047;
-	H2 = hkl->mode->parameters[0].value = 0;
-	K2 = hkl->mode->parameters[1].value = 1.;
-	L2 = hkl->mode->parameters[2].value = 1. - 2*0.047;
+	H2 = hkl->mode->parameters[0]->value = 0;
+	K2 = hkl->mode->parameters[1]->value = 1.;
+	L2 = hkl->mode->parameters[2]->value = 1. - 2*0.047;
 	if( HKL_SUCCESS == hkl_pseudo_axis_engine_set(hkl, NULL)){
 		for(i=0; i<hkl_geometry_list_len(engines->geometries); ++i) {
 			*H = *K = *L = 0;

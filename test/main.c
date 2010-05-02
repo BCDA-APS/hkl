@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #include "hkl-test.h"
+#include <glib-object.h>
 
 int main(int argc, char **argv)
 {
@@ -29,11 +30,13 @@ int main(int argc, char **argv)
 
 	struct hkl_tests tests;
 
+	g_type_init();
+
 	hkl_tests_init(&tests, 0);
 
 	HKL_TEST_SUITE( error );
 	HKL_TEST_SUITE( vector );
-	HKL_TEST_SUITE( smatrix );
+	HKL_TEST_SUITE( matrix );
 	HKL_TEST_SUITE( quaternion );
 	/* HKL_TEST_SUITE( interval ); */
 	HKL_TEST_SUITE( source );

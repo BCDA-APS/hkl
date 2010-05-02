@@ -21,11 +21,20 @@
  */
 using Gsl;
 
-public class Hkl.Sample {
+public enum Hkl.SampleType {
+	MONOCRYSTAL
+}
+
+public class Hkl.Sample
+{
 	public string name;
+	public SampleType type;
 	public Lattice lattice;
 	public Matrix U;
 	public Matrix UB;
+	public Parameter ux;
+	public Parameter uy;
+	public Parameter uz;
 	public Reflection[] reflections;
 
 	public class Reflection {
@@ -35,23 +44,16 @@ public class Hkl.Sample {
 		public Vector _hkl;
 		public bool flag;
 
-		public Reflection(Geometry g, Detector det, double h, double k, double l)
+		void update()
 		{
 			Vector ki;
 
-			g.update();
-
-			this.geometry = new Geometry.copy(g);
-			this.detector = det;
-			this.hkl.set(h, k, l);
-			this.flag = true;
-
 			// compute the _hkl using only the axes of the geometry
-			weak Holder holder_d = g.holders[det.idx];
-			weak Holder holder_s = g.holders[0];
+			weak Holder holder_d = this.geometry.holders[this.detector.idx];
+			weak Holder holder_s = this.geometry.holders[0];
 
 			// compute Q from angles
-			g.source.compute_ki(out ki);
+			this.geometry.source.compute_ki(out ki);
 			this._hkl = ki;
 			this._hkl.rotated_quaternion(holder_d.q);
 			this._hkl.minus_vector(ki);
@@ -59,6 +61,18 @@ public class Hkl.Sample {
 			Quaternion q = holder_s.q;
 			q.conjugate();
 			this._hkl.rotated_quaternion(q);
+		}
+
+		public Reflection(Geometry g, Detector det, double h, double k, double l)
+		{
+			g.update();
+
+			this.geometry = new Geometry.copy(g);
+			this.detector = det;
+			this.hkl.set(h, k, l);
+			this.flag = true;
+
+			this.update();
 		}
 
 		public Reflection.copy(Reflection src)
@@ -79,9 +93,25 @@ public class Hkl.Sample {
 		{
 			this.flag = flag;
 		}
+
+		public void set_geometry(Geometry geometry)
+		{
+			this.geometry = new Geometry.copy(geometry);
+			this.update();
+		}
 	}
 
-	/* private */
+	void compute_UxUyUz()
+	{
+		double ux;
+		double uy;
+		double uz;
+
+		this.U.to_euler(out ux, out uy, out uz);
+		this.ux.set_value(ux);
+		this.uy.set_value(uy);
+		this.uz.set_value(uz);
+	}
 
 	/* return true if the calculation can not be acheave */
 	bool compute_UB()
@@ -95,6 +125,46 @@ public class Hkl.Sample {
 		this.UB.times_matrix(B);
 
 		return false;
+	}
+
+	struct set_UB_t
+	{
+		unowned Hkl.Sample sample;
+		unowned Hkl.Matrix UB;
+	}
+
+	static double set_UB_fitness([Immutable] Gsl.Vector x, void *params)
+	{
+		size_t i;
+		double fitness;
+		double euler_x;
+		double euler_y;
+		double euler_z;
+		set_UB_t *parameters = params;
+		weak Hkl.Sample sample = parameters->sample;
+		double *UB = &parameters->UB.m11;
+		double *UBs = &sample.UB.m11;
+
+		sample.ux.value = euler_x = x.get(0);
+		sample.uy.value = euler_y = x.get(1);
+		sample.uz.value = euler_z = x.get(2);
+		sample.lattice.a.value = x.get(3);
+		sample.lattice.b.value = x.get(4);
+		sample.lattice.c.value = x.get(5);
+		sample.lattice.alpha.value = x.get(6);
+		sample.lattice.beta.value = x.get(7);
+		sample.lattice.gamma.value = x.get(8);
+		sample.U.from_euler(euler_x, euler_y, euler_z);
+		if (sample.compute_UB())
+			return double.NAN;
+
+		fitness = 0.0;
+		for(i=0; i<9; ++i){
+			double tmp = UB[i] - UBs[i];
+			fitness += tmp * tmp;
+		}
+
+		return fitness;
 	}
 
 	static double mono_crystal_fitness([Immutable] Gsl.Vector x, void *params)
@@ -126,14 +196,72 @@ public class Hkl.Sample {
 		return fitness;
 	}
 
+	double minimize(Gsl.MultiminFunction f)
+	{
+		int status = 0;
+
+		// Starting point
+		var x = new Gsl.Vector(9);
+		x.set(0, this.ux.value);
+		x.set(1, this.uy.value);
+		x.set(2, this.uz.value);
+		x.set(3, this.lattice.a.value);
+		x.set(4, this.lattice.b.value);
+		x.set(5, this.lattice.c.value);
+		x.set(6, this.lattice.alpha.value);
+		x.set(7, this.lattice.beta.value);
+		x.set(8, this.lattice.gamma.value);
+
+		// Set initial step sizes to 1
+		var ss = new Gsl.Vector(9);
+		ss.set(0, (double)this.ux.fit);
+		ss.set(1, (double)this.uy.fit);
+		ss.set(2, (double)this.uz.fit);
+		ss.set(3, (double)this.lattice.a.fit);
+		ss.set(4, (double)this.lattice.b.fit);
+		ss.set(5, (double)this.lattice.c.fit);
+		ss.set(6, (double)this.lattice.alpha.fit);
+		ss.set(7, (double)this.lattice.beta.fit);
+		ss.set(8, (double)this.lattice.gamma.fit);
+
+		// Initialize method and iterate
+		Gsl.Error.set_error_handler_off();
+		var s = new Gsl.MultiminFminimizer(Gsl.MultiminFminimizerTypes.nmsimplex, 9);
+		s.set(&f, x, ss);
+		uint iter = 0;
+		do {
+			++iter;
+			status = s.iterate();
+			if (status != 0)
+				break;
+			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.0);
+		} while (status == Gsl.Status.CONTINUE && iter < 10000U);
+		Gsl.Error.set_error_handler(null);
+
+		return s.size;
+	}
+
 	/* public */
 
-	public Sample(string name)
+	public Sample(string name, SampleType type)
 	{
 		this.name = name;
+		this.type = type;
 		this.lattice = new Lattice.default();
 		this.U.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 		this.UB.set(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+		this.ux = new Parameter("ux", -Math.PI, 0.0, Math.PI,
+					true, true,
+					hkl_unit_angle_rad,
+					hkl_unit_angle_deg);
+		this.uy = new Parameter("uy", -Math.PI, 0.0, Math.PI,
+					true, true,
+					hkl_unit_angle_rad,
+					hkl_unit_angle_deg);
+		this.uz = new Parameter("uz", -Math.PI, 0.0, Math.PI,
+					true, true,
+					hkl_unit_angle_rad,
+					hkl_unit_angle_deg);
 		this.compute_UB();
 	}
 
@@ -145,6 +273,10 @@ public class Hkl.Sample {
 		this.lattice = src.lattice;
 		this.U = src.U;
 		this.UB = src.UB;
+		this.ux = new Parameter.copy(src.ux);
+		this.uy = new Parameter.copy(src.uy);
+		this.uz = new Parameter.copy(src.uz);
+
 		/* make a deep copy of the reflections */
 		this.reflections = new Reflection[src.reflections.length];
 		i=0;
@@ -174,6 +306,9 @@ public class Hkl.Sample {
 	{
 		this.U.set_from_eulers(x, y, z);
 		this.compute_UB();
+		this.ux.set_value(x);
+		this.uy.set_value(y);
+		this.uz.set_value(z);
 
 		return true;
 	}
@@ -184,8 +319,15 @@ public class Hkl.Sample {
 		UB = this.UB;
 	}
 
+	public double set_UB(Hkl.Matrix UB)
+	{
+		set_UB_t params = {this, UB};
+		Gsl.MultiminFunction f = {set_UB_fitness, 9, &params};
 
-	public weak Reflection? add_reflection(Geometry g, Detector det,
+		return this.minimize(f);
+	}
+
+	public unowned Reflection? add_reflection(Geometry g, Detector det,
 					       double h, double k, double l) requires (
 						       Math.fabs(h) >= EPSILON
 						       || Math.fabs(k) >= EPSILON
@@ -197,7 +339,7 @@ public class Hkl.Sample {
 		return this.reflections[len];
 	}
 
-	public weak Reflection? get_ith_reflection(uint idx)
+	public unowned Reflection? get_ith_reflection(uint idx)
 	{
 		return this.reflections[idx];
 	}
@@ -233,6 +375,8 @@ public class Hkl.Sample {
 				// compute U
 				this.U.set_from_two_vectors(r1._hkl, r2._hkl);
 				this.U.times_matrix(Tc);
+				this.compute_UxUyUz();
+				this.compute_UB();
 			} else
 				return true;
 		} else
@@ -243,48 +387,8 @@ public class Hkl.Sample {
 
 	public double affine()
 	{
-		int status = 0;
-
-		// Starting point
-		var x = new Gsl.Vector(9);
-		x.set(0, 10 * DEGTORAD);
-		x.set(1, 10 * DEGTORAD);
-		x.set(2, 10 * DEGTORAD);
-		x.set(3, this.lattice.a.value);
-		x.set(4, this.lattice.b.value);
-		x.set(5, this.lattice.c.value);
-		x.set(6, this.lattice.alpha.value);
-		x.set(7, this.lattice.beta.value);
-		x.set(8, this.lattice.gamma.value);
-
-		// Set initial step sizes to 1
-		var ss = new Gsl.Vector(9);
-		ss.set(0, 1 * DEGTORAD);
-		ss.set(1, 1 * DEGTORAD);
-		ss.set(2, 1 * DEGTORAD);
-		ss.set(3, (double)!this.lattice.a.not_to_fit);
-		ss.set(4, (double)!this.lattice.b.not_to_fit);
-		ss.set(5, (double)!this.lattice.c.not_to_fit);
-		ss.set(6, (double)!this.lattice.alpha.not_to_fit);
-		ss.set(7, (double)!this.lattice.beta.not_to_fit);
-		ss.set(8, (double)!this.lattice.gamma.not_to_fit);
-
-		// Initialize method and iterate
-		Gsl.Error.set_error_handler_off();
-		Gsl.MultiminFunction minex_func = {mono_crystal_fitness, 9, this};
-		var s = new Gsl.MultiminFminimizer(Gsl.MultiminFminimizerTypes.nmsimplex, 9);
-		s.set(&minex_func, x, ss);
-		uint iter = 0;
-		do {
-			++iter;
-			status = s.iterate();
-			if (status != 0)
-				break;
-			status = Gsl.MultiminTest.size(s.size, EPSILON / 2.0);
-		} while (status == Gsl.Status.CONTINUE && iter < 10000U);
-		Gsl.Error.set_error_handler(null);
-
-		return s.size;
+		Gsl.MultiminFunction f = {mono_crystal_fitness, 9, this};
+		return this.minimize(f);
 	}
 
 	public double get_reflection_mesured_angle(int idx1, int idx2)

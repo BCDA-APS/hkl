@@ -37,12 +37,12 @@ public struct Hkl.Matrix {
 		this.set(m11, m12, m13, m21, m22, m23, m31, m32, m33);
 	}
 
-	public Matrix.from_two_vectors(Vector v1, Vector v2)
+	public Matrix.from_two_vector(Vector v1, Vector v2)
 	{
 		this.set_from_two_vectors(v1, v2);
 	}
 
-	public Matrix.from_eulers(double ex, double ey, double ez)
+	public Matrix.from_euler(double ex, double ey, double ez)
 	{
 		this.set_from_eulers(ex, ey, ez);
 	}
@@ -123,9 +123,9 @@ public struct Hkl.Matrix {
 				|| (Math.fabs(this.m32 - m.m32) > EPSILON)
 				|| (Math.fabs(this.m33 - m.m33) > EPSILON)
 		   )
-			return true;
-		else
 			return false;
+		else
+			return true;
 	}
 
 

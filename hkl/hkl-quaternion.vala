@@ -36,7 +36,7 @@ public struct Hkl.Quaternion
 		this.set(0.0, v.x, v.y, v.z);
 	}
 
-	public Quaternion.from_angle_and_axis(double angle, Vector v)
+	public Quaternion.from_angle_and_axe(double angle, Vector v)
 	{
 		double c = Math.cos(angle / 2.0);
 		double s = Math.sin(angle / 2.0) / v.norm2();
@@ -66,9 +66,9 @@ public struct Hkl.Quaternion
 				|| (Math.fabs(this.b - q.b) > EPSILON)
 				|| (Math.fabs(this.c - q.c) > EPSILON)
 				|| (Math.fabs(this.d - q.d) > EPSILON))
-			return true;
-		else
 			return false;
+		else
+			return true;
 	}
 
 	public void minus_quaternion(Quaternion q)

@@ -117,13 +117,13 @@ public class Hkl.PseudoAxisEngineModePsi : Hkl.PseudoAxisEngineMode
 							   false, true, null, null));
 	}
 
-	public override bool init(Geometry geometry, Detector detector, Sample sample)
+	public override bool initialize(Geometry geometry, Detector detector, Sample sample) throws GLib.Error
 	{
 		Vector ki;
 		Matrix RUB;
 		bool status = true;
 	
-		status = base.init(geometry, detector, sample);
+		status = base.initialize(geometry, detector, sample);
 		if (status == false)
 			return status;
 

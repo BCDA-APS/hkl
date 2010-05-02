@@ -119,11 +119,6 @@ HKL_TEST_SUITE_FUNC(is_valid)
 {
 	HklParameter p;
 
-	p = hkl_parameter_new("toto", 1, 2, 3,
-			      HKL_TRUE, HKL_TRUE,
-			      &hkl_unit_angle_rad, &hkl_unit_angle_deg);
-	HKL_ASSERT_EQUAL(HKL_TRUE, hkl_parameter_is_valid(p));
-
 	hkl_parameter_init(&p, "toto", 1, 2, 3,
 			   HKL_FALSE, HKL_TRUE,
 			   &hkl_unit_angle_rad, &hkl_unit_angle_deg);

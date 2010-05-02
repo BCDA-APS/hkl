@@ -142,6 +142,59 @@ public class Hkl.Lattice
 
 		return false;
 	}
+/**
+ * hkl_lattice_get_1_B:
+ * @self: the @HklLattice
+ * @B: the @HklMatrix returned
+ *
+ * Compute the invert of B (needed by the hkl_sample_set_UB method)
+ * should be optimized
+ *
+ * Returns: HKL_SUCCESS or HKL_FAIL depending of the success of the
+ * computation.
+ **/
+	public bool get_1_B(out Hkl.Matrix B)
+	{
+		Hkl.Matrix tmp;
+		double a;
+		double b;
+		double c;
+		double d;
+		double e;
+		double f;
+
+		/*
+		 * first compute the B matrix
+		 * | a b c |
+		 * | 0 d e |
+		 * | 0 0 f |
+		 */
+		this.get_B(out tmp);
+
+		/*
+		 * now invert this triangular matrix
+		 */
+		a = tmp.m11;
+		b = tmp.m12;
+		c = tmp.m13;
+		d = tmp.m21;
+		e = tmp.m22;
+		f = tmp.m23;
+
+		B.m11 = 1 / a;
+		B.m12 = -b / a / d;
+		B.m13 = (b * e - d * c) / a / d / f;
+
+		B.m21 = 0;
+		B.m22 = 1 / d;
+		B.m23 = -e / d / f;
+
+		B.m31 = 0;
+		B.m32 = 0;
+		B.m33 = 1 / f;
+
+		return false;
+	}
 
 	public bool reciprocal(Lattice reciprocal)
 	{
@@ -193,12 +246,12 @@ public class Hkl.Lattice
 		this.b.randomize();
 		this.c.randomize();
 
-		uint angles_to_randomize = (uint)!this.alpha.not_to_fit + (uint)!this.beta.not_to_fit + (uint)!this.gamma.not_to_fit;
+		uint angles_to_randomize = (uint)this.alpha.fit + (uint)this.beta.fit + (uint)this.gamma.fit;
 		switch (angles_to_randomize) {
 			case 0:
 				break;
 			case 1:
-				if (!this.alpha.not_to_fit) {// alpha
+				if (this.alpha.fit) {// alpha
 					a = vector_x;
 					b = vector_x;
 					c = vector_x;
@@ -213,7 +266,7 @@ public class Hkl.Lattice
 
 					//compute the alpha angle.
 					this.alpha.value = b.angle(c);
-				} else if (!this.beta.not_to_fit) {
+				} else if (this.beta.fit) {
 					// beta
 					a = vector_x;
 					b = vector_x;
@@ -248,8 +301,8 @@ public class Hkl.Lattice
 				}
 				break;
 			case 2:
-				if (!this.alpha.not_to_fit) {
-					if (!this.beta.not_to_fit) {// alpha + beta
+				if (this.alpha.fit) {
+					if (this.beta.fit) {// alpha + beta
 						a = vector_x;
 						b = vector_x;
 						c = vector_x;
