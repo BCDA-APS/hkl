@@ -250,11 +250,96 @@ void hkl3d_object_fprintf(FILE *f, const struct Hkl3DObject *self)
 	fprintf(f, "selected : %d\n", self->selected);
 }
 
+static int hkl3d_object_serialize(yaml_document_t *document, const struct Hkl3DObject *self)
+{
+	char buffer[64];
+	int i;
+	int map;
+	int key;
+	int value;
+	int seq;
+
+	map = yaml_document_add_mapping(document,
+					(yaml_char_t *)YAML_MAP_TAG,
+					YAML_BLOCK_MAPPING_STYLE);
+
+	/* Id */
+	key = yaml_document_add_scalar(document, 
+				       NULL,
+				       (yaml_char_t *)"Id", -1, 
+				       YAML_PLAIN_SCALAR_STYLE);
+		
+	sprintf(buffer, "%d", self->id);
+	value = yaml_document_add_scalar(document,
+					 NULL,
+					 (yaml_char_t *)buffer,
+					 -1, 
+					 YAML_PLAIN_SCALAR_STYLE);
+	yaml_document_append_mapping_pair(document, map, key, value);
+
+
+	/* axis name */
+	key = yaml_document_add_scalar(document,
+				       NULL,
+				       (yaml_char_t *)"Name", 
+				       -1, 
+				       YAML_PLAIN_SCALAR_STYLE);
+	value = yaml_document_add_scalar(document,
+					 NULL,
+					 (yaml_char_t *)self->axis_name,
+					 -1, 
+					 YAML_PLAIN_SCALAR_STYLE);
+	yaml_document_append_mapping_pair(document, map, key, value);
+
+
+	/* transformation */
+	key = yaml_document_add_scalar(document,
+				       NULL,
+				       (yaml_char_t *)"Transformation",
+				       -1,
+				       YAML_PLAIN_SCALAR_STYLE);
+	seq = yaml_document_add_sequence(document, 
+					  (yaml_char_t *)YAML_SEQ_TAG,
+					  YAML_FLOW_SEQUENCE_STYLE);
+	for(i=0; i<16; ++i){
+		sprintf(buffer, "%f", self->transformation[i]);
+		value = yaml_document_add_scalar(document,
+						 NULL,
+						 (yaml_char_t *)buffer, 
+						 -1, 	
+						 YAML_PLAIN_SCALAR_STYLE);
+		yaml_document_append_sequence_item(document, seq, value);
+	}
+	yaml_document_append_mapping_pair(document, map, key, seq);
+	
+	/* hide */
+	key = yaml_document_add_scalar(document,
+				       NULL,
+				       (yaml_char_t *)"Hide",
+				       -1,
+				       YAML_PLAIN_SCALAR_STYLE);
+	if(self->hide)
+		value = yaml_document_add_scalar(document,
+						 NULL,
+						 (yaml_char_t *)"yes",
+						 -1,
+						 YAML_PLAIN_SCALAR_STYLE);
+	else
+		value = yaml_document_add_scalar(document,
+						 NULL,
+						 (yaml_char_t *)"no",
+						 -1,
+						 YAML_PLAIN_SCALAR_STYLE);
+	yaml_document_append_mapping_pair(document, map, key, value);
+
+	return map;
+}
+
 /***************/
 /* Hkl3DConfig */
 /***************/
 
-static struct Hkl3DConfig *hkl_config_new(void)
+static struct Hkl3DConfig *hkl3d_config_new(void)
 {
 	struct Hkl3DConfig *self = NULL;
 
@@ -315,6 +400,57 @@ void hkl3d_config_fprintf(FILE *f, const struct Hkl3DConfig *self)
 		hkl3d_object_fprintf(f, self->objects[i]);
 }
 
+static int hkl3d_config_serialize(yaml_document_t *document, const struct Hkl3DConfig *self)
+{
+	int i;
+	char number[64];
+	int map;
+	int key;
+	int value;
+	int seq;
+
+	/* create the property of the root sequence */
+	map = yaml_document_add_mapping(document,
+					(yaml_char_t *)YAML_MAP_TAG,
+					YAML_BLOCK_MAPPING_STYLE);
+
+	/* add the map key1 : value1 to the property */
+	key = yaml_document_add_scalar(document,
+				       NULL,
+				       (yaml_char_t *)"FileName", 
+				       -1, 
+				       YAML_PLAIN_SCALAR_STYLE);
+	value = yaml_document_add_scalar(document,
+					 NULL,
+					 (yaml_char_t *)self->filename,
+					 -1, 
+					 YAML_PLAIN_SCALAR_STYLE);
+	yaml_document_append_mapping_pair(document, map, key, value);
+
+	/* add the map key1 : seq to the first property */
+	key = yaml_document_add_scalar(document,
+				       NULL,
+				       (yaml_char_t *)"Objects",
+				       -1,
+				       YAML_PLAIN_SCALAR_STYLE);
+
+	/* create the sequence of objects */
+	seq = yaml_document_add_sequence(document,
+					 (yaml_char_t *)YAML_SEQ_TAG,
+					 YAML_BLOCK_SEQUENCE_STYLE);
+
+	for(i=0; i<self->len; ++i){
+		int node;
+
+		node = hkl3d_object_serialize(document, self->objects[i]);
+		yaml_document_append_sequence_item(document, seq, node);
+	}
+
+	yaml_document_append_mapping_pair(document, map, key, seq);
+
+	return map;
+}
+
 /****************/
 /* Hkl3DConfigs */
 /****************/
@@ -372,6 +508,26 @@ void hkl3d_configs_fprintf(FILE *f, const struct Hkl3DConfigs *self)
 	fprintf(f, "configs (%d):\n", self->len);
 	for(i=0; i<self->len; ++i)
 		hkl3d_config_fprintf(f, self->configs[i]);
+}
+
+static void hkl3d_configs_serialize(yaml_document_t *document, const struct Hkl3DConfigs *self)
+{
+	int i;
+	int seq;
+
+	if(!document || !self)
+		return;
+
+	/* Create the root of the config file */ 
+	seq = yaml_document_add_sequence(document,
+					  (yaml_char_t *)"coucou",
+					  YAML_BLOCK_SEQUENCE_STYLE);
+	for(i=0; i<self->len; i++){
+		int node;
+
+		node = hkl3d_config_serialize(document, self->configs[i]);
+		yaml_document_append_sequence_item(document, seq, node);
+	}
 }
 
 /**************/
@@ -521,7 +677,7 @@ static void hkl3d_init_internals(struct Hkl3D *self, G3DModel *model, const char
 	if(!self || !model || !filename)
 		return;
 
-	config = hkl_config_new();
+	config = hkl3d_config_new();
 	objects = model->objects;
 	while(objects){
 		G3DObject *object;
@@ -910,163 +1066,6 @@ void hkl3d_load_config(struct Hkl3D *self, const char *filename)
 	hkl3d_connect_all_axes(self);
 }
 
-void hkl3d_save_config(struct Hkl3D *self, const char *filename)
-{
-	int i;
-
-	for(i=0; i<self->configs->len; i++){
-		int j;
-		char number[64];
-		int properties1, key1, value1,seq0;
-		int root;
-		time_t now;
-		yaml_emitter_t emitter;
-		yaml_document_t output_document;
-		yaml_event_t output_event;
-		FILE * file;
-
-		memset(&emitter, 0, sizeof(emitter));
-		memset(&output_document, 0, sizeof(output_document));
-		memset(&output_event, 0, sizeof(output_event));
-	
-		if (!yaml_emitter_initialize(&emitter)) 
-			fprintf(stderr, "Could not inialize the emitter object\n");
-	 
-		/* Set the emitter parameters */
-		file = fopen(filename, "a+");
-		if(!file){
-			fprintf(stderr, "Could not open the config file %s to save\n", filename);
-			return;
-		}
-		yaml_emitter_set_output_file(&emitter, file);
-		yaml_emitter_open(&emitter);
-	
-		/* Create an output_document object */
-		if (!yaml_document_initialize(&output_document, NULL, NULL, NULL, 0, 0))
-			fprintf(stderr, "Could not create a output_document object\n");
-	
-		/* Create the root of the config file */ 
-		time(&now);
-		root = yaml_document_add_sequence(&output_document,
-						  (yaml_char_t *)ctime(&now),
-						  YAML_BLOCK_SEQUENCE_STYLE);
-
-		/* create the property of the root sequence */
-		properties1 = yaml_document_add_mapping(&output_document,
-							(yaml_char_t *)YAML_MAP_TAG,
-							YAML_BLOCK_MAPPING_STYLE);
-
-		yaml_document_append_sequence_item(&output_document, root, properties1);
-	
-		/* add the map key1 : value1 to the property */
-		key1 = yaml_document_add_scalar(&output_document,
-						NULL,
-						(yaml_char_t *)"FileName", 
-						-1, 
-						YAML_PLAIN_SCALAR_STYLE);
-		value1 = yaml_document_add_scalar(&output_document,
-						  NULL,
-						  (yaml_char_t *)self->configs->configs[i]->filename,
-						  -1, 
-						  YAML_PLAIN_SCALAR_STYLE);
-		yaml_document_append_mapping_pair(&output_document, properties1, key1, value1);
-
-		/* add the map key1 : seq0 to the first property */
-		key1 = yaml_document_add_scalar(&output_document,
-						NULL,
-						(yaml_char_t *)"Objects",
-						-1,
-						YAML_PLAIN_SCALAR_STYLE);
-		/* create the sequence of objects */
-		seq0 = yaml_document_add_sequence(&output_document,
-						  (yaml_char_t *)YAML_SEQ_TAG,
-						  YAML_BLOCK_SEQUENCE_STYLE);
-		for(j=0; j<self->configs->configs[i]->len; j++){
-			int k;
-			int properties;
-			int key;
-			int value;
-			int seq1;
-		
-			properties = yaml_document_add_mapping(&output_document,
-							       (yaml_char_t *)YAML_MAP_TAG,
-							       YAML_BLOCK_MAPPING_STYLE);
-			yaml_document_append_sequence_item(&output_document,seq0, properties);
-
-			key = yaml_document_add_scalar(&output_document, 
-						       NULL,
-						       (yaml_char_t *)"Id", -1, 
-						       YAML_PLAIN_SCALAR_STYLE);
-		
-			sprintf(number, "%d", self->configs->configs[i]->objects[j]->id);
-			value = yaml_document_add_scalar(&output_document,
-							 NULL,
-							 (yaml_char_t *)number,
-							 -1, 
-							 YAML_PLAIN_SCALAR_STYLE);
-			yaml_document_append_mapping_pair(&output_document,properties,key,value);
-
-			key = yaml_document_add_scalar(&output_document,
-						       NULL,
-						       (yaml_char_t *)"Name", 
-						       -1, 
-						       YAML_PLAIN_SCALAR_STYLE);
-			value = yaml_document_add_scalar(&output_document,
-							 NULL,
-							 (yaml_char_t *)self->configs->configs[i]->objects[j]->axis_name,
-							 -1, 
-							 YAML_PLAIN_SCALAR_STYLE);
-			yaml_document_append_mapping_pair(&output_document,properties,key,value);
-
-			key = yaml_document_add_scalar(&output_document,
-						       NULL,
-						       (yaml_char_t *)"Transformation",
-						       -1,
-						       YAML_PLAIN_SCALAR_STYLE);
-			seq1 = yaml_document_add_sequence(&output_document, 
-							  (yaml_char_t *)YAML_SEQ_TAG,
-							  YAML_FLOW_SEQUENCE_STYLE);
-			yaml_document_append_mapping_pair(&output_document,properties, key, seq1);
-			for(k=0; k<16; k++){
-				sprintf(number, "%f", self->configs->configs[i]->objects[j]->transformation[k]);
-				value = yaml_document_add_scalar(&output_document,
-								 NULL,
-								 (yaml_char_t *)number, 
-								 -1, 	
-								 YAML_PLAIN_SCALAR_STYLE);
-				yaml_document_append_sequence_item(&output_document,seq1,value);
-			}
-	
-			key = yaml_document_add_scalar(&output_document,
-						       NULL,
-						       (yaml_char_t *)"Hide",
-						       -1,
-						       YAML_PLAIN_SCALAR_STYLE);
-			if(self->configs->configs[i]->objects[j]->hide)
-				value = yaml_document_add_scalar(&output_document,
-								 NULL,
-								 (yaml_char_t *)"yes",
-								 -1,
-								 YAML_PLAIN_SCALAR_STYLE);
-			else
-				value = yaml_document_add_scalar(&output_document,
-								 NULL,
-								 (yaml_char_t *)"no",
-								 -1,
-								 YAML_PLAIN_SCALAR_STYLE);
-			yaml_document_append_mapping_pair(&output_document,properties,key,value);
-		}
-		yaml_document_append_mapping_pair(&output_document, properties1, key1, seq0);
-
-		/* flush the document */
-		yaml_emitter_dump(&emitter, &output_document);
-		fclose(file);
-
-		yaml_document_delete(&output_document);
-		yaml_emitter_delete(&emitter);
-	}
-}
-
 /**
  * Hkl3D::hide_object:
  *
@@ -1229,4 +1228,33 @@ void hkl3d_fprintf(FILE *f, const struct Hkl3D *self)
 #ifdef USE_PARALLEL_DISPATCHER
 	fprintf(f, "_btThreadSupportInterface : %p\n", self->_btThreadSupportInterface);
 #endif
+}
+
+void hkl3d_serialize(FILE *f, const struct Hkl3D *self)
+{
+	int i;
+	yaml_emitter_t emitter;
+	yaml_document_t document;
+
+	if(!f || !self)
+		return;
+
+	memset(&emitter, 0, sizeof(emitter));
+	memset(&document, 0, sizeof(document));
+	
+	if (!yaml_emitter_initialize(&emitter)) 
+		fprintf(stderr, "Could not inialize the emitter object\n");
+	yaml_emitter_set_output_file(&emitter, f);
+	yaml_emitter_open(&emitter);
+	
+	/* Create an output_document object */
+	if (!yaml_document_initialize(&document, NULL, NULL, NULL, 0, 0))
+		fprintf(stderr, "Could not create a output_document object\n");
+
+	hkl3d_configs_serialize(&document, self->configs);
+
+	/* flush the document */
+	yaml_emitter_dump(&emitter, &document);
+	yaml_document_delete(&document);
+	yaml_emitter_delete(&emitter);
 }
