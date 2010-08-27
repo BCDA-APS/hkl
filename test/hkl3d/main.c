@@ -130,6 +130,23 @@ static void check_no_collision(struct Hkl3D *hkl3d)
 	ok(res == TRUE, "no-collision");
 }
 
+static void check_serialization(struct Hkl3D *hkl3d)
+{
+	FILE *f;
+	int res;
+
+	res = TRUE;
+
+	f = fopen("toto.yaml", "w+");
+	hkl3d_serialize(f, hkl3d);
+	fclose(f);
+	f = fopen("toto.yaml", "r+");
+	hkl3d_unserialize(f, hkl3d);
+	fclose(f);
+
+	ok(res = TRUE, "serialization");
+}
+
 int main(int argc, char** argv)
 {
 	char* filename;
@@ -144,10 +161,11 @@ int main(int argc, char** argv)
 	filename  = test_file_path(MODEL_FILENAME);
 	hkl3d = hkl3d_new(filename, geometry);
 
-	plan(3);
+	plan(4);
 	check_model_validity(hkl3d);
 	check_collision(hkl3d);
 	check_no_collision(hkl3d);
+	check_serialization(hkl3d);
 
 	hkl3d_free(hkl3d);
 	test_file_path_free(filename);
