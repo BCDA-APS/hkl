@@ -141,7 +141,7 @@ static void check_serialization(struct Hkl3D *hkl3d)
 	hkl3d_serialize(f, hkl3d);
 	fclose(f);
 	f = fopen("toto.yaml", "r+");
-	hkl3d_unserialize(f, hkl3d);
+	hkl3d_unserialize("toto.yaml", hkl3d);
 	fclose(f);
 
 	ok(res = TRUE, "serialization");

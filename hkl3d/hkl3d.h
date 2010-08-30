@@ -172,6 +172,7 @@ extern "C" {
 
 	extern void hkl3d_fprintf(FILE *f, const struct Hkl3D *self);
 	extern void hkl3d_serialize(FILE *f, const struct Hkl3D *self);
+	extern void hkl3d_unserialize(const char *filename, struct Hkl3D *self);
 
 #ifdef __cplusplus
 }

@@ -335,6 +335,83 @@ static int hkl3d_object_serialize(yaml_document_t *document, const struct Hkl3DO
 	return map;
 }
 
+static void hkl3d_object_unserialize(yaml_parser_t *parser, yaml_event_t *event, struct Hkl3DObject *self)
+{
+	int done = 0;
+	int first = 1;
+	yaml_event_t tmp;
+	int state;
+
+	enum state {KEY1, VALUE1, KEY2, VALUE2, KEY3, VALUE3, KEY4, VALUE4};
+
+	tmp = *event;
+	while(!done){
+		if(!first)
+			yaml_parser_parse(parser, event);
+
+		fprintf(stdout, "%s, %d\n", __func__, event->type);
+ 
+		switch(event->type){
+		case YAML_STREAM_END_EVENT:
+		case YAML_MAPPING_END_EVENT:
+			done = 1;
+			break;
+		case YAML_MAPPING_START_EVENT:
+			state = KEY1;
+			break;
+		case YAML_SEQUENCE_START_EVENT:
+			if(state == VALUE3){
+				int i;
+
+				for(i=0; i<16; ++i){
+					yaml_event_delete(event);
+					yaml_parser_parse(parser, event);
+					//self->transformation[i] = atof((const char *)event->data.scalar.value);
+				}
+				state = KEY4;
+			}
+			break;
+		case YAML_SCALAR_EVENT:
+			fprintf(stdout, "value : %s\n", (const char *)event->data.scalar.value);
+			if (state == VALUE4){
+				//self->hide = !strcmp("yes", (const char *)event->data.scalar.value);
+			}
+			if (state == KEY4){
+				if(!strcmp("Hide", (const char *)event->data.scalar.value))
+					state = VALUE4;
+			}
+			if (state == KEY3){
+				if(!strcmp("Transformation", (const char *)event->data.scalar.value))
+					state = VALUE3;
+			}
+			if (state == VALUE2){
+				//self->axis_name = strdup((const char *)event->data.scalar.value);
+				state = KEY3;
+			}
+			if (state == KEY2){
+				if(!strcmp("Name", (const char *)event->data.scalar.value))
+					state = VALUE2;
+			}
+			if (state == VALUE1){
+				//self->id = atoi((const char *)event->data.scalar.value);
+				state = KEY2;
+			}
+			if (state == KEY1){
+				if(!strcmp("Id", (const char *)event->data.scalar.value))
+					state = VALUE1;
+			}
+			break;
+		default:
+			break;
+		}
+		if (!first)
+			yaml_event_delete(event);
+		else
+			first = 0;
+	}
+	*event = tmp;
+}
+
 /***************/
 /* Hkl3DConfig */
 /***************/
@@ -451,6 +528,67 @@ static int hkl3d_config_serialize(yaml_document_t *document, const struct Hkl3DC
 	return map;
 }
 
+static void hkl3d_config_unserialize(yaml_parser_t *parser, yaml_event_t *event, struct Hkl3DConfig *self)
+{
+	int done = 0;
+	int first = 1;
+	yaml_event_t tmp;
+	int state;
+
+	enum state {MAP, KEY1, VALUE1, KEY2, WAIT_SEQ, SEQ};
+	tmp = *event;
+	state = MAP;
+	while(!done){
+		if(!first)
+			yaml_parser_parse(parser, event);
+
+		fprintf(stdout, "%s, %d state : %d\n", __func__, event->type, state);
+ 
+		if (state == SEQ && event->type != YAML_SEQUENCE_END_EVENT){
+			Hkl3DObject *object;
+
+			hkl3d_object_unserialize(parser, event, object);
+		}
+
+		switch(event->type){
+		case YAML_STREAM_END_EVENT:
+		case YAML_MAPPING_END_EVENT:
+			done = 1;
+			break;
+		case YAML_MAPPING_START_EVENT:
+			if (state == MAP)
+				state = KEY1;
+			break;
+		case YAML_SEQUENCE_START_EVENT:
+			if(state == WAIT_SEQ)
+				state = SEQ;
+			break;
+		case YAML_SCALAR_EVENT:
+			fprintf(stdout, "value : %s\n", (const char *)event->data.scalar.value);
+			if (state == KEY2){
+				if(!strcmp("Objects", (const char *)event->data.scalar.value))
+					state = WAIT_SEQ;
+			}
+			if (state == VALUE1){
+				self->filename = strdup((const char *)event->data.scalar.value);
+				state = KEY2;
+			}
+			if (state == KEY1){
+				if(!strcmp("FileName", (const char *)event->data.scalar.value))
+					state = VALUE1;
+			}
+			break;
+		default:
+			break;
+		}
+		if(!first)
+			yaml_event_delete(event);
+		else
+			first = 0;
+	}
+	*event = tmp;
+}
+
 /****************/
 /* Hkl3DConfigs */
 /****************/
@@ -527,6 +665,45 @@ static void hkl3d_configs_serialize(yaml_document_t *document, const struct Hkl3
 
 		node = hkl3d_config_serialize(document, self->configs[i]);
 		yaml_document_append_sequence_item(document, seq, node);
+	}
+}
+
+static void hkl3d_configs_unserialize(yaml_parser_t *parser, struct Hkl3DConfigs *self)
+{
+	yaml_event_t event;
+	int done = 0;
+	int in_seq = 0;
+	int state;
+
+	enum state {BEGIN, SEQ};
+
+	state = BEGIN;
+	while(!done){
+		yaml_parser_parse(parser, &event);
+
+		fprintf(stdout, "%s, %d state: %d\n", __func__, event.type, state);
+ 
+		if (state == SEQ && event.type != YAML_SEQUENCE_END_EVENT){
+				Hkl3DConfig *config;
+
+				config = hkl3d_config_new();
+				hkl3d_config_unserialize(parser, &event, config);
+				hkl3d_configs_add_config(self, config);
+		}
+
+		switch(event.type){
+		case YAML_STREAM_END_EVENT:
+		case YAML_SEQUENCE_END_EVENT:
+			done = 1;
+			break;
+		case YAML_SEQUENCE_START_EVENT:
+			if(state == BEGIN)
+				state = SEQ;
+			break;
+		default:
+			break;
+		}
+		yaml_event_delete(&event);
 	}
 }
 
@@ -1258,3 +1435,67 @@ void hkl3d_serialize(FILE *f, const struct Hkl3D *self)
 	yaml_document_delete(&document);
 	yaml_emitter_delete(&emitter);
 }
+
+void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
+{
+	int i, j;
+	int done = 0;
+	yaml_parser_t parser;
+	yaml_event_t event;
+	FILE *file;
+	char *dirc;
+	char *dir;
+	struct Hkl3DConfig *config;
+
+	/* Clear the objects. */
+	memset(&parser, 0, sizeof(parser));
+	memset(&event, 0, sizeof(event));
+
+	file = fopen(filename, "rb");
+	if (!file){
+		fprintf(stderr, "Could not open the %s config file\n", filename);
+		return;
+	}
+
+	if (!yaml_parser_initialize(&parser))
+		fprintf(stderr, "Could not initialize the parser object\n");
+	yaml_parser_set_input_file(&parser, file);
+
+	/* 
+	 * compute the dirname of the config file as all model files
+	 * will be relative to this directory
+	 */
+	dirc = strdup(filename);
+	dir = dirname(dirc);
+
+	while(!done){
+		/* Get the next event. */
+		yaml_parser_parse(&parser, &event);
+
+		fprintf(stdout, "%s, %d\n", __func__, event.type);
+ 
+		switch(event.type){
+			/* Check if this is the stream end. */
+		case YAML_STREAM_END_EVENT:
+		case YAML_DOCUMENT_END_EVENT:
+			done = 1;
+			break;
+		case YAML_DOCUMENT_START_EVENT:
+			hkl3d_configs_unserialize(&parser, self->configs);
+			break;
+		default:
+			break;
+		}
+		yaml_event_delete(&event);
+	}
+
+	free(dirc);
+    	yaml_parser_delete(&parser);
+	fclose(file);
+
+	/* now that everythings goes fine we can save the filename */
+	self->filename = filename;
+
+	hkl3d_connect_all_axes(self);
+}
+
