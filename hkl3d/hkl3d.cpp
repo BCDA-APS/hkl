@@ -145,7 +145,7 @@ static btCollisionObject * btObject_from_shape(btCollisionShape* shape)
 }
 
 
-static struct Hkl3DObject *hkl3d_object_new(G3DObject *object, int id, const char* filename)
+static struct Hkl3DObject *hkl3d_object_new_old(G3DObject *object, int id, const char* filename)
 {
 	int i;
 	GSList *faces;
@@ -878,7 +878,7 @@ static void hkl3d_init_internals(struct Hkl3D *self, G3DModel *model, const char
 			struct Hkl3DObject *hkl3dObject;
 			
 			id = g_slist_index(model->objects, object);
-			hkl3dObject = hkl3d_object_new(object, id, filename);
+			hkl3dObject = hkl3d_object_new_old(object, id, filename);
 
 			// insert collision Object in collision world
 			self->_btWorld->addCollisionObject(hkl3dObject->btObject);
