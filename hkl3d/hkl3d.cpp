@@ -144,6 +144,33 @@ static btCollisionObject * btObject_from_shape(btCollisionShape* shape)
 	return btObject;
 }
 
+static struct Hkl3DObject *hkl3d_object_new(void)
+{
+	int i;
+	struct Hkl3DObject *self = NULL;
+
+	self = HKL_MALLOC(Hkl3DObject);
+
+	// fill the hkl3d object structure.
+	self->id = -1;
+	self->axis_name = NULL;
+	self->g3dObject = NULL;
+	self->meshes = NULL;
+	self->btShape = NULL;
+	self->btObject = NULL;
+	self->color = NULL;
+	self->hide = false;
+	self->added = false;
+	self->selected = false;
+	self->movable = false;
+	self->filename = NULL;
+	self->is_colliding = false;
+
+	for(i=0; i<16; i++)
+		self->transformation[i] = identity[i];
+
+	return self;
+}
 
 static struct Hkl3DObject *hkl3d_object_new_old(G3DObject *object, int id, const char* filename)
 {
@@ -386,7 +413,7 @@ static void hkl3d_object_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 				for(i=0; i<16; ++i){
 					yaml_event_delete(event);
 					yaml_parser_parse(parser, event);
-					//self->transformation[i] = atof((const char *)event->data.scalar.value);
+					self->transformation[i] = atof((const char *)event->data.scalar.value);
 				}
 				state = KEY4;
 			}
@@ -398,13 +425,13 @@ static void hkl3d_object_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 				if(!strcmp("Id", (const char *)event->data.scalar.value))
 					state = VALUE1;
 			}else if(state == VALUE1){
-				//self->id = atoi((const char *)event->data.scalar.value);
+				self->id = atoi((const char *)event->data.scalar.value);
 				state = KEY2;
 			}else if(state == KEY2){
 				if(!strcmp("Name", (const char *)event->data.scalar.value))
 					state = VALUE2;
 			}else if(state == VALUE2){
-				//self->axis_name = strdup((const char *)event->data.scalar.value);
+				self->axis_name = strdup((const char *)event->data.scalar.value);
 				state = KEY3;
 			}else if (state == KEY3){
 				if(!strcmp("Transformation", (const char *)event->data.scalar.value))
@@ -413,7 +440,7 @@ static void hkl3d_object_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 				if(!strcmp("Hide", (const char *)event->data.scalar.value))
 					state = VALUE4;
 			}else if (state == VALUE4){
-				//self->hide = !strcmp("yes", (const char *)event->data.scalar.value);
+				self->hide = !strcmp("yes", (const char *)event->data.scalar.value);
 			}
 			break;
 		default:
@@ -560,9 +587,11 @@ static void hkl3d_config_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 			yaml_event_fprintf(stdout, event);
 		}
  
+		/*  now add all the object to the config */
 		if (state == SEQ && event->type != YAML_SEQUENCE_END_EVENT){
 			Hkl3DObject *object;
 
+			object = hkl3d_object_new();
 			hkl3d_object_unserialize(parser, event, object);
 		}
 
