@@ -356,27 +356,28 @@ static int hkl3d_object_serialize(yaml_document_t *document, const struct Hkl3DO
 
 static void hkl3d_object_unserialize(yaml_parser_t *parser, yaml_event_t *event, struct Hkl3DObject *self)
 {
-	int done = 0;
 	int first = 1;
 	yaml_event_t tmp;
 	int state;
 
-	enum state {KEY1, VALUE1, KEY2, VALUE2, KEY3, VALUE3, KEY4, VALUE4};
+	enum state {START, KEY1, VALUE1, KEY2, VALUE2, KEY3, VALUE3, KEY4, VALUE4, DONE};
 
 	tmp = *event;
-	while(!done){
-		if(!first)
+	state = START;
+	while(state != DONE){
+		if(!first){
 			yaml_parser_parse(parser, event);
-
-		fprintf(stdout, "%s, %d\n", __func__, event->type);
+			yaml_event_fprintf(stdout, event);
+		}
  
 		switch(event->type){
 		case YAML_STREAM_END_EVENT:
 		case YAML_MAPPING_END_EVENT:
-			done = 1;
+			state = DONE;
 			break;
 		case YAML_MAPPING_START_EVENT:
-			state = KEY1;
+			if (state == START)
+				state = KEY1;
 			break;
 		case YAML_SEQUENCE_START_EVENT:
 			if(state == VALUE3){
@@ -392,32 +393,27 @@ static void hkl3d_object_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 			break;
 		case YAML_SCALAR_EVENT:
 			fprintf(stdout, "value : %s\n", (const char *)event->data.scalar.value);
-			if (state == VALUE4){
-				//self->hide = !strcmp("yes", (const char *)event->data.scalar.value);
-			}
-			if (state == KEY4){
-				if(!strcmp("Hide", (const char *)event->data.scalar.value))
-					state = VALUE4;
-			}
-			if (state == KEY3){
-				if(!strcmp("Transformation", (const char *)event->data.scalar.value))
-					state = VALUE3;
-			}
-			if (state == VALUE2){
-				//self->axis_name = strdup((const char *)event->data.scalar.value);
-				state = KEY3;
-			}
-			if (state == KEY2){
-				if(!strcmp("Name", (const char *)event->data.scalar.value))
-					state = VALUE2;
-			}
-			if (state == VALUE1){
-				//self->id = atoi((const char *)event->data.scalar.value);
-				state = KEY2;
-			}
-			if (state == KEY1){
+
+			if(state == KEY1){
 				if(!strcmp("Id", (const char *)event->data.scalar.value))
 					state = VALUE1;
+			}else if(state == VALUE1){
+				//self->id = atoi((const char *)event->data.scalar.value);
+				state = KEY2;
+			}else if(state == KEY2){
+				if(!strcmp("Name", (const char *)event->data.scalar.value))
+					state = VALUE2;
+			}else if(state == VALUE2){
+				//self->axis_name = strdup((const char *)event->data.scalar.value);
+				state = KEY3;
+			}else if (state == KEY3){
+				if(!strcmp("Transformation", (const char *)event->data.scalar.value))
+					state = VALUE3;
+			}else if (state == KEY4){
+				if(!strcmp("Hide", (const char *)event->data.scalar.value))
+					state = VALUE4;
+			}else if (state == VALUE4){
+				//self->hide = !strcmp("yes", (const char *)event->data.scalar.value);
 			}
 			break;
 		default:
@@ -549,19 +545,20 @@ static int hkl3d_config_serialize(yaml_document_t *document, const struct Hkl3DC
 
 static void hkl3d_config_unserialize(yaml_parser_t *parser, yaml_event_t *event, struct Hkl3DConfig *self)
 {
-	int done = 0;
 	int first = 1;
 	yaml_event_t tmp;
 	int state;
 
-	enum state {MAP, KEY1, VALUE1, KEY2, WAIT_SEQ, SEQ};
-	tmp = *event;
-	state = MAP;
-	while(!done){
-		if(!first)
-			yaml_parser_parse(parser, event);
+	enum state {START, KEY1, VALUE1, KEY2, WAIT_SEQ, SEQ, DONE};
 
-		fprintf(stdout, "%s, %d state : %d\n", __func__, event->type, state);
+	tmp = *event;
+
+	state = START;
+	while(state != DONE){
+		if(!first){
+			yaml_parser_parse(parser, event);
+			yaml_event_fprintf(stdout, event);
+		}
  
 		if (state == SEQ && event->type != YAML_SEQUENCE_END_EVENT){
 			Hkl3DObject *object;
@@ -572,10 +569,10 @@ static void hkl3d_config_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 		switch(event->type){
 		case YAML_STREAM_END_EVENT:
 		case YAML_MAPPING_END_EVENT:
-			done = 1;
+			state = DONE;
 			break;
 		case YAML_MAPPING_START_EVENT:
-			if (state == MAP)
+			if (state == START)
 				state = KEY1;
 			break;
 		case YAML_SEQUENCE_START_EVENT:
@@ -584,17 +581,15 @@ static void hkl3d_config_unserialize(yaml_parser_t *parser, yaml_event_t *event,
 			break;
 		case YAML_SCALAR_EVENT:
 			fprintf(stdout, "value : %s\n", (const char *)event->data.scalar.value);
-			if (state == KEY2){
-				if(!strcmp("Objects", (const char *)event->data.scalar.value))
-					state = WAIT_SEQ;
-			}
-			if (state == VALUE1){
-				self->filename = strdup((const char *)event->data.scalar.value);
-				state = KEY2;
-			}
-			if (state == KEY1){
+			if(state == KEY1){
 				if(!strcmp("FileName", (const char *)event->data.scalar.value))
 					state = VALUE1;
+			}else if(state == VALUE1){
+				self->filename = strdup((const char *)event->data.scalar.value);
+				state = KEY2;
+			}else if(state == KEY2){
+				if(!strcmp("Objects", (const char *)event->data.scalar.value))
+					state = WAIT_SEQ;
 			}
 			break;
 		default:
@@ -694,13 +689,12 @@ static void hkl3d_configs_unserialize(yaml_parser_t *parser, struct Hkl3DConfigs
 	int in_seq = 0;
 	int state;
 
-	enum state {BEGIN, SEQ};
+	enum state {START, SEQ, DONE};
 
-	state = BEGIN;
-	while(!done){
+	state = START;
+	while(state != DONE){
 		yaml_parser_parse(parser, &event);
-
-		fprintf(stdout, "%s, %d state: %d\n", __func__, event.type, state);
+		yaml_event_fprintf(stdout, &event);
  
 		if (state == SEQ && event.type != YAML_SEQUENCE_END_EVENT){
 			Hkl3DConfig *config;
@@ -713,10 +707,10 @@ static void hkl3d_configs_unserialize(yaml_parser_t *parser, struct Hkl3DConfigs
 		switch(event.type){
 		case YAML_STREAM_END_EVENT:
 		case YAML_SEQUENCE_END_EVENT:
-			done = 1;
+			state = DONE;
 			break;
 		case YAML_SEQUENCE_START_EVENT:
-			if(state == BEGIN)
+			if(state == START)
 				state = SEQ;
 			break;
 		default:
@@ -1491,7 +1485,7 @@ void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
 		/* Get the next event. */
 		yaml_parser_parse(&parser, &event);
 
-		fprintf(stdout, "%s, %d\n", __func__, event.type);
+		yaml_event_fprintf(stdout, &event);
  
 		switch(event.type){
 			/* Check if this is the stream end. */
