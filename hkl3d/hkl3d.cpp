@@ -52,6 +52,25 @@ static float identity[] = {1, 0, 0, 0,
 			   0, 0, 1 ,0,
 			   0, 0, 0, 1};
 
+static void yaml_event_fprintf(FILE *f, yaml_event_t *event)
+{
+	static const char* event_names[] = {
+		"YAML_NO_EVENT",
+		"YAML_STREAM_START_EVENT",
+		"YAML_STREAM_END_EVENT",
+		"YAML_DOCUMENT_START_EVENT",
+		"YAML_DOCUMENT_END_EVENT",
+		"YAML_ALIAS_EVENT",
+		"YAML_SCALAR_EVENT",
+		"YAML_SEQUENCE_START_EVENT",
+		"YAML_SEQUENCE_END_EVENT",
+		"YAML_MAPPING_START_EVENT",
+		"YAML_MAPPING_END_EVENT"
+	};
+
+	fprintf(f, "event.type : %s\n", event_names[event->type]); 
+}
+
 /***************/
 /* Hkl3DObject */
 /***************/
