@@ -318,8 +318,8 @@ static int hkl3d_object_serialize(yaml_document_t *document, const struct Hkl3DO
 				       -1,
 				       YAML_PLAIN_SCALAR_STYLE);
 	seq = yaml_document_add_sequence(document, 
-					  (yaml_char_t *)YAML_SEQ_TAG,
-					  YAML_FLOW_SEQUENCE_STYLE);
+					 (yaml_char_t *)YAML_SEQ_TAG,
+					 YAML_FLOW_SEQUENCE_STYLE);
 	for(i=0; i<16; ++i){
 		sprintf(buffer, "%f", self->transformation[i]);
 		value = yaml_document_add_scalar(document,
@@ -677,8 +677,8 @@ static void hkl3d_configs_serialize(yaml_document_t *document, const struct Hkl3
 
 	/* Create the root of the config file */ 
 	seq = yaml_document_add_sequence(document,
-					  (yaml_char_t *)"coucou",
-					  YAML_BLOCK_SEQUENCE_STYLE);
+					 (yaml_char_t *)"coucou",
+					 YAML_BLOCK_SEQUENCE_STYLE);
 	for(i=0; i<self->len; i++){
 		int node;
 
@@ -703,11 +703,11 @@ static void hkl3d_configs_unserialize(yaml_parser_t *parser, struct Hkl3DConfigs
 		fprintf(stdout, "%s, %d state: %d\n", __func__, event.type, state);
  
 		if (state == SEQ && event.type != YAML_SEQUENCE_END_EVENT){
-				Hkl3DConfig *config;
+			Hkl3DConfig *config;
 
-				config = hkl3d_config_new();
-				hkl3d_config_unserialize(parser, &event, config);
-				hkl3d_configs_add_config(self, config);
+			config = hkl3d_config_new();
+			hkl3d_config_unserialize(parser, &event, config);
+			hkl3d_configs_add_config(self, config);
 		}
 
 		switch(event.type){
