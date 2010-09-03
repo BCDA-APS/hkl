@@ -38,6 +38,8 @@ static void check_model_validity(struct Hkl3D *hkl3d)
 
 	res = TRUE;
 
+	hkl3d_fprintf(stdout, hkl3d);
+
 	/* imported 1 config files with 7 Hkl3DObjects */
 	res &= hkl3d->configs->len == 1;
 	res &= hkl3d->configs->configs[0]->len == 7;
@@ -163,15 +165,15 @@ int main(int argc, char** argv)
 	/* compute the filename of the diffractometer config file */
 	filename  = test_file_path(MODEL_FILENAME);
 	hkl3d = hkl3d_new(filename, geometry);
+	test_file_path_free(filename);
 
 	plan(4);
+	check_serialization(hkl3d);
 	check_model_validity(hkl3d);
 	check_collision(hkl3d);
 	check_no_collision(hkl3d);
-	check_serialization(hkl3d);
 
 	hkl3d_free(hkl3d);
-	test_file_path_free(filename);
 	hkl_geometry_free(geometry);
 
 	return 0;

@@ -1600,6 +1600,8 @@ void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
 			hkl3d_clear_btworld(self);
 			hkl3d_configs_free(self->configs);
 			self->configs = configs;
+			hkl3d_geometry_free(self->movingObjects);
+			self->movingObjects = hkl3d_geometry_new(self->geometry->len);
 			state = DONE;
 			break;
 		default:
