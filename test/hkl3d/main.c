@@ -26,6 +26,7 @@
 #include "tap/basic.h"
 
 #define MODEL_FILENAME "data/diffabs.yaml"
+#define MODEL2_FILENAME "data/toto.yaml"
 
 static void check_model_validity(struct Hkl3D *hkl3d)
 {
@@ -134,15 +135,17 @@ static void check_serialization(struct Hkl3D *hkl3d)
 {
 	FILE *f;
 	int res;
+	char* filename;
 
 	res = TRUE;
 
-	f = fopen("toto.yaml", "w+");
+	/* compute the filename of the diffractometer config file */
+	filename  = test_file_path(MODEL2_FILENAME);
+
+	f = fopen(filename, "w+");
 	hkl3d_serialize(f, hkl3d);
 	fclose(f);
-	f = fopen("toto.yaml", "r+");
-	hkl3d_unserialize("toto.yaml", hkl3d);
-	fclose(f);
+	hkl3d_unserialize(filename, hkl3d);
 
 	ok(res = TRUE, "serialization");
 }

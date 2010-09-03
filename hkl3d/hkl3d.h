@@ -36,6 +36,8 @@ struct btCollisionDispatcher;
 struct btCollisionShape;
 struct btVector3;
 struct btTriangleMesh;
+struct Hkl3DConfig;
+struct Hkl3DConfigs;
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,7 +62,7 @@ extern "C" {
 
 	struct Hkl3DObject
 	{
-		const char* filename; 
+		struct Hkl3DConfig *config;
 		int id;
 		struct btCollisionObject *btObject;
 		G3DObject *g3dObject;
@@ -84,9 +86,12 @@ extern "C" {
 
 	struct Hkl3DConfig
 	{
-		char *filename;	
+		char *filename;
+		struct Hkl3DConfigs *configs;
 		struct Hkl3DObject **objects;
 		int len;
+		G3DModel *model;
+		G3DContext *context;
 	};
 
 	extern void hkl3d_config_fprintf(FILE *f, const struct Hkl3DConfig *self);
