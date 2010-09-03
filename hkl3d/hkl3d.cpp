@@ -1132,8 +1132,10 @@ struct Hkl3D *hkl3d_new(const char *filename, HklGeometry *geometry)
 					      self->_btCollisionConfiguration);
 
 	self->filename = filename;
+	// if (filename)
+	// 	hkl3d_load_config(self, filename);
 	if (filename)
-		hkl3d_load_config(self, filename);
+		hkl3d_unserialize(filename, self);
 
 	return self;
 }
@@ -1578,16 +1580,42 @@ void hkl3d_serialize(FILE *f, const struct Hkl3D *self)
 	yaml_emitter_delete(&emitter);
 }
 
-void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
+/* regenerate the non serialized part */
+static void hkl3d_post_unserialize(struct Hkl3D *self)
 {
 	char curdir[PATH_MAX];
+	char *dirc;
+	char *dir;
+
+	/* set up the Geometry */
+	hkl3d_geometry_free(self->movingObjects);
+	self->movingObjects = hkl3d_geometry_new(self->geometry->len);
+
+	/*
+	 * compute the dirname of the config file as all model files
+	 * will be relative to this directory
+	 */
+	getcwd(curdir, PATH_MAX);
+	dirc = strdup(self->filename);
+	dir = dirname(dirc);
+	chdir(dir);
+
+	hkl3d_configs_post_unserialize(self->configs);
+
+	chdir(curdir);
+	free(dirc);
+ 
+	hkl3d_connect_all_axes(self);
+}
+
+void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
+{
 	int i, j;
 	int state;
 	yaml_parser_t parser;
 	yaml_event_t event;
 	FILE *file;
-	char *dirc;
-	char *dir;
+	struct Hkl3DConfigs *configs;
 
 	enum state {START, DONE};
 
@@ -1617,15 +1645,12 @@ void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
 			state = DONE;
 			break;
 		case YAML_DOCUMENT_START_EVENT:
-			struct Hkl3DConfigs *configs;
-
 			configs = hkl3d_configs_new();
 			hkl3d_configs_unserialize(&parser, configs);
+			/* put a reference to hkl3d in the configs */
 			hkl3d_clear_btworld(self);
 			hkl3d_configs_free(self->configs);
 			self->configs = configs;
-			hkl3d_geometry_free(self->movingObjects);
-			self->movingObjects = hkl3d_geometry_new(self->geometry->len);
 			state = DONE;
 			break;
 		default:
@@ -1637,26 +1662,8 @@ void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
    	yaml_parser_delete(&parser);
 	fclose(file);
 
-
-	/* now that all the serialized part have been restored */
-	/* lets regenerate the non serialized part */
-	/* 
-	 * compute the dirname of the config file as all model files
-	 * will be relative to this directory
-	 */
-	getcwd(curdir, PATH_MAX);
-	dirc = strdup(filename);
-	dir = dirname(dirc);
-	chdir(dir);
-
-	hkl3d_configs_post_unserialize(self->configs);
-
-	chdir(curdir);
-	free(dirc);
- 
-	/* now that everythings goes fine we can save the filename */
 	self->filename = filename;
 
-	hkl3d_connect_all_axes(self);
+	hkl3d_post_unserialize(self);
 }
 
