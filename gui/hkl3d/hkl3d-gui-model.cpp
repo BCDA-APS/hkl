@@ -236,7 +236,8 @@ namespace Hkl3dGui
 		options->updated = true;
 		options->initialized = false;
 		GL_ShapeDrawer::drawCoordSystem();
-		GLDRAW::gl_draw(options, _hkl3d->model);
+		// for(i=0; i<_hkl3d->configs->len; ++i)
+		// 	GLDRAW::gl_draw(options, _hkl3d->configs->configs[i]->model);
 		glFlush();
 	}
 
