@@ -1102,7 +1102,6 @@ struct Hkl3D *hkl3d_new(const char *filename, HklGeometry *geometry)
 
 	// first initialize the _movingObjects with the right len.
 	self->_context = g3d_context_new();
-	self->model= g3d_model_new();
 
 	// initialize the bullet part
 	self->_btCollisionConfiguration = new btDefaultCollisionConfiguration();
@@ -1163,7 +1162,6 @@ void hkl3d_free(struct Hkl3D *self)
 #endif
 	if (self->_btCollisionConfiguration)
 		delete self->_btCollisionConfiguration;
-	g3d_model_free(self->model);
 	g3d_context_free(self->_context);
 
 	free(self);
@@ -1186,10 +1184,6 @@ struct Hkl3DConfig *hkl3d_add_model_from_file(struct Hkl3D *self,
 	res = chdir(current);
 
 	if(model){
-		/* concatenate the added Model with the one from Hkl3D */ 
-		self->model->objects = g_slist_concat(self->model->objects, model->objects);
-		self->model->materials = g_slist_concat(self->model->materials, model->materials);
-
 		/* update the Hkl3D internals from the model */
 		hkl3d_init_internals(self, model, filename);
 
@@ -1422,7 +1416,7 @@ void hkl3d_remove_object(struct Hkl3D *self, struct Hkl3DObject *object)
 	hkl3d_geometry_remove_object(self->movingObjects, object);
 
 	/* now remove the G3DObject from the model */
-	self->model->objects = g_slist_remove(self->model->objects, object->g3dObject);
+	//self->model->objects = g_slist_remove(self->model->objects, object->g3dObject);
 	g3d_object_free(object->g3dObject);
 	hkl3d_configs_delete_object(self->configs, object);
 }
@@ -1535,7 +1529,6 @@ void hkl3d_fprintf(FILE *f, const struct Hkl3D *self)
 	fprintf(f, "- filename : %s\n", self->filename);
 	hkl_geometry_fprintf(f, self->geometry);
 	fprintf(f, "\n");
-	fprintf(f, "- model : %p\n", self->model);
 	hkl3d_stats_fprintf(f, &self->stats);
 	hkl3d_configs_fprintf(f, self->configs);
 	hkl3d_geometry_fprintf(f, self->movingObjects);

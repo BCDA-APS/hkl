@@ -136,7 +136,6 @@ extern "C" {
 	{
 		char const *filename; /* config filename */
 		HklGeometry *geometry; /* do not own this object */
-		G3DModel *model;
 		struct Hkl3DStats stats;
 		struct Hkl3DConfigs *configs;
 		struct Hkl3DGeometry *movingObjects;
