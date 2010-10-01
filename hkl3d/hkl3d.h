@@ -155,8 +155,8 @@ extern "C" {
 	extern void hkl3d_free(struct Hkl3D *self);
 
 	extern int hkl3d_is_colliding(struct Hkl3D *self);
-	extern void hkl3d_load_config(struct Hkl3D *self, const char *filename);
-	extern void hkl3d_save_config(struct Hkl3D *self, const char *filename);
+	extern void hkl3d_load(struct Hkl3D *self, const char *filename);
+	extern void hkl3d_save(const struct Hkl3D *self, FILE *f);
 	extern struct Hkl3DConfig *hkl3d_add_model_from_file(struct Hkl3D *self,
 							     const char *filename, const char *directory);
 
@@ -175,8 +175,6 @@ extern "C" {
 						 struct Hkl3DObject *object, const char *name);
 
 	extern void hkl3d_fprintf(FILE *f, const struct Hkl3D *self);
-	extern void hkl3d_serialize(FILE *f, const struct Hkl3D *self);
-	extern void hkl3d_unserialize(const char *filename, struct Hkl3D *self);
 
 #ifdef __cplusplus
 }

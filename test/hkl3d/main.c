@@ -139,16 +139,19 @@ static void check_serialization(struct Hkl3D *hkl3d)
 	int res;
 	char* filename;
 
-	res = TRUE;
+	res = FALSE;
 
 	/* compute the filename of the diffractometer config file */
 	filename  = test_file_path(MODEL2_FILENAME);
 
 	f = fopen(filename, "w+");
-	hkl3d_serialize(f, hkl3d);
-	fclose(f);
-	hkl3d_unserialize(filename, hkl3d);
-
+	if(f){
+		fprintf(stdout, "filename : %s", filename);
+		hkl3d_save(hkl3d, f);
+		fclose(f);
+		hkl3d_load(hkl3d, filename);
+		res = TRUE;
+	}
 	ok(res = TRUE, "serialization");
 }
 

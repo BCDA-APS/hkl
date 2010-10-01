@@ -43,6 +43,7 @@ struct _G3DGLRenderState {
 	guint32 prev_texid;
 };
 
+#define DEBUG 5
 #if DEBUG > 0
 #define TIMING
 #endif

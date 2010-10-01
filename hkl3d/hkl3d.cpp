@@ -172,60 +172,12 @@ static struct Hkl3DObject *hkl3d_object_new(void)
 	return self;
 }
 
-static struct Hkl3DObject *hkl3d_object_new_old(G3DObject *object, int id)
-{
-	int i;
-	GSList *faces;
-	G3DMaterial* material;
-	struct Hkl3DObject *self = NULL;
-
-	self = HKL_MALLOC(Hkl3DObject);
-
-	// extract the color from the first face
-	faces = object->faces;
-	material = ((G3DFace *)faces->data)->material;
-
-	// fill the hkl3d object structure.
-	self->id = id;
-	self->axis_name = strdup(object->name);
-	self->g3dObject = object;
-	self->meshes = trimesh_from_g3dobject(object);
-	self->btShape = shape_from_trimesh(self->meshes, false);
-	self->btObject = btObject_from_shape(self->btShape);
-	self->color = new btVector3(material->r, material->g, material->b);
-	self->hide = object->hide;
-	self->added = false;
-	self->selected = false;
-	self->movable = false;
-
-	/*
-	 * if the object already contain a transformation set the Hkl3DObject
-	 * transformation with this transformation. Otherwise set it with the
-	 * identity
-	 */
-	if(object->transformation){
-		for(i=0; i<16; i++)
-			self->transformation[i] = object->transformation->matrix[i];
-	}else{
-		/* create one as we requiered it to apply our transformations */
-		object->transformation = g_new0(G3DTransformation, 1);
-		for(i=0; i<16; i++){
-			self->transformation[i] = identity[i];
-			object->transformation->matrix[i] = identity[i];
-		}
-	}
-
-	self->is_colliding = false;
-
-	return self;
-}
-
 static void hkl3d_object_free(struct Hkl3DObject *self)
 {
 	if(!self)
 		return;
 
-	/* memory leak in libg3d */
+	/* memory leak in libg3d to move in the config part */
 	if(self->g3dObject && self->g3dObject->transformation){
 		g_free(self->g3dObject->transformation);
 		self->g3dObject->transformation = NULL;
@@ -252,6 +204,58 @@ static void hkl3d_object_free(struct Hkl3DObject *self)
 	}
 
 	free(self);
+}
+
+static void hkl3d_object_set_G3DObject(struct Hkl3DObject *self, G3DObject * object, int id)
+{
+	int i;
+	GSList *faces;
+	G3DMaterial* material;
+
+	if(!self || !object)
+		return;
+
+	/* release btObject */
+	if(self->color)
+		delete self->color;
+	if(self->btObject)
+		delete self->btObject;
+	if(self->btShape)
+		delete self->btShape;
+	if(self->meshes)
+		delete self->meshes;
+
+
+	/* first find the right object depending on the id and the name of the object */
+	faces = object->faces;
+	material = ((G3DFace *)faces->data)->material;
+	
+	self->g3dObject = object;
+	self->meshes = trimesh_from_g3dobject(object);
+	self->btShape = shape_from_trimesh(self->meshes, false);
+	self->btObject = btObject_from_shape(self->btShape);
+	self->color = new btVector3(material->r, material->g, material->b);
+	self->hide = object->hide;
+	self->added = false;
+	self->selected = false;
+	self->movable = false;
+
+	/*
+	 * if the object already contain a transformation set the Hkl3DObject
+	 * transformation with this transformation. Otherwise set it with the
+	 * identity
+	 */
+	if(object->transformation){
+		for(i=0; i<16; i++)
+			self->transformation[i] = object->transformation->matrix[i];
+	}else{
+		/* create one as we requiered it to apply our transformations */
+		object->transformation = g_new0(G3DTransformation, 1);
+		for(i=0; i<16; i++){
+			self->transformation[i] = identity[i];
+			object->transformation->matrix[i] = identity[i];
+		}
+	}
 }
 
 /* return 0 if identical 1 if not */
@@ -555,6 +559,61 @@ static void hkl3d_config_delete_object(struct Hkl3DConfig *self, struct Hkl3DObj
 			if(i < self->len)
 				memmove(&self->objects[i], &self->objects[i+1], sizeof(*self->objects) * (self->len - i));
 		}
+}
+
+/* create a new config from a filename, the directory can be NULL */
+static struct Hkl3DConfig *hkl3d_config_new_from_filename(const char *filename, const char *directory)
+{
+	struct Hkl3DConfig *self = NULL;
+	char current[PATH_MAX];
+	int res;
+
+	if(!filename)
+		return NULL;
+
+	self = hkl3d_config_new();
+
+	/* first set the current directory using the directory parameter*/
+	getcwd(current, PATH_MAX);
+	res = chdir(directory);
+
+	self->context = g3d_context_new();
+	self->model = g3d_model_load_full(self->context, filename, 0);
+
+	res = chdir(current);
+
+	if(!self->model){
+		hkl3d_config_free(self);
+		return NULL;
+	}else{
+		/* create all the objects of the model */
+		GSList *objects;
+
+		objects = self->model->objects;
+		while(objects){
+			G3DObject *object;
+
+			object = (G3DObject*)objects->data;
+			if(object->vertex_count){			
+				int id;
+				struct Hkl3DObject *hkl3DObject;
+			
+				id = g_slist_index(self->model->objects, object);
+				hkl3DObject = hkl3d_object_new();
+				hkl3d_object_set_G3DObject(hkl3DObject, object, id);
+
+				// insert collision Object in collision world
+				//self->_btWorld->addCollisionObject(hkl3dObject->btObject);
+				//hkl3DObject->added = true;
+			
+				// remembers objects to avoid memory leak
+				hkl3d_config_add_object(self, hkl3DObject);
+			}
+			objects = g_slist_next(objects);
+		}
+		self->filename = strdup(filename);
+	}
+	return self;
 }
 
 void hkl3d_config_fprintf(FILE *f, const struct Hkl3DConfig *self)
@@ -975,46 +1034,6 @@ static void hkl3d_geometry_remove_object(struct Hkl3DGeometry *self, struct Hkl3
 /* HKL3D */
 /*********/
 
-/*
- * Initialize the bullet collision environment.
- * create the Hkl3DObjects
- * create the Hkl3DConfigs
- */
-static void hkl3d_init_internals(struct Hkl3D *self, G3DModel *model, const char *filename)
-{
-	struct Hkl3DConfig *config;
-	GSList *objects; // lets iterate from the first object.
-
-	if(!self || !model || !filename)
-		return;
-
-	config = hkl3d_config_new();
-	objects = model->objects;
-	while(objects){
-		G3DObject *object;
-
-		object = (G3DObject*)objects->data;
-		if(object->vertex_count){			
-			int id;
-			struct Hkl3DObject *hkl3dObject;
-			
-			id = g_slist_index(model->objects, object);
-			hkl3dObject = hkl3d_object_new_old(object, id);
-
-			// insert collision Object in collision world
-			self->_btWorld->addCollisionObject(hkl3dObject->btObject);
-			hkl3dObject->added = true;
-			
-			// remembers objects to avoid memory leak
-			hkl3d_config_add_object(config, hkl3dObject);
-		}
-		objects = g_slist_next(objects);
-	}
-	
-	config->filename = strdup(filename);
-	hkl3d_configs_add_config(self->configs, config);
-}
-
 static void hkl3d_apply_transformations(struct Hkl3D *self)
 {
 	int i;
@@ -1131,10 +1150,8 @@ struct Hkl3D *hkl3d_new(const char *filename, HklGeometry *geometry)
 					      self->_btCollisionConfiguration);
 
 	self->filename = filename;
-	// if (filename)
-	// 	hkl3d_load_config(self, filename);
 	if (filename)
-		hkl3d_unserialize(filename, self);
+		hkl3d_load(self, filename);
 
 	return self;
 }
@@ -1185,13 +1202,7 @@ struct Hkl3DConfig *hkl3d_add_model_from_file(struct Hkl3D *self,
 
 	if(model){
 		/* update the Hkl3D internals from the model */
-		hkl3d_init_internals(self, model, filename);
-
-		/* now method to merge two models so we need to free the memory allocated */
-		g_free(model);
-	
-		/* if resp == true there is a problem in the diffractometer model. */
-		config = hkl3d_configs_get_last(self->configs);
+		config = hkl3d_config_new_from_filename(filename, directory);
 	}
 	return config;
 }
@@ -1250,135 +1261,6 @@ void hkl3d_connect_object_to_axis(struct Hkl3D *self,
 	}
 	if(connect)
 		hkl3d_axis_attach_object(self->movingObjects->axes[idx], object);
-}
-
-void hkl3d_load_config(struct Hkl3D *self, const char *filename)
-{
-	int j,l;
-	int newFile=0;
-	int endEvent = 0;
-	yaml_parser_t parser;
-	yaml_event_t input_event;
-	FILE *file;
-	char *dirc;
-	char *dir;
-	struct Hkl3DConfig *config;
-
-	/* Clear the objects. */
-	memset(&parser, 0, sizeof(parser));
-	memset(&input_event, 0, sizeof(input_event));
-
-	file = fopen(filename, "rb");
-	if (!file){
-		fprintf(stderr, "Could not open the %s config file\n", filename);
-		return;
-	}
-
-	if (!yaml_parser_initialize(&parser))
-		fprintf(stderr, "Could not initialize the parser object\n");
-	yaml_parser_set_input_file(&parser, file);
-
-	/* 
-	 * compute the dirname of the config file as all model files
-	 * will be relative to this directory
-	 */
-	dirc = strdup(filename);
-	dir = dirname(dirc);
-
-	while(!endEvent){
-		/* Get the next event. */
-		yaml_parser_parse(&parser, &input_event);
-		
-		/* Check if this is the stream end. */
-		if(input_event.type == YAML_STREAM_END_EVENT)
-			endEvent = 1;
-		if(input_event.type == YAML_DOCUMENT_START_EVENT){
-			j=0;
-			/* skip 4 events */
-			// DOCUMENT-START
-			// SEQUENCE-START
-			// MAPPING-START
-			// SCALAR fileName key
-			for(l=0;l<4;l++){
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-		
-			/* the add form file method create a default Hkl3DConfig and add it to the HKL3D */
-			/* we just need to update this config with the values from the configuration file */
-			config = hkl3d_add_model_from_file(self, (const char *)input_event.data.scalar.value, dir);
-			/* skip 3 events */
-			// SCALAR objects key
-			// SEQUENCE-START
-			// MAPPING-START
-			for(l=0;l<3;l++){
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-		}
-		
-		if((input_event.type==YAML_MAPPING_START_EVENT)&& config){
-			j++;
-			/* skip 2 events */
-			// MAPPING-START
-			// SCALAR iD key
-			for(l=0;l<2;l++){
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-
-			/* get the object id */
-			config->objects[j-1]->id = atoi((const char *)input_event.data.scalar.value);
-
-			/* skip 2 more events */
-			// SCALAR valueId
-			// SCALAR Name key
-			for(l=0;l<2;l++){
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-
-			/* get the name of the object from the config file */
-			hkl3d_object_set_axis_name(config->objects[j-1], (const char *)input_event.data.scalar.value);
-			/*  skip 3 events */
-			// SCALAR NameValue
-			// SCALAR transformation key
-			// SEQUENCE-START
-			for(l=0;l<3;l++){
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-
-			/* get the 16 values of the transformation */
-			for(l=0;l<16;l++){
-				config->objects[j-1]->transformation[l] = atof((const char *)input_event.data.scalar.value);
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-
-			/* skip 2 events */
-			// SEQUENCE-END
-			// SCALAR hide key
-			for(l=0;l<2;l++){
-				yaml_event_delete(&input_event);
-				yaml_parser_parse(&parser, &input_event);
-			}
-
-			/* get the hide value */
-			config->objects[j-1]->hide = strcmp((const char *)input_event.data.scalar.value, "no");	
-			config->objects[j-1]->g3dObject->hide = config->objects[j-1]->hide;
-		}
-		yaml_event_delete(&input_event);
-	}
-
-	free(dirc);
-    	yaml_parser_delete(&parser);
-	fclose(file);
-
-	/* now that everythings goes fine we can save the filename */
-	self->filename = filename;
-
-	hkl3d_connect_all_axes(self);
 }
 
 /**
@@ -1544,7 +1426,7 @@ void hkl3d_fprintf(FILE *f, const struct Hkl3D *self)
 #endif
 }
 
-void hkl3d_serialize(FILE *f, const struct Hkl3D *self)
+void hkl3d_save(const struct Hkl3D *self, FILE *f)
 {
 	int i;
 	yaml_emitter_t emitter;
@@ -1601,7 +1483,7 @@ static void hkl3d_post_unserialize(struct Hkl3D *self)
 	hkl3d_connect_all_axes(self);
 }
 
-void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
+void hkl3d_load(struct Hkl3D *self, const char *filename)
 {
 	int i, j;
 	int state;
@@ -1658,5 +1540,7 @@ void hkl3d_unserialize(const char *filename, struct Hkl3D *self)
 	self->filename = filename;
 
 	hkl3d_post_unserialize(self);
+
+	hkl3d_fprintf(stdout, self);
 }
 
