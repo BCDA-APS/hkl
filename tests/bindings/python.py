@@ -23,7 +23,9 @@ Authors: Picca Frédéric-Emmanuel <picca@synchrotron-soleil.fr>
 """
 
 import math
+import numpy
 import unittest
+
 from gi.repository import GLib
 from gi.repository import Hkl
 
@@ -158,7 +160,7 @@ class TestAPI(unittest.TestCase):
             self.assertTrue(capabilities & Hkl.EngineCapabilities.READABLE)
             self.assertTrue(capabilities & Hkl.EngineCapabilities.WRITABLE)
             if engine.name_get() == "psi":
-                self.assertTrue(capabilities & Hkl.EngineCapabilities.INITIALIZABLE)
+                self.assertTrue(capabilities & Hkl.EngineCapabilities.INITIALIZABLE)  # noqa
 
         # check initialized_get/set
         for engine in engines.engines_get():
@@ -264,6 +266,41 @@ class TestAPI(unittest.TestCase):
         reflections = sample.reflections_get()
         for reflection in reflections:
             sample.del_reflection(reflection)
+
+    @unittest.skip("wip trajectories")
+    def test_trajectory_api(self):
+        """
+        enforce the HklTrajectory API
+        """
+        detector = Hkl.Detector.factory_new(Hkl.DetectorType(0))
+
+        factory = Hkl.factories()['K6C']
+        geometry = factory.create_new_geometry()
+        values_w = [0., 30., 0., 0., 0., 60.]
+        geometry.axes_values_set(values_w, Hkl.UnitEnum.USER)
+
+        sample = Hkl.Sample.new("toto")
+        lattice = sample.lattice_get()
+        lattice.set(1.54, 1.54, 1.54, 90, 90, 90, Hkl.UnitEnum.USER)
+        sample.lattice_set(lattice)
+
+        # compute all the pseudo axes managed by all engines
+        engines = factory.create_new_engine_list()
+        engines.init(geometry, detector, sample)
+
+        # pseudo + parameters -> axes
+        for engine in engines.engines_get():
+            pseudo_axes = engine.pseudo_axes_names_get()
+            traj = {pseudo: numpy.linspace(0, 0.5, 100) for pseudo in pseudo_axes}  # noqa
+
+            solutions = engine.trajectory_set(traj)
+            for solution in solutions.solutions_get():
+                self.assertTrue(isinstance(solution, dict))
+
+                # axes + parameters -> pseudo
+                traj = engine.trajectory_get(solution)
+                self.assertTrue(isinstance(traj, doct))
+
 
 if __name__ == '__main__':
     unittest.main()

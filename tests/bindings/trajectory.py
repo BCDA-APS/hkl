@@ -27,23 +27,19 @@ def compute_hkl_trajectories(engines, engine, hkl1=None, hkl2=None, n=100):
     k = numpy.linspace(hkl1[1], hkl2[1], n + 1)
     l = numpy.linspace(hkl1[2], hkl2[2], n + 1)
 
-    # set the hkl engine and get the results
+    trajectory = Hkl.Trajectory.new()
+
+    for key, values in zip(["h", "k", "l"], [h, k, l]):
+        trajectory.set(key, values, Hkl.UnitEnum.USER)
+
     trajectories = []
-    for hh, kk, ll in zip(h, k, l):
-        try:
-            solutions = engine.pseudo_axes_values_set([hh, kk, ll],
-                                                      Hkl.UnitEnum.USER)
-            first_solution = solutions.items()[0]
-            for i, item in enumerate(solutions.items()):
-                try:
-                    trajectories[i]
-                except IndexError:
-                    trajectories.append([])
-                values = item.geometry().axes_values_get(Hkl.UnitEnum.USER)
-                trajectories[i].append(values)
-            engines.select_solution(first_solution)
-        except GLib.GError, err:
-            pass
+    try:
+        solutions = engine.trajectory_set(trajectory)
+        for i, item in enumerate(solutions.items()):
+            for axis in item.geometry().axes_names_get():
+                trajectories[i].append(item.geometry().trajectory_axis_values_get(axis))
+    except GLib.GError, e:
+        pass
 
     return trajectories
 

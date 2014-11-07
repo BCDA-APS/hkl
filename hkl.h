@@ -518,6 +518,23 @@ HKLAPI int hkl_engine_list_get(HklEngineList *self) HKL_ARG_NONNULL(1);
 HKLAPI void hkl_engine_list_fprintf(FILE *f,
 				    const HklEngineList *self) HKL_ARG_NONNULL(1, 2);
 
+/* HklTrajectory */
+
+typedef struct _HklTrajectory HklTrajectory
+
+HKLAPI HklTrajectory *hkl_trajectory_new(void);
+
+HKLAPI void hkl_trajectory_free(HklTrajectory *self);
+
+HKLAPI int hkl_trajectory_set(HklTrajectory *self, const char *parameter,
+			      const double values[], int n_values,
+			      HklUnitEnum unit_type,
+			      GError **error) HKL_ARG_NONNULL(1, 2, 3) HKL_WARN_UNUSED_RESULT;
+
+HKLAPI int hkl_trajectory_get(const HklTrajectory *self, const char *parameter,
+			      double values[], int n_values,
+			      HklUnitEnum unit_type,
+			      GError **error) HKL_ARG_NONNULL(1, 2, 3) HKL_WARN_UNUSED_RESULT;
 /***********/
 /* Factory */
 /***********/

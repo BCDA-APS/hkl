@@ -492,6 +492,53 @@ static void parameters(void)
 }
 
 
+static int _trajectories(HklEngine *engine, HklEngineList *engine_list, unsigned int n)
+{
+	uint n_values;
+	GError *error = NULL;
+	int res = TRUE;
+	HklGeometry *geometry = hkl_engine_list_geometry_get(engine_list);
+	const darray_string *pseudo_axes = hkl_engine_pseudo_axes_names_get(engine);
+	const size_t n_pseudo_axes = darray_size(*pseudo_axes);
+	double targets[n_pseudo_axes];
+	double currents[n_pseudo_axes];
+
+	HklTrajectory *trajectory;
+	HklTrajectorySolutionList *solutions;
+	HklTrajectorySolution *solution;
+
+	/* select the parameters */
+	HklTrajectory *trajectory = hkl_trajectory_new(engine, parameters);
+	/* need the engine to be able to set the trajectory values
+	 * with the right unit */
+
+	hkl_trajectory_init(trajectory, parameters, n);
+	darray_foreach(parameter, parameters){
+		/* check that trajectories can be written */
+		hkl_trajectory_parameter_values_set(trajectory, parameter, targets, n_values, HKL_UNIT_USER, &error);
+		/* and read */
+		hkl_trajectory_parameter_values_get(trajectory, parameter, currents, n_values, HKL_UNIT_USER, &error);
+
+		/* check that all values are equals */
+		for(uint i=0; i<n_values; ++i)
+			res &= DIAG(fabs(targets[j] - currents[j]) < HKL_EPSILON);
+	}
+
+	/* compute the trajectory */
+	solutions = hkl_engine_trajectory_set(engine, trajectory, &error);
+	HKL_TRAJECTORY_LIST_FOREACH(solution, solutions){
+		currents = hkl_engine_trajectory_get(engine, solution, &error);
+	}
+	hkl_trajectory_solution_free(solutions);
+
+	return res;
+}
+
+static void trajectories(void)
+{
+	ok(TRUE == TEST_FOREACH_MODE(1, _trajectories), __func__);
+}
+
 int main(int argc, char** argv)
 {
 	double n;
@@ -512,6 +559,7 @@ int main(int argc, char** argv)
 	modes();
 	axes_names();
 	parameters();
+	trajectories();
 
 	return 0;
 }
