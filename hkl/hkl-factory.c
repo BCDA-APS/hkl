@@ -651,6 +651,57 @@ static HklEngineList *hkl_engine_list_new_petra3_p09_eh2(const HklFactory *facto
 
 REGISTER_DIFFRACTOMETER(petra3_p09_eh2, "PETRA3 P09 EH2", HKL_GEOMETRY_TYPE_PETRA3_P09_EH2_DESCRIPTION);
 
+/******************/
+/* APS POLAR      */
+/******************/
+
+#define HKL_GEOMETRY_TYPE_APS_POLAR_DESCRIPTION                                  \
+	"+ xrays source is fixed along the :math:`\\vec{x}` direction (1, 0, 0)\n"   \
+	"+ 4 axes for the sample\n"                                                  \
+	"\n"                                                                         \
+	"  + **mu** : rotation around the :math:`-\\vec{y}` direction (0, -1, 0)\n"  \
+	"  + **omega** : rotation around the :math:`\\vec{z}` direction (0, 0, 1)\n" \
+	"  + **chi** : rotating around the :math:`\\vec{x}` direction (1, 0, 0)\n"   \
+	"  + **phi** : rotating around the :math:`\\vec{z}` direction (0, 0, 1)\n"   \
+	"\n"                                                                         \
+	"+ 3 axis for the detector\n"                                                \
+	"\n"                                                                         \
+	"  + **mu** : rotation around the :math:`-\\vec{y}` direction (0, -1, 0)\n"  \
+	"  + **delta** : rotation around the :math:`\\vec{z}` direction (0, 0, 1)\n" \
+	"  + **gamma** : rotation around the :math:`-\\vec{y}` direction (0, -1, 0)\n"
+
+static const char *hkl_geometry_aps_polar_axes[] = {"mu", "omega", "chi", "phi", "delta", "gamma"};
+
+static HklGeometry *hkl_geometry_new_aps_polar(const HklFactory *factory)
+{
+	HklGeometry *self = hkl_geometry_new(factory);
+	HklHolder *h;
+
+	h = hkl_geometry_add_holder(self);
+	hkl_holder_add_rotation_axis(h, "mu", 0, -1, 0);
+	hkl_holder_add_rotation_axis(h, "omega", 0, 0, 1);
+	hkl_holder_add_rotation_axis(h, "chi", 1, 0, 0);
+	hkl_holder_add_rotation_axis(h, "phi", 0, 0, 1);
+
+	h = hkl_geometry_add_holder(self);
+	hkl_holder_add_rotation_axis(h, "mu", 0, -1, 0);
+	hkl_holder_add_rotation_axis(h, "delta", 0, 0, 1);
+	hkl_holder_add_rotation_axis(h, "gamma", 0, -1, 0);
+
+	return self;
+}
+
+static HklEngineList *hkl_engine_list_new_aps_polar(const HklFactory *factory)
+{
+	HklEngineList *self = hkl_engine_list_new();
+
+	hkl_engine_list_add(self, hkl_engine_aps_polar());
+
+	return self;
+}
+
+REGISTER_DIFFRACTOMETER(aps_polar, "APS POLAR", HKL_GEOMETRY_TYPE_APS_POLAR_DESCRIPTION);
+
 /***********************/
 /* SOLEIL SIXS MED 2+3 */
 /***********************/
