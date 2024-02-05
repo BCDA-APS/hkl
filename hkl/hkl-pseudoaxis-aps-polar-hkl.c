@@ -182,7 +182,7 @@ HklEngine *hkl_engine_aps_polar_hkl_new(void)
 
 	self = hkl_engine_hkl_new();
 
-	default_mode = zaxis_alpha_fixed();
+	default_mode = fourc_constant_phi_horizontal();
 	hkl_engine_add_mode(self, default_mode);
 	hkl_engine_mode_set(self, default_mode);
 
@@ -192,7 +192,6 @@ HklEngine *hkl_engine_aps_polar_hkl_new(void)
 	hkl_engine_add_mode(self, fourc_bissector_horizontal());
 	hkl_engine_add_mode(self, fourc_constant_omega_horizontal());
 	hkl_engine_add_mode(self, fourc_constant_chi_horizontal());
-	hkl_engine_add_mode(self, fourc_constant_phi_horizontal());
 
 	return self;
 }
