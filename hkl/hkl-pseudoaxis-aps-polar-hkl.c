@@ -203,6 +203,76 @@ static HklMode *psi_constant()
 	return hkl_mode_psi_new(&info);
 }
 
+static HklMode *psi_constant_vertical(void)
+{
+	static const char *axes_r[] = {"mu", "omega", "chi", "phi", "gamma", "delta"};
+	static const char *axes_w[] = {"omega", "chi", "phi", "delta"};
+	static const HklFunction *functions[] = {&psi_constant_vertical_func};
+	static const HklParameter parameters[] = {
+		{
+			HKL_PARAMETER_DEFAULTS,
+			.name = "h2",
+			.range = {.min = -1, .max = 1},
+			._value = 1,
+		},
+		{
+			HKL_PARAMETER_DEFAULTS,
+			.name = "k2",
+			.range = {.min = -1, .max = 1},
+			._value = 0,
+		},
+		{
+			HKL_PARAMETER_DEFAULTS,
+			.name = "l2",
+			.range = {.min = -1, .max = 1},
+			._value = 0,
+		},
+		{HKL_PARAMETER_DEFAULTS_ANGLE, .name = "psi"},
+	};
+	static const HklModeAutoInfo info = {
+		HKL_MODE_AUTO_INFO_WITH_PARAMS(__func__, axes_r, axes_w, functions, parameters),
+	};
+
+	return hkl_mode_auto_new(&info,
+							 &psi_constant_vertical_mode_operations,
+							 TRUE);
+}
+
+static HklMode *psi_constant_horizontal(void)
+{
+	static const char *axes_r[] = {"mu", "omega", "chi", "phi", "gamma", "delta"};
+	static const char *axes_w[] = {"omega", "chi", "phi", "gamma"};
+	static const HklFunction *functions[] = {&psi_constant_vertical_func};
+	static const HklParameter parameters[] = {
+		{
+			HKL_PARAMETER_DEFAULTS,
+			.name = "h2",
+			.range = {.min = -1, .max = 1},
+			._value = 1,
+		},
+		{
+			HKL_PARAMETER_DEFAULTS,
+			.name = "k2",
+			.range = {.min = -1, .max = 1},
+			._value = 0,
+		},
+		{
+			HKL_PARAMETER_DEFAULTS,
+			.name = "l2",
+			.range = {.min = -1, .max = 1},
+			._value = 0,
+		},
+		{HKL_PARAMETER_DEFAULTS_ANGLE, .name = "psi"},
+	};
+	static const HklModeAutoInfo info = {
+		HKL_MODE_AUTO_INFO_WITH_PARAMS(__func__, axes_r, axes_w, functions, parameters),
+	};
+
+	return hkl_mode_auto_new(&info,
+							 &psi_constant_vertical_mode_operations,
+							 TRUE);
+}
+
 /**********************/
 /* pseudo axis engine */
 /**********************/
@@ -224,6 +294,11 @@ HklEngine *hkl_engine_aps_polar_hkl_new(void)
 	hkl_engine_add_mode(self, fourc_bissector_horizontal());
 	hkl_engine_add_mode(self, fourc_constant_omega_horizontal());
 	hkl_engine_add_mode(self, fourc_constant_chi_horizontal());
+
+	/* Which one of these modes do we want? */
+	hkl_engine_add_mode(self, psi_constant());			  // copied from hkl-pseudoaxis-e6c-psi.c
+	hkl_engine_add_mode(self, psi_constant_vertical());	  // copied from hkl-pseudoaxis-e6c-hkl.c
+	hkl_engine_add_mode(self, psi_constant_horizontal()); // copied from hkl-pseudoaxis-e6c-hkl.c
 
 	return self;
 }
