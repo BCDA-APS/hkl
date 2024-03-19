@@ -695,7 +695,7 @@ static HklEngineList *hkl_engine_list_new_aps_polar(const HklFactory *factory)
 {
 	HklEngineList *self = hkl_engine_list_new();
 
-	hkl_engine_list_add(self, hkl_engine_aps_polar());
+	hkl_engine_list_add(self, hkl_engine_aps_polar_hkl_new());
 
 	return self;
 }

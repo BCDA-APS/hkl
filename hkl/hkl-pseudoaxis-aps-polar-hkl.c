@@ -25,6 +25,7 @@
 #include <math.h>						 // for fmod, M_PI
 #include "hkl-pseudoaxis-auto-private.h" // for HklFunction, etc
 #include "hkl-pseudoaxis-common-hkl-private.h"
+#include "hkl-pseudoaxis-common-psi-private.h"  // for hkl_engine_psi_new, etc
 #include "hkl-pseudoaxis-private.h"			// for hkl_engine_add_mode
 #include "hkl/ccan/array_size/array_size.h" // for ARRAY_SIZE
 #include "hkl.h"							// for HklMode, HklEngine, etc
