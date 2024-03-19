@@ -178,24 +178,9 @@ static HklMode *psi_constant()
 	static const char *axes_w[] = {"omega", "chi", "phi", "delta"};
 	static const HklFunction *functions[] = {&psi_func};
 	static const HklParameter parameters[] = {
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "h1",
-			.range = {.min = -1, .max = 1},
-			._value = 1,
-		},
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "k1",
-			.range = {.min = -1, .max = 1},
-			._value = 1,
-		},
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "l1",
-			.range = {.min = -1, .max = 1},
-			._value = 1,
-		},
+		{HKL_PARAMETER_DEFAULTS, .name = "h1", .range = {.min = -1, .max = 1}, ._value = 1,},
+		{HKL_PARAMETER_DEFAULTS, .name = "k1", .range = {.min = -1, .max = 1}, ._value = 1,},
+		{HKL_PARAMETER_DEFAULTS, .name = "l1", .range = {.min = -1, .max = 1}, ._value = 1,},
 	};
 	static const HklModeAutoInfo info = {
 		HKL_MODE_AUTO_INFO_WITH_PARAMS(__func__, axes_r, axes_w, functions, parameters),
@@ -210,24 +195,9 @@ static HklMode *psi_constant_vertical(void)
 	static const char *axes_w[] = {"omega", "chi", "phi", "delta"};
 	static const HklFunction *functions[] = {&psi_constant_vertical_func};
 	static const HklParameter parameters[] = {
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "h2",
-			.range = {.min = -1, .max = 1},
-			._value = 1,
-		},
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "k2",
-			.range = {.min = -1, .max = 1},
-			._value = 0,
-		},
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "l2",
-			.range = {.min = -1, .max = 1},
-			._value = 0,
-		},
+		{HKL_PARAMETER_DEFAULTS, .name = "h2", .range = {.min = -1, .max = 1}, ._value = 1,},
+		{HKL_PARAMETER_DEFAULTS, .name = "k2", .range = {.min = -1, .max = 1}, ._value = 0,},
+		{HKL_PARAMETER_DEFAULTS, .name = "l2", .range = {.min = -1, .max = 1}, ._value = 0,},
 		{HKL_PARAMETER_DEFAULTS_ANGLE, .name = "psi"},
 	};
 	static const HklModeAutoInfo info = {
@@ -245,24 +215,9 @@ static HklMode *psi_constant_horizontal(void)
 	static const char *axes_w[] = {"omega", "chi", "phi", "gamma"};
 	static const HklFunction *functions[] = {&psi_constant_vertical_func};
 	static const HklParameter parameters[] = {
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "h2",
-			.range = {.min = -1, .max = 1},
-			._value = 1,
-		},
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "k2",
-			.range = {.min = -1, .max = 1},
-			._value = 0,
-		},
-		{
-			HKL_PARAMETER_DEFAULTS,
-			.name = "l2",
-			.range = {.min = -1, .max = 1},
-			._value = 0,
-		},
+		{HKL_PARAMETER_DEFAULTS, .name = "h2", .range = {.min = -1, .max = 1}, ._value = 1,},
+		{HKL_PARAMETER_DEFAULTS, .name = "k2", .range = {.min = -1, .max = 1}, ._value = 0,},
+		{HKL_PARAMETER_DEFAULTS, .name = "l2", .range = {.min = -1, .max = 1}, ._value = 0,},
 		{HKL_PARAMETER_DEFAULTS_ANGLE, .name = "psi"},
 	};
 	static const HklModeAutoInfo info = {
